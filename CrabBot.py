@@ -30,6 +30,10 @@ async def on_message(message):
         num = random.randint(1, (len(mobas) - 1))
         await client.send_message(message.channel, "This is a strange {} mod".format(mobas[num]))
 
+    if message.content.startswith('!annoy'):
+        # TODO anti-spam cooldown (probably a good idea for most commands)
+        await client.send_message(message.channel, "Ho ho ha ha!", tts=True)
+
 
 # IMPROVEMENT give option to use args instead of cfg file
 # if __name__ == "__main__":
