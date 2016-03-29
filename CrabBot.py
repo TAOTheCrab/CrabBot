@@ -40,7 +40,10 @@ username = user_config.readline()
 password = user_config.readline()
 user_config.close()
 
+<<<<<<< HEAD
 username = username.strip('\n\r')
 password = password.strip('\n\r')
 
+=======
+>>>>>>> origin/master
 client.run(username, password)
