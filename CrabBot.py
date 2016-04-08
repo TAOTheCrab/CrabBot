@@ -44,24 +44,32 @@ async def annoy():
 @bot.command(help='For the unruly patron')
 async def sir():
     # Yes, possibly having repeats is intentional, more fun that way
-    placeOne = random.randint(1, (len(places) - 1))
-    placeTwo = random.randint(1, (len(places) - 1))
-    reply = "Sir, this is {}, not {}.".format(places[placeOne], places[placeTwo])
+    place_one = random.randint(1, (len(places) - 1))
+    place_two = random.randint(1, (len(places) - 1))
+    reply = "Sir, this is {}, not {}.".format(places[place_one], places[place_two])
     await bot.say(reply)
 
 @bot.command()
 async def assist():
     await bot.say("Help is transient, and for some reason is not provided here.")
 
-@bot.command()
-async def thumbsup():
-    await bot.reply("👍")
+@bot.command(help="👍")
+async def thumbsup(num = '1'):
+    if num not in ('nope', '0'):
+        try:
+            number = int(num)
+        except ValueError:
+            number = 1
+        await bot.reply("👍" * number)
+    else:
+        await bot.say("Awww")
 
 # IMPROVEMENT give option to use args instead of cfg file
 # if __name__ == "__main__":
 
 user_config = open('user.cfg', 'r')
 # TODO probably define a better cfg layout than username\n password
+# There are almost definitely security concerns in the following code, be careful using a valuable account
 username = user_config.readline()
 password = user_config.readline()
 user_config.close()
