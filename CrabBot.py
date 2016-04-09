@@ -67,14 +67,7 @@ async def thumbsup(num = '1'):
 # IMPROVEMENT give option to use args instead of cfg file
 # if __name__ == "__main__":
 
-user_config = open('user.cfg', 'r')
-# TODO probably define a better cfg layout than username\n password
-# There are almost definitely security concerns in the following code, be careful using a valuable account
-username = user_config.readline()
-password = user_config.readline()
-user_config.close()
+user_cfg = open("user.cfg", 'r')
+login = user_cfg.read()
 
-username = username.strip('\n\r')
-password = password.strip('\n\r')
-
-bot.run(username, password)
+bot.run(login)
