@@ -68,6 +68,9 @@ async def thumbsup(num = '1'):
 # if __name__ == "__main__":
 
 user_cfg = open("user.cfg", 'r')
-login = user_cfg.read()
+login = user_cfg.readline()
+user_cfg.close()
+
+login = login.strip('\n\r')
 
 bot.run(login)
