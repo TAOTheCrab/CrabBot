@@ -67,10 +67,9 @@ async def thumbsup(num = '1'):
 # IMPROVEMENT give option to use args instead of cfg file
 # if __name__ == "__main__":
 
+# Might want to add more cfg options later
 user_cfg = open("user.cfg", 'r')
-login = user_cfg.readline()
+login = user_cfg.readline().rstrip()
 user_cfg.close()
-
-login = login.strip('\n\r')
 
 bot.run(login)
