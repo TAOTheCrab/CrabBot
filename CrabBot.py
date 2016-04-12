@@ -39,9 +39,7 @@ async def update_profile():
     picture = open('CrabBot.jpg', 'rb')
     picture_bits = picture.read()
     picture.close()
-    # NOTE: doesn't work. I have no idea which profile I'm supposed to be editing here.
-    # Just wanted to upload an avatar for the bot user, then to test I tried changing the name.
-    bot.edit_profile(username="CrabBotIsAlive", avatar=picture_bits)
+    await bot.edit_profile(avatar=picture_bits)
     print("Updated profile")
 
 @bot.command(help='The bots have something to say')
