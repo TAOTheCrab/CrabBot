@@ -8,6 +8,12 @@ import discord
 from discord.ext import commands
 import random
 import logging
+import time
+
+# Needed for voice
+# TODO Make optional in some way
+if not discord.opus.is_loaded():
+    discord.opus.load_opus('opus')
 
 bot = commands.Bot(command_prefix='!crab', description="Huh, another bot")
 
@@ -19,12 +25,24 @@ places = ["Desert Bus", "the woods", "a Discord server", "DotA", "a video game",
 
 logging.basicConfig(level=logging.INFO)
 
+# https://github.com/Rapptz/discord.py/blob/async/examples/basic_bot.py
 @bot.event
 async def on_ready():
     print('Logged in as')
     print(bot.user.name)
     print(bot.user.id)
     print('------')
+
+@bot.command(hidden=True)
+async def update_profile():
+    # As far as I can tell, Discord's official API only supports JPEG
+    picture = open('CrabBot.jpg', 'rb')
+    picture_bits = picture.read()
+    picture.close()
+    # NOTE: doesn't work. I have no idea which profile I'm supposed to be editing here.
+    # Just wanted to upload an avatar for the bot user, then to test I tried changing the name.
+    bot.edit_profile(username="CrabBotIsAlive", avatar=picture_bits)
+    print("Updated profile")
 
 @bot.command(help='The bots have something to say')
 async def takeover():
@@ -64,8 +82,41 @@ async def thumbsup(num = '1'):
     else:
         await bot.say("Awww")
 
+# https://github.com/Rapptz/discord.py/blob/async/examples/playlist.py
+
+# Connects to message author's voice channel, plays music, then disconnects (like Airhorn Solutions)
+@bot.command(pass_context=True, help="Lost?")
+async def test_voice(ctx):
+    if bot.is_voice_connected():
+        # for now, assume we don't need to reconnect (obv we'll dc at end of function, but for now...)
+        # this is mostly just to remind myself that this might be a concern later
+        pass
+    else:
+        channel_name = ctx.message.author.voice_channel
+        if channel_name == None:
+            await bot.reply("Try being in a voice channel first")
+            return
+
+        await bot.join_voice_channel(channel_name)
+
+    # TODO figure out discord.py cogs (ext/commands/bot.py) for eg. player.stop()
+    # in meantime global player var?
+    player = bot.voice.create_ffmpeg_player("wayShort.ogg", options='-af "volume=0.2"')
+    # TODO figure out if there's an async way to play stuff
+    player.run()
+
+    print("stopped playing music")
+
+    await bot.voice.disconnect()
+    #ffmpeg_player should call stop when it finishes
+
 # IMPROVEMENT give option to use args instead of cfg file
 # if __name__ == "__main__":
+
+@bot.command()
+async def stop():
+    # NOTE: Currently does not work as intended, will not interrupt playback
+    await bot.voice.disconnect()
 
 # Might want to add more cfg options later
 user_cfg = open("user.cfg", 'r')
