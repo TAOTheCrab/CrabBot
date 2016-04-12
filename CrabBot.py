@@ -25,12 +25,18 @@ places = ["Desert Bus", "the woods", "a Discord server", "DotA", "a video game",
 
 logging.basicConfig(level=logging.INFO)
 
+def log_command(used):
+    # TODO convert to Context.command. Set pass_context=True for all commands,
+    # or look into overriding process_commands
+    logging.info("Command: " + used)
+
 # https://github.com/Rapptz/discord.py/blob/async/examples/basic_bot.py
 @bot.event
 async def on_ready():
     print('Logged in as')
     print(bot.user.name)
     print(bot.user.id)
+    print("Prefix: " + bot.command_prefix)
     print('------')
 
 @bot.command(hidden=True)
@@ -59,6 +65,7 @@ async def annoy():
 
 @bot.command(help='For the unruly patron')
 async def sir():
+    log_command("sir")
     # Yes, possibly having repeats is intentional, more fun that way
     place_one = random.randint(1, (len(places) - 1))
     place_two = random.randint(1, (len(places) - 1))
