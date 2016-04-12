@@ -82,9 +82,7 @@ async def thumbsup(num = '1'):
 
 # https://github.com/Rapptz/discord.py/blob/async/examples/playlist.py
 
-# Connects to message author's voice channel, plays music, then disconnects (like Airhorn Solutions)
-@bot.command(pass_context=True, help="Lost?")
-async def test_voice(ctx):
+async def connect_voice(ctx):
     if bot.is_voice_connected():
         # for now, assume we don't need to reconnect (obv we'll dc at end of function, but for now...)
         # this is mostly just to remind myself that this might be a concern later
@@ -97,24 +95,54 @@ async def test_voice(ctx):
 
         await bot.join_voice_channel(channel_name)
 
+player = None
+
+# Connects to message author's voice channel, plays music, then disconnects (like Airhorn Solutions)
+@bot.command(pass_context=True, help="Lost?")
+async def test_voice(ctx):
+    await connect_voice(ctx)
+
     # TODO figure out discord.py cogs (ext/commands/bot.py) for eg. player.stop()
     # in meantime global player var?
     player = bot.voice.create_ffmpeg_player("wayShort.ogg", options='-af "volume=0.2"')
     # TODO figure out if there's an async way to play stuff
+    # Examples say this should be player.start(), but that doesn't seem to exist?
     player.run()
 
     print("stopped playing music")
 
-    await bot.voice.disconnect()
-    #ffmpeg_player should call stop when it finishes
+    if bot.is_voice_connected():
+        await bot.voice.disconnect()
 
-# IMPROVEMENT give option to use args instead of cfg file
-# if __name__ == "__main__":
+@bot.command(pass_context=True)
+async def test_yt(ctx, video=None):
+    await connect_voice(ctx)
+
+    if video is not None:
+        player = await bot.voice.create_ytdl_player(video, options='-af "volume=0.2"')
+        player.run()
+
+        print("stopped streaming")
+
+    if bot.is_voice_connected():
+        await bot.voice.disconnect()
 
 @bot.command()
 async def stop():
     # NOTE: Currently does not work as intended, will not interrupt playback
-    await bot.voice.disconnect()
+    # Also tends to just crash by having multiple tasks call disconnect
+    # Clearly I do not understand asyncio
+
+    if player is not None:
+        # Try to get the player to stop. May not be the right function and/or procedure.
+        player.stop()
+        print("stopped player")
+
+    if bot.is_voice_connected():
+        await bot.voice.disconnect()
+
+# IMPROVEMENT give option to use args instead of cfg file
+# if __name__ == "__main__":
 
 # Might want to add more cfg options later
 user_cfg = open("user.cfg", 'r')
