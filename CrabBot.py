@@ -54,8 +54,8 @@ async def takeover():
 
 @bot.command(help='Well, what is this Lords Management then?', aliases=['lol'])
 async def dota():
-    num = random.randint(1, (len(mobas) - 1))
-    await bot.say("This is a strange {} mod".format(mobas[num]))
+    moba = random.choice(mobas)
+    await bot.say("This is a strange {} mod".format(moba))
 
 @bot.command(enabled=False, hidden=True)
 async def annoy():
@@ -67,9 +67,9 @@ async def annoy():
 async def sir():
     log_command("sir")
     # Yes, possibly having repeats is intentional, more fun that way
-    place_one = random.randint(1, (len(places) - 1))
-    place_two = random.randint(1, (len(places) - 1))
-    reply = "Sir, this is {}, not {}.".format(places[place_one], places[place_two])
+    place_one = random.choice(places)
+    place_two = random.choice(places)
+    reply = "Sir, this is {}, not {}.".format(place_one, place_two)
     await bot.say(reply)
 
 @bot.command()
