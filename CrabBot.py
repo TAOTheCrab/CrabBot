@@ -10,11 +10,6 @@ from discord.ext import commands
 import logging
 import random
 
-# Needed for voice
-# TODO Make optional in some way
-if not discord.opus.is_loaded():
-    discord.opus.load_opus('opus')
-
 bot = commands.Bot(command_prefix='!crab', description="Huh, another bot")
 
 # TODO It would probably be nicer to store these somewhere else
@@ -116,6 +111,11 @@ async def adventure():
 # https://github.com/Rapptz/discord.py/blob/async/examples/playlist.py
 
 async def connect_voice(ctx):
+    # Needed for voice
+    # TODO Make optional in some way
+    if not discord.opus.is_loaded():
+        discord.opus.load_opus('opus')
+
     if bot.is_voice_connected():
         # for now, assume we don't need to reconnect (obv we'll dc at end of function, but for now...)
         # this is mostly just to remind myself that this might be a concern later
