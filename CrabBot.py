@@ -4,11 +4,11 @@
 #
 # Requires user.cfg with valid username/password combo
 
+import asyncio
 import discord
 from discord.ext import commands
-import random
 import logging
-import time
+import random
 
 # Needed for voice
 # TODO Make optional in some way
@@ -18,10 +18,17 @@ if not discord.opus.is_loaded():
 bot = commands.Bot(command_prefix='!crab', description="Huh, another bot")
 
 # TODO It would probably be nicer to store these somewhere else
+# !dota
 mobas = ["Smite", "SMNC", "Strife", "Overwatch", "HoN", "AoS", "HotS"]
+# !sir
 places = ["Desert Bus", "the woods", "a Discord server", "DotA", "a video game",
             "a hall of Ricks", "an interdimensional peace zone", "the TARDIS",
             "Twitch chat", "Dark Souls", "Stack Overflow"]
+# !adventure
+deaths = ["skewered", "slapped to death", "tickled to sleep", "drowned", "stabbed", "lead pipe'd"]
+killers = ["a goblin", "fish", "a knight", "a roving band of thieves", "aliens", "a robot", "Colonel Catsup"]
+locations = ["Lordran", "a fish bowl", "space", "the castle", "the living room", "the first dungeon", "the boss room"]
+rewards = ["the Amulet of Yendor", "pride", "the Orb of Zot", "... uh, the devs will think of something", "the lordvessel", "humanity"]
 
 logging.basicConfig(level=logging.INFO)
 
@@ -74,7 +81,10 @@ async def sir():
 
 @bot.command()
 async def assist():
-    await bot.say("Help is transient, and for some reason is not provided here.")
+    if random.randint(1, 10) == 3: # 10%
+        await bot.say("Ok")
+    else:
+        await bot.say("Help is transient, and for some reason is not provided here.")
 
 @bot.command(help="👍")
 async def thumbsup(num = '1'):
@@ -86,6 +96,22 @@ async def thumbsup(num = '1'):
         await bot.reply("👍" * number)
     else:
         await bot.say("Awww")
+
+@bot.command(help="Go on a quest!")
+async def adventure():
+    await bot.say("Simulating adventure...")
+    await bot.type()
+    await asyncio.sleep(3) # suspense!
+    if random.randint(1,100) == 7: # 1% chance to win
+        reward = random.choice(rewards)
+        await bot.say("You win! You got {}!".format(reward))
+    else: # Ruin!
+        death = random.choice(deaths)
+        killer = random.choice(killers)
+        location = random.choice(locations)
+        await bot.say("You were {} by {} in {}".format(death, killer, location))
+
+# Begin voice section (pending separation)
 
 # https://github.com/Rapptz/discord.py/blob/async/examples/playlist.py
 
@@ -104,12 +130,14 @@ async def connect_voice(ctx):
 
 player = None
 
+# TODO? volume control (eg. '-af "volume={}"'.format{x}) be sure to clamp
+
 # Connects to message author's voice channel, plays music, then disconnects (like Airhorn Solutions)
 @bot.command(pass_context=True, help="Lost?")
 async def test_voice(ctx):
     await connect_voice(ctx)
 
-    # TODO figure out discord.py cogs (ext/commands/bot.py) for eg. player.stop()
+    # TODO figure out discord.py cogs (ext/commands/bot.py) for ex. player.stop()
     # in meantime global player var?
     player = bot.voice.create_ffmpeg_player("wayShort.ogg", options='-af "volume=0.2"')
     # TODO figure out if there's an async way to play stuff
@@ -147,6 +175,8 @@ async def stop():
 
     if bot.is_voice_connected():
         await bot.voice.disconnect()
+
+# End voice section
 
 # IMPROVEMENT give option to use args instead of cfg file
 # if __name__ == "__main__":
