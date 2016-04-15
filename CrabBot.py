@@ -44,7 +44,7 @@ async def on_ready():
 @bot.command(hidden=True)
 async def update_profile():
     # As far as I can tell, Discord's official API only supports JPEG
-    picture = open('CrabBot.jpg', 'rb')
+    picture = open('assets/CrabBot.jpg', 'rb')
     picture_bits = picture.read()
     picture.close()
     await bot.edit_profile(avatar=picture_bits)
@@ -139,7 +139,7 @@ async def test_voice(ctx):
 
     # TODO figure out discord.py cogs (ext/commands/bot.py) for ex. player.stop()
     # in meantime global player var?
-    player = bot.voice.create_ffmpeg_player("wayShort.ogg", options='-af "volume=0.2"')
+    player = bot.voice.create_ffmpeg_player("assets/memes/wayShort.ogg", options='-af "volume=0.2"')
     # TODO figure out if there's an async way to play stuff
     # Examples say this should be player.start(), but that doesn't seem to exist?
     player.run()
