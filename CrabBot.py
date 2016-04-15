@@ -2,7 +2,7 @@
 # NOTE: using Python3.5+ async syntax
 # Simple Discord chatbot for fun
 #
-# Requires user.cfg with valid username/password combo
+# Requires user.cfg with valid token
 
 import asyncio
 import discord
