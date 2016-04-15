@@ -2,7 +2,7 @@
 # NOTE: using Python3.5+ async syntax
 # Simple Discord chatbot for fun
 #
-# Requires user.cfg with valid token
+# Requires a bot user token. See -h for details.
 
 import asyncio
 import discord
@@ -10,7 +10,28 @@ from discord.ext import commands
 import logging
 import random
 
-bot = commands.Bot(command_prefix='!crab', description="Huh, another bot")
+if __name__ == "__main__":
+    # Do argparse first so that -h can print and exit before anything else happens
+    import argparse
+    parser = argparse.ArgumentParser(description='A silly Discord bot')
+    token_args = parser.add_mutually_exclusive_group(required=True)
+    token_args.add_argument('-t', '--token', help="The bot user's login token")
+    token_args.add_argument('-f', '--file', type=argparse.FileType('r'), help="A file with the bot user's login token as the first line")
+
+    # IMPROVEMENT convert update_profile() to optional startup args (safer)
+    # IMPROVEMENT user.cfg. Look into argparse's fromfile_prefix_chars, otherwise have default location and arg-defined location
+
+    args = parser.parse_args()
+
+    if args.file is not None:
+        login = args.file.readline().rstrip()
+        args.file.close()
+    else:
+        login = args.token
+
+    bot = commands.Bot(command_prefix='!crab', description="Huh, another bot")
+
+# Begin core bot stuff
 
 # TODO It would probably be nicer to store these somewhere else
 # !dota
@@ -178,12 +199,8 @@ async def stop():
 
 # End voice section
 
-# IMPROVEMENT give option to use args instead of cfg file
-# if __name__ == "__main__":
+# End core bot
 
-# Might want to add more cfg options later
-user_cfg = open("user.cfg", 'r')
-login = user_cfg.readline().rstrip()
-user_cfg.close()
-
-bot.run(login)
+if __name__ == "__main__":
+    # Blocking, must be last. See discord.py Client for more info.
+    bot.run(login)
