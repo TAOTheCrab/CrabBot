@@ -97,7 +97,7 @@ async def sir():
 
 @bot.command()
 async def assist():
-    if random.randint(1, 10) == 3: # 10%
+    if random.randint(1, 10) == 5: # 10%
         await bot.say("Ok")
     else:
         await bot.say("Help is transient, and for some reason is not provided here.")
@@ -118,7 +118,7 @@ async def adventure():
     await bot.say("Simulating adventure...")
     await bot.type()
     await asyncio.sleep(3) # suspense!
-    if random.randint(1,100) == 7: # 1% chance to win
+    if random.randint(1,10) == 5: # 10% chance to win
         reward = random.choice(rewards)
         await bot.say("You win! You got {}!".format(reward))
     else: # Ruin!
