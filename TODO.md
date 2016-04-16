@@ -1,5 +1,6 @@
 Soon
 - Need solution for handling voice player state (with bot.command decorator, might be difficult to eg. make a class)
+- Voice output tends to cut out after a certain time, as if ffmpeg gets suspended. Investigate. Might be computer-specific.
 - Put eg. places into a better storage space. Plain files? sqlite?
     - a db would be nice for edited-while-running word lists. A little overblown though.
     - in-memory list to plain text. Have to figure out command line text input and safe shutdown.
