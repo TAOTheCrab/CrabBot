@@ -1,6 +1,8 @@
 Soon
 - Need solution for handling voice player state (with bot.command decorator, might be difficult to eg. make a class)
-- Put eg. places into a better storage space. Plain files? sqlite? (a db would be nice for edited-while-running word lists. A little overblown though.)
+- Put eg. places into a better storage space. Plain files? sqlite?
+    - a db would be nice for edited-while-running word lists. A little overblown though.
+    - in-memory list to plain text. Have to figure out command line text input and safe shutdown.
 
 Nice to have
 - Would like to make a custom help formatter
