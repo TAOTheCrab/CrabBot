@@ -4,32 +4,35 @@
 #
 # Requires a bot user token. See -h for details.
 
+import argparse
 import asyncio
 import discord
 from discord.ext import commands
 import logging
 import random
 
-if __name__ == "__main__":
-    # Do argparse first so that -h can print and exit before anything else happens
-    import argparse
-    parser = argparse.ArgumentParser(description='A silly Discord bot')
-    token_args = parser.add_mutually_exclusive_group(required=True)
-    token_args.add_argument('-t', '--token', help="The bot user's login token")
-    token_args.add_argument('-f', '--file', type=argparse.FileType('r'), help="A file with the bot user's login token as the first line")
+# Running the bot
 
-    # IMPROVEMENT convert update_profile() to optional startup args (safer)
-    # IMPROVEMENT user.cfg. Look into argparse's fromfile_prefix_chars, otherwise have default location and arg-defined location
+# Do argparse first so that -h can print and exit before anything else happens
+parser = argparse.ArgumentParser(description='A silly Discord bot')
+token_args = parser.add_mutually_exclusive_group(required=True)
+token_args.add_argument('-t', '--token', help="The bot user's login token")
+token_args.add_argument('-f', '--file', type=argparse.FileType('r'), help="A file with the bot user's login token as the first line")
 
-    args = parser.parse_args()
+# IMPROVEMENT convert update_profile() to optional startup args (safer)
+# IMPROVEMENT user.cfg. Look into argparse's fromfile_prefix_chars, otherwise have default location and arg-defined location
 
-    if args.file is not None:
-        login = args.file.readline().rstrip()
-        args.file.close()
-    else:
-        login = args.token
+args = parser.parse_args()
 
-    bot = commands.Bot(command_prefix='!crab', description="Huh, another bot")
+if args.file is not None:
+    login = args.file.readline().rstrip()
+    args.file.close()
+else:
+    login = args.token
+
+bot = commands.Bot(command_prefix='!crab', description="Huh, another bot")
+
+# End running the bot (more at end of file)
 
 # Begin core bot stuff
 
@@ -201,6 +204,7 @@ async def stop():
 
 # End core bot
 
-if __name__ == "__main__":
-    # Blocking, must be last. See discord.py Client for more info.
-    bot.run(login)
+# Running the bot, continued
+
+# Blocking, must be last. See discord.py Client for more info.
+bot.run(login)

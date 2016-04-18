@@ -10,5 +10,6 @@ Nice to have
 (see default [formatter](https://github.com/Rapptz/discord.py/blob/async/discord/ext/commands/formatter.py)
 and "formatter" commands.Bot arg)
 - Look into an exit more graceful than Interrupt (requires using client.start() instead of run())
-- Split into modules (eg. voice, management?, grouped commands? cogs?)
+- Split into modules (eg. running the bot, voice, management?, grouped commands? cogs?)
 - Command logging (probably Logging.INFO level. Timestamp. Usage stats?)
+- Voice command queueing (need voice system to be responsive first...)
