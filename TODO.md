@@ -1,14 +1,6 @@
-In progress (late night brainstorm so I don't forget)
-- Words data structure
-    - Integrate random.choice()?
-    - Do we have to use getters/setters to ensure async is referring to a global shared resource?
-        - Probably will work the same as before with global lists...
-    - The problem is that async functions seem to have their own space
-        - So an async update_vars may be creating its own eg. mobas var and thus deleting it when it's done
-
 Soon
-- Need solution for handling voice player state (with bot.command decorator, might be difficult to eg. make a class)
 - Voice output tends to cut out after a certain time, as if ffmpeg gets suspended. Investigate. Might be computer-specific.
+    - Might be gone now? Test
 - Put eg. places into a better storage space. Plain files? sqlite?
     - a db would be nice for edited-while-running word lists. A little overblown though.
     - in-memory list to plain text. Have to figure out command line text input and safe shutdown.
@@ -20,7 +12,9 @@ and "formatter" commands.Bot arg)
 - Look into an exit more graceful than Interrupt (requires using client.start() instead of run())
 - Split into modules (eg. running the bot, voice, management?, grouped commands? cogs?)
 - Command logging (probably Logging.INFO level. Timestamp. Usage stats?)
-- Voice command queueing (need voice system to be responsive first...)
+- Voice command queueing
+- Volume control (eg. '-af "volume={}"'.format{x}) Be sure to clamp (might make 20%/0.2 the max to not take over channels)
+- user.cfg. Look into argparse's fromfile_prefix_chars, otherwise have default location and arg-defined location
+    - Currently would only save passing -f or -t every launch, but we might want more options later
 
 Fun
-- crabcake :fish_cake:

@@ -19,8 +19,7 @@ token_args = parser.add_mutually_exclusive_group(required=True)
 token_args.add_argument('-t', '--token', help="The bot user's login token")
 token_args.add_argument('-f', '--file', type=argparse.FileType('r'), help="A file with the bot user's login token as the first line")
 
-# IMPROVEMENT convert update_profile() to optional startup args (safer)
-# IMPROVEMENT user.cfg. Look into argparse's fromfile_prefix_chars, otherwise have default location and arg-defined location
+# TODO convert update_profile() to optional startup args (safer)
 
 args = parser.parse_args()
 
@@ -48,12 +47,15 @@ deaths = ["skewered", "slapped to death", "tickled to sleep", "drowned", "stabbe
 killers = ["a goblin", "fish", "a knight", "a roving band of thieves", "aliens", "a robot", "Colonel Catsup"]
 locations = ["Lordran", "a fish bowl", "space", "the castle", "the living room", "the first dungeon", "the boss room"]
 rewards = ["the Amulet of Yendor", "pride", "the Orb of Zot", "... uh, the devs will think of something", "the lordvessel", "humanity"]
+# !cake
+cakes = [':cake:', ':fish_cake:', ':birthday:']
 
 logging.basicConfig(level=logging.INFO)
 
 def log_command(used):
     # TODO convert to Context.command. Set pass_context=True for all commands,
-    # or look into overriding process_commands
+    # or look into overriding process_commands.
+    # Probably not worth cluttering code further than just calls to logging though.
     logging.info("Command: " + used)
 
 # https://github.com/Rapptz/discord.py/blob/async/examples/basic_bot.py
@@ -115,6 +117,11 @@ async def thumbsup(num = '1'):
     else:
         await bot.say("Awww")
 
+@bot.command()
+async def cake(num = '1'):
+    reply = [random.choice(cakes) for _ in range(abs(int(num)))]
+    await bot.say(''.join(reply))
+
 @bot.command(help="Go on a quest!")
 async def adventure():
     await bot.say("Simulating adventure...")
@@ -130,12 +137,12 @@ async def adventure():
         await bot.say("You were {} by {} in {}".format(death, killer, location))
 
 # Begin voice section (pending separation)
+# TODO Make optional in some way
 
 # https://github.com/Rapptz/discord.py/blob/async/examples/playlist.py
 
 async def connect_voice(ctx):
     # Needed for voice
-    # TODO Make optional in some way
     if not discord.opus.is_loaded():
         discord.opus.load_opus('opus')
 
@@ -162,8 +169,6 @@ async def stop():
     if bot.is_voice_connected():
         await bot.voice.disconnect()
 
-# TODO? volume control (eg. '-af "volume={}"'.format{x}) be sure to clamp
-
 # Connects to message author's voice channel, plays music, then disconnects (like Airhorn Solutions)
 @bot.command(pass_context=True, help="Lost?")
 async def test_voice(ctx):
@@ -181,7 +186,7 @@ async def test_yt(ctx, video=None):
     await connect_voice(ctx)
 
     if video is not None:
-        #
+        # TODO further testing. stop doesn't seem to trigger (might be computer-specific)
         player = await bot.voice.create_ytdl_player(video, options='-af "volume=0.2"', after=stop)
         player.start()
 
