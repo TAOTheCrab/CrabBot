@@ -11,15 +11,28 @@ from discord.ext import commands
 import logging
 import random
 
+# Core bot function useful for startup
+async def update_profile(username=None, avatar=None):
+    if avatar is not None:
+        # As far as I can tell, Discord's official API only supports JPEG
+        new_avatar = open(picture, 'rb')
+        picture_bits = new_avatar.read()
+        new_avatar.close()
+    await bot.edit_profile(username=username, avatar=picture_bits)
+    logging.info("Updated profile")
+
 # Running the bot
 
 # Do argparse first so that -h can print and exit before anything else happens
 parser = argparse.ArgumentParser(description='A silly Discord bot')
 token_args = parser.add_mutually_exclusive_group(required=True)
-token_args.add_argument('-t', '--token', help="The bot user's login token")
-token_args.add_argument('-f', '--file', type=argparse.FileType('r'), help="A file with the bot user's login token as the first line")
+token_args.add_argument('-t', '--token', help="The bot user's login token. Use this or -f.")
+token_args.add_argument('-f', '--file', type=argparse.FileType('r'), help="A file with the bot user's login token as the first line. Use this or -t")
+parser.add_argument('-u', '--username', metavar='NEW-USERNAME', help="OPTIONAL update the bot with a new username when it logs in")
+parser.add_argument('-a', '--avatar', metavar='NEW-AVATAR', help="OPTIONAL update the bot with a new avatar when it logs in")
 
 # TODO convert update_profile() to optional startup args (safer)
+# PROBLEM can't currently update until logged in, but bot.run() is blocking
 
 args = parser.parse_args()
 
@@ -65,15 +78,6 @@ async def on_ready():
     print(bot.user.name)
     print(bot.user.id)
     print('------')
-
-@bot.command(hidden=True)
-async def update_profile():
-    # As far as I can tell, Discord's official API only supports JPEG
-    picture = open('assets/CrabBot.jpg', 'rb')
-    picture_bits = picture.read()
-    picture.close()
-    await bot.edit_profile(avatar=picture_bits)
-    print("Updated profile")
 
 @bot.command(help='The bots have something to say')
 async def takeover():
