@@ -165,8 +165,9 @@ async def test_voice(ctx):
     # in meantime global player var?
     player = bot.voice.create_ffmpeg_player("assets/memes/wayShort.ogg", options='-af "volume=0.2"')
     # TODO figure out if there's an async way to play stuff
-    # Examples say this should be player.start(), but that doesn't seem to exist?
-    player.run()
+    # player.start() is inherited from threading.Thread and auto-invokes player.run().
+    # Currently throws errors when the options are passed... run() has no problems
+    player.start()
 
     print("stopped playing music")
 
@@ -179,7 +180,7 @@ async def test_yt(ctx, video=None):
 
     if video is not None:
         player = await bot.voice.create_ytdl_player(video, options='-af "volume=0.2"')
-        player.run()
+        player.start()
 
         print("stopped streaming")
 
