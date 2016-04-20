@@ -1,3 +1,11 @@
+In progress (late night brainstorm so I don't forget)
+- Words data structure
+    - Integrate random.choice()?
+    - Do we have to use getters/setters to ensure async is referring to a global shared resource?
+        - Probably will work the same as before with global lists...
+    - The problem is that async functions seem to have their own space
+        - So an async update_vars may be creating its own eg. mobas var and thus deleting it when it's done
+
 Soon
 - Need solution for handling voice player state (with bot.command decorator, might be difficult to eg. make a class)
 - Voice output tends to cut out after a certain time, as if ffmpeg gets suspended. Investigate. Might be computer-specific.
@@ -13,3 +21,6 @@ and "formatter" commands.Bot arg)
 - Split into modules (eg. running the bot, voice, management?, grouped commands? cogs?)
 - Command logging (probably Logging.INFO level. Timestamp. Usage stats?)
 - Voice command queueing (need voice system to be responsive first...)
+
+Fun
+- crabcake :fish_cake:

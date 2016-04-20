@@ -139,19 +139,28 @@ async def connect_voice(ctx):
     if not discord.opus.is_loaded():
         discord.opus.load_opus('opus')
 
-    if bot.is_voice_connected():
-        # for now, assume we don't need to reconnect (obv we'll dc at end of function, but for now...)
-        # this is mostly just to remind myself that this might be a concern later
-        pass
-    else:
-        channel_name = ctx.message.author.voice_channel
-        if channel_name == None:
-            await bot.reply("Try being in a voice channel first")
-            return
+    channel_name = ctx.message.author.voice_channel
+    if channel_name == None:
+        await bot.reply("Try being in a voice channel first")
+        return None
 
+    try:
         await bot.join_voice_channel(channel_name)
+    except discord.ClientException as e:
+        await bot.say(e.message)
 
 player = None
+
+@bot.command()
+async def stop():
+
+    # TODO figure out global player (currently this is always None). voice.disconnect() covers us, but...
+    if player is not None:
+        player.stop()
+        print("stopped player")
+
+    if bot.is_voice_connected():
+        await bot.voice.disconnect()
 
 # TODO? volume control (eg. '-af "volume={}"'.format{x}) be sure to clamp
 
@@ -162,42 +171,21 @@ async def test_voice(ctx):
 
     # TODO figure out discord.py cogs (ext/commands/bot.py) for ex. player.stop()
     # in meantime global player var?
-    player = bot.voice.create_ffmpeg_player("assets/memes/wayShort.ogg", options='-af "volume=0.2"')
-    # TODO figure out if there's an async way to play stuff
-    # Examples say this should be player.start(), but that doesn't seem to exist?
-    player.run()
+    player = bot.voice.create_ffmpeg_player("assets/memes/wayShort.ogg", options='-af "volume=0.2"', after=stop)
+    player.start()
 
-    print("stopped playing music")
-
-    if bot.is_voice_connected():
-        await bot.voice.disconnect()
+    logging.info("Started testing voice")
 
 @bot.command(pass_context=True)
 async def test_yt(ctx, video=None):
     await connect_voice(ctx)
 
     if video is not None:
-        player = await bot.voice.create_ytdl_player(video, options='-af "volume=0.2"')
-        player.run()
+        #
+        player = await bot.voice.create_ytdl_player(video, options='-af "volume=0.2"', after=stop)
+        player.start()
 
-        print("stopped streaming")
-
-    if bot.is_voice_connected():
-        await bot.voice.disconnect()
-
-@bot.command()
-async def stop():
-    # NOTE: Currently does not work as intended, will not interrupt playback
-    # Also tends to just crash by having multiple tasks call disconnect
-    # Clearly I do not understand asyncio
-
-    if player is not None:
-        # Try to get the player to stop. May not be the right function and/or procedure.
-        player.stop()
-        print("stopped player")
-
-    if bot.is_voice_connected():
-        await bot.voice.disconnect()
+        logging.info("Started testing yt")
 
 # End voice section
 
