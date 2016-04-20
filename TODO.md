@@ -21,3 +21,6 @@ and "formatter" commands.Bot arg)
 - Split into modules (eg. running the bot, voice, management?, grouped commands? cogs?)
 - Command logging (probably Logging.INFO level. Timestamp. Usage stats?)
 - Voice command queueing (need voice system to be responsive first...)
+
+Fun
+- crabcake :fish_cake:
