@@ -30,7 +30,7 @@ if args.file is not None:
 else:
     login = args.token
 
-bot = commands.Bot(command_prefix='!crab', description="Huh, another bot")
+bot = commands.Bot(command_prefix=commands.when_mentioned_or('!crab'), description="Huh, another bot")
 
 # End running the bot (more at end of file)
 
@@ -62,7 +62,6 @@ async def on_ready():
     print('Logged in as')
     print(bot.user.name)
     print(bot.user.id)
-    print("Prefix: " + bot.command_prefix)
     print('------')
 
 @bot.command(hidden=True)
