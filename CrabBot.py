@@ -11,6 +11,8 @@ from discord.ext import commands
 import logging
 import random
 
+voice = True # Set to False to disable voice commands
+
 # Core bot function useful for startup
 async def update_profile(username=None, avatar=None):
     if avatar is not None:
@@ -146,14 +148,16 @@ async def adventure():
 # https://github.com/Rapptz/discord.py/blob/async/examples/playlist.py
 
 async def connect_voice(ctx):
-    # Needed for voice
-    if not discord.opus.is_loaded():
-        discord.opus.load_opus('opus')
+    # Might be nice to check if voice is True, but for now disabling commands should be enough
 
     channel_name = ctx.message.author.voice_channel
     if channel_name == None:
         await bot.reply("Try being in a voice channel first")
-        return None
+        return
+
+    # Needed for voice
+    if not discord.opus.is_loaded():
+        discord.opus.load_opus('opus')
 
     try:
         await bot.join_voice_channel(channel_name)
@@ -162,6 +166,7 @@ async def connect_voice(ctx):
 
 player = None
 
+# Doesn't hurt to keep enabled even if voice is False
 @bot.command()
 async def stop():
 
@@ -174,7 +179,7 @@ async def stop():
         await bot.voice.disconnect()
 
 # Connects to message author's voice channel, plays music, then disconnects (like Airhorn Solutions)
-@bot.command(pass_context=True, help="Lost?")
+@bot.command(enabled=voice, pass_context=True, help="Lost?")
 async def test_voice(ctx):
     await connect_voice(ctx)
 
@@ -185,7 +190,7 @@ async def test_voice(ctx):
 
     logging.info("Started testing voice")
 
-@bot.command(pass_context=True)
+@bot.command(enabled=voice, pass_context=True)
 async def test_yt(ctx, video=None):
     await connect_voice(ctx)
 
