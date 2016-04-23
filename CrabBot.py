@@ -162,7 +162,7 @@ async def connect_voice(ctx):
     try:
         await bot.join_voice_channel(channel_name)
     except discord.ClientException as e:
-        await bot.say(e.message)
+        logging.info(e)
 
 player = None
 
@@ -188,7 +188,7 @@ async def memes(ctx):
     player = bot.voice.create_ffmpeg_player("assets/memes/wayShort.ogg", options='-af "volume=0.2"', after=stop)
     player.start()
 
-    logging.info("Started testing voice")
+    logging.info("Started memes")
 
 @bot.command(enabled=voice, pass_context=True)
 async def stream(ctx, video=None):
@@ -199,7 +199,7 @@ async def stream(ctx, video=None):
         player = await bot.voice.create_ytdl_player(video, options='-af "volume=0.2"', after=stop)
         player.start()
 
-        logging.info("Started testing yt")
+        logging.info("Started streaming")
 
 # End voice section
 
