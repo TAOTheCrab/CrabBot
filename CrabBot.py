@@ -64,6 +64,9 @@ locations = ["Lordran", "a fish bowl", "space", "the castle", "the living room",
 rewards = ["the Amulet of Yendor", "pride", "the Orb of Zot", "... uh, the devs will think of something", "the lordvessel", "humanity"]
 # !cake
 cakes = [':cake:', ':fish_cake:', ':birthday:']
+# !memes
+# TODO instead, iterate over or otherwise choose from the contents of assets/memes/
+the_memes = ['DEATH.ogg', 'wayShort.ogg']
 
 logging.basicConfig(level=logging.INFO)
 
@@ -168,7 +171,7 @@ player = None
 
 # Doesn't hurt to keep enabled even if voice is False
 @bot.command()
-async def stop():
+async def stop_voice():
 
     # TODO figure out global player (currently this is always None). voice.disconnect() covers us, but...
     if player is not None:
@@ -185,7 +188,7 @@ async def memes(ctx):
 
     # TODO figure out discord.py cogs (ext/commands/bot.py) for ex. player.stop()
     # in meantime global player var?
-    player = bot.voice.create_ffmpeg_player("assets/memes/wayShort.ogg", options='-af "volume=0.2"', after=stop)
+    player = bot.voice.create_ffmpeg_player("assets/memes/"+random.choice(the_memes), options='-af "volume=0.2"', after=stop_voice)
     player.start()
 
     logging.info("Started memes")
@@ -196,7 +199,7 @@ async def stream(ctx, video=None):
 
     if video is not None:
         # TODO further testing. stop doesn't seem to trigger (might be computer-specific)
-        player = await bot.voice.create_ytdl_player(video, options='-af "volume=0.2"', after=stop)
+        player = await bot.voice.create_ytdl_player(video, options='-af "volume=0.2"', after=stop_voice)
         player.start()
 
         logging.info("Started streaming")
