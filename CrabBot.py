@@ -180,7 +180,7 @@ async def stop():
 
 # Connects to message author's voice channel, plays music, then disconnects (like Airhorn Solutions)
 @bot.command(enabled=voice, pass_context=True, help="Lost?")
-async def test_voice(ctx):
+async def memes(ctx):
     await connect_voice(ctx)
 
     # TODO figure out discord.py cogs (ext/commands/bot.py) for ex. player.stop()
@@ -191,7 +191,7 @@ async def test_voice(ctx):
     logging.info("Started testing voice")
 
 @bot.command(enabled=voice, pass_context=True)
-async def test_yt(ctx, video=None):
+async def stream(ctx, video=None):
     await connect_voice(ctx)
 
     if video is not None:
