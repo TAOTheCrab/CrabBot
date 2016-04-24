@@ -8,6 +8,7 @@ import argparse
 import asyncio
 import discord
 from discord.ext import commands
+from pathlib import Path
 import logging
 import random
 
@@ -22,9 +23,6 @@ async def update_profile(username=None, avatar=None):
         new_avatar.close()
     await bot.edit_profile(username=username, avatar=picture_bits)
     logging.info("Updated profile")
-
-def read_list_file(file):
-    pass
 
 # Running the bot
 
@@ -53,23 +51,29 @@ bot = commands.Bot(command_prefix=commands.when_mentioned_or('!crab'), descripti
 
 # Begin core bot stuff
 
-# TODO It would probably be nicer to store these somewhere else
+def read_list_file(filepath):
+    with filepath.open() as file_list:
+        words = [x.rstrip() for x in file_list]
+    return words
+
+# TODO make configurable
+assets_path = Path("assets")
+memes_path = Path("assets/memes")
+
 # !dota
-mobas = ["Smite", "SMNC", "Strife", "Overwatch", "HoN", "AoS", "HotS"]
+mobas = read_list_file(assets_path / "mobas.txt")
 # !sir
-places = ["Desert Bus", "the woods", "a Discord server", "DotA", "a video game",
-            "a hall of Ricks", "an interdimensional peace zone", "the TARDIS",
-            "Twitch chat", "Dark Souls", "Stack Overflow"]
+places = read_list_file(assets_path / "sir-places.txt")
 # !adventure
-deaths = ["skewered", "slapped to death", "tickled to sleep", "drowned", "stabbed", "lead pipe'd"]
-killers = ["a goblin", "fish", "a knight", "a roving band of thieves", "aliens", "a robot", "Colonel Catsup"]
-locations = ["Lordran", "a fish bowl", "space", "the castle", "the living room", "the first dungeon", "the boss room"]
-rewards = ["the Amulet of Yendor", "pride", "the Orb of Zot", "... uh, the devs will think of something", "the lordvessel", "humanity"]
+deaths = read_list_file(assets_path / "adventure-deaths.txt")
+killers = read_list_file(assets_path / "adventure-killers.txt")
+locations = read_list_file(assets_path / "adventure-locations.txt")
+rewards = read_list_file(assets_path / "adventure-rewards.txt")
 # !cake
-cakes = [':cake:', ':fish_cake:', ':birthday:']
+cakes = read_list_file(assets_path / "cakes.txt")
 # !memes
-# TODO instead, iterate over or otherwise choose from the contents of assets/memes/
-the_memes = ['DEATH.ogg', 'wayShort.ogg', 'HisNameIsEB.wav']
+# TODO? instead, iterate over or otherwise choose from the contents of assets/memes/
+the_memes = read_list_file(memes_path / "filelist.txt")
 
 logging.basicConfig(level=logging.INFO)
 

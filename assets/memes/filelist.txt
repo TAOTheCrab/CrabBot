@@ -1,0 +1,3 @@
+DEATH.ogg
+wayShort.ogg
+HisNameIsEB.wav
