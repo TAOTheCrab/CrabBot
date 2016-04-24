@@ -23,6 +23,9 @@ async def update_profile(username=None, avatar=None):
     await bot.edit_profile(username=username, avatar=picture_bits)
     logging.info("Updated profile")
 
+def read_list_file(file):
+    pass
+
 # Running the bot
 
 # Do argparse first so that -h can print and exit before anything else happens
@@ -66,7 +69,7 @@ rewards = ["the Amulet of Yendor", "pride", "the Orb of Zot", "... uh, the devs 
 cakes = [':cake:', ':fish_cake:', ':birthday:']
 # !memes
 # TODO instead, iterate over or otherwise choose from the contents of assets/memes/
-the_memes = ['DEATH.ogg', 'wayShort.ogg']
+the_memes = ['DEATH.ogg', 'wayShort.ogg', 'HisNameIsEB.wav']
 
 logging.basicConfig(level=logging.INFO)
 
