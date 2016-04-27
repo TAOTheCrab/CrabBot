@@ -200,7 +200,7 @@ async def memes(ctx):
 
     logging.info("Started memes")
 
-@bot.command(enabled=voice, pass_context=True)
+@bot.command(enabled=voice, pass_context=True help="Plays most things supported by youtube-dl")
 async def stream(ctx, video=None):
     await connect_voice(ctx)
 
