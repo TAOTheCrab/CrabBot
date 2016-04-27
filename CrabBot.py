@@ -54,6 +54,7 @@ bot = commands.Bot(command_prefix=commands.when_mentioned_or('!crab'), descripti
 def read_list_file(filepath):
     with filepath.open() as file_list:
         words = [x.rstrip() for x in file_list]
+    # TODO check whether trailing newlines make it into the list as blank strings
     return words
 
 # TODO make configurable
