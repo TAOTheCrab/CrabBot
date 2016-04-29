@@ -56,6 +56,9 @@ def read_list_file(filepath):
         words = [x.rstrip() for x in file_list]
     # TODO check whether trailing newlines make it into the list as blank strings
     return words
+# NOTES FOR LATER
+  # def update_lists():
+  #     global memes = **new memes list**
 
 # TODO make configurable
 assets_path = Path("assets")
@@ -201,7 +204,7 @@ async def memes(ctx):
 
     logging.info("Started memes")
 
-@bot.command(enabled=voice, pass_context=True help="Plays most things supported by youtube-dl")
+@bot.command(enabled=voice, pass_context=True, help="Plays most things supported by youtube-dl")
 async def stream(ctx, video=None):
     await connect_voice(ctx)
 
