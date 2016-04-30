@@ -56,28 +56,37 @@ def read_list_file(filepath):
         words = [x.rstrip() for x in file_list]
     # TODO check whether trailing newlines make it into the list as blank strings
     return words
-# NOTES FOR LATER
-  # def update_lists():
-  #     global memes = **new memes list**
 
 # TODO make configurable
 assets_path = Path("assets")
 memes_path = Path("assets/memes")
 
-# !dota
-mobas = read_list_file(assets_path / "mobas.txt")
-# !sir
-places = read_list_file(assets_path / "sir-places.txt")
-# !adventure
-deaths = read_list_file(assets_path / "adventure-deaths.txt")
-killers = read_list_file(assets_path / "adventure-killers.txt")
-locations = read_list_file(assets_path / "adventure-locations.txt")
-rewards = read_list_file(assets_path / "adventure-rewards.txt")
-# !cake
-cakes = read_list_file(assets_path / "cakes.txt")
-# !memes
-# TODO? instead, iterate over or otherwise choose from the contents of assets/memes/
-the_memes = read_list_file(memes_path / "filelist.txt")
+
+def update_lists():
+    # !dota
+    global mobas
+    mobas = read_list_file(assets_path / "mobas.txt")
+    # !sir
+    global places
+    places = read_list_file(assets_path / "sir-places.txt")
+    # !adventure
+    global deaths
+    deaths = read_list_file(assets_path / "adventure-deaths.txt")
+    global killers
+    killers = read_list_file(assets_path / "adventure-killers.txt")
+    global locations
+    locations = read_list_file(assets_path / "adventure-locations.txt")
+    global rewards
+    rewards = read_list_file(assets_path / "adventure-rewards.txt")
+    # !cake
+    global cakes
+    cakes = read_list_file(assets_path / "cakes.txt")
+    # !memes
+    # TODO? instead, iterate over or otherwise choose from the contents of assets/memes/
+    global the_memes
+    the_memes = read_list_file(memes_path / "filelist.txt")
+
+update_lists() # Initialize the lists
 
 logging.basicConfig(level=logging.INFO)
 
