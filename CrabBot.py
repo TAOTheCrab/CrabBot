@@ -11,6 +11,8 @@ from discord.ext import commands
 from pathlib import Path
 import logging
 import random
+import readline # Only for better terminal input support, eg. history
+from threading import Thread
 
 voice = True # Set to False to disable voice commands
 
@@ -230,5 +232,26 @@ async def stream(ctx, video=None):
 
 # Running the bot, continued
 
+def poll_terminal():
+    running = True
+    # TODO function dict
+
+    while running:
+        term_input = input()
+        if term_input == "help":
+            print("Uh, no. I'm gonna be annoying instead.") #TODO print terminal command help
+        elif term_input == "quit":
+            # TODO figure out if it's possible to end discord.Client without KeyboardInterrupt
+            #   Probably need to reimplement run() using start() with a different quit condition
+
+            # For now, tell user how to quit  so we don't leave them in the dark without a prompt
+            print("Disabling command input. Use ctrl+c to quit the bot.")
+            running = False
+
+input_thread = Thread(target=poll_terminal)
+input_thread.start()
+
 # Blocking, must be last. See discord.py Client for more info.
 bot.run(login)
+
+input_thread.join()
