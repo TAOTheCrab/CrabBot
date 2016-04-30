@@ -1,9 +1,4 @@
 Soon
-- Voice output tends to cut out after a certain time, as if ffmpeg gets suspended. Investigate. Might be computer-specific.
-    - Might be gone now? Test
-- Put eg. places into a better storage space. Plain files? sqlite?
-    - a db would be nice for edited-while-running word lists. A little overblown though.
-    - in-memory list to plain text. Have to figure out command line text input and safe shutdown.
 
 Nice to have
 - Would like to make a custom help formatter
@@ -16,5 +11,8 @@ and "formatter" commands.Bot arg)
 - Volume control (eg. '-af "volume={}"'.format{x}) Be sure to clamp (might make 20%/0.2 the max to not take over channels)
 - user.cfg. Look into argparse's fromfile_prefix_chars, otherwise have default location and arg-defined location
     - Currently would only save passing -f or -t every launch, but we might want more options later
+- Voice pre-encoded for opus (see AirhornBot's use of DCA)
+    - Might be worth tweaking discord.py's calls to FFMPEG for places we can't bypass it entirely
+        - FFMPEG has libopus support
 
 Fun
