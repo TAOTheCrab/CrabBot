@@ -194,6 +194,7 @@ player = None
 # Doesn't hurt to keep enabled even if voice is False
 @bot.command()
 async def stop_voice():
+    global player # just to be explicit. Might want to set player to None later?
 
     # TODO figure out global player (currently this is always None). voice.disconnect() covers us, but...
     if player is not None:
@@ -209,7 +210,7 @@ async def memes(ctx):
     await connect_voice(ctx)
 
     # TODO figure out discord.py cogs (ext/commands/bot.py) for ex. player.stop()
-    # in meantime global player var?
+    global player # in meantime global player var?
     player = bot.voice.create_ffmpeg_player("assets/memes/"+random.choice(the_memes), options='-af "volume=0.2"', after=stop_voice)
     player.start()
 
@@ -221,6 +222,7 @@ async def stream(ctx, video=None):
 
     if video is not None:
         # TODO further testing. stop doesn't seem to trigger (might be computer-specific)
+        global player
         player = await bot.voice.create_ytdl_player(video, options='-af "volume=0.2"', after=stop_voice)
         player.start()
 
@@ -240,11 +242,13 @@ def poll_terminal():
         term_input = input()
         if term_input == "help":
             print("Uh, no. I'm gonna be annoying instead.") #TODO print terminal command help
+            # NOTES could use function.__doc__ and docstrings for function help
         elif term_input == "quit":
             # TODO figure out if it's possible to end discord.Client without KeyboardInterrupt
             #   Probably need to reimplement run() using start() with a different quit condition
+            #   Could also use run() and just throw a KeyboardInterrupt or two. Ew...
 
-            # For now, tell user how to quit  so we don't leave them in the dark without a prompt
+            # For now, tell user how to quit so we don't leave them in the dark without a prompt
             print("Disabling command input. Use ctrl+c to quit the bot.")
             running = False
 
