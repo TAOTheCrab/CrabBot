@@ -1,6 +1,6 @@
-Soon
+## Soon
 
-Nice to have
+## Nice to have
 - Would like to make a custom help formatter
 (see default [formatter](https://github.com/Rapptz/discord.py/blob/async/discord/ext/commands/formatter.py)
 and "formatter" commands.Bot arg)
@@ -15,4 +15,4 @@ and "formatter" commands.Bot arg)
     - Might be worth tweaking discord.py's calls to FFMPEG for places we can't bypass it entirely
         - FFMPEG has libopus support
 
-Fun
+## Fun

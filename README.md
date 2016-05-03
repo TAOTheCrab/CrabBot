@@ -1,5 +1,5 @@
 # CrabBot
-Silly Discord bot for giggles and testing
+Silly Discord bot for funsies
 
 Mostly prints funny messages in reply to commands
 
