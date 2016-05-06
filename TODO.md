@@ -14,5 +14,6 @@ and "formatter" commands.Bot arg)
 - Voice pre-encoded for opus (see AirhornBot's use of DCA)
     - Might be worth tweaking discord.py's calls to FFMPEG for places we can't bypass it entirely
         - FFMPEG has libopus support
+- Translation strings (mostly as an excuse to shorten the help= sections)
 
 ## Fun

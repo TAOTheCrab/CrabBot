@@ -11,10 +11,10 @@ from discord.ext import commands
 from pathlib import Path
 import logging
 import random
-import readline # Only for better terminal input support, eg. history
+import readline  # Only for better terminal input support, eg. history
 from threading import Thread
 
-voice = True # Set to False to disable voice commands
+voice = True  # Set to False to disable voice commands
 
 # Core bot function useful for startup
 async def update_profile(username=None, avatar=None):
@@ -31,13 +31,18 @@ async def update_profile(username=None, avatar=None):
 # Do argparse first so that -h can print and exit before anything else happens
 parser = argparse.ArgumentParser(description='A silly Discord bot')
 token_args = parser.add_mutually_exclusive_group(required=True)
-token_args.add_argument('-t', '--token', help="The bot user's login token. Use this or -f.")
-token_args.add_argument('-f', '--file', type=argparse.FileType('r'), help="A file with the bot user's login token as the first line. Use this or -t")
-parser.add_argument('-u', '--username', metavar='NEW-USERNAME', help="OPTIONAL update the bot with a new username when it logs in")
-parser.add_argument('-a', '--avatar', metavar='NEW-AVATAR', help="OPTIONAL update the bot with a new avatar when it logs in")
+token_args.add_argument('-t', '--token',
+                        help="The bot user's login token. Use this or -f.")
+token_args.add_argument('-f', '--file', type=argparse.FileType('r'),
+                        help="A file with the bot user's login token as the first line. Use this or -t")
+parser.add_argument('-u', '--username', metavar='NEW-USERNAME',
+                    help="OPTIONAL update the bot with a new username when it logs in")
+parser.add_argument('-a', '--avatar', metavar='NEW-AVATAR',
+                    help="OPTIONAL update the bot with a new avatar when it logs in")
 
 # TODO convert update_profile() to optional startup args (safer)
 # PROBLEM can't currently update until logged in, but bot.run() is blocking
+# SOLUTION? do the update in the poll thread (use terminal command instead?)
 
 args = parser.parse_args()
 
@@ -47,11 +52,13 @@ if args.file is not None:
 else:
     login = args.token
 
-bot = commands.Bot(command_prefix=commands.when_mentioned_or('!crab'), description="Huh, another bot")
+bot = commands.Bot(command_prefix=commands.when_mentioned_or('!crab'),
+                   description="Huh, another bot")
 
 # End running the bot (more at end of file)
 
 # Begin core bot stuff
+
 
 def read_list_file(filepath):
     with filepath.open() as file_list:
@@ -84,21 +91,24 @@ def update_lists():
     global cakes
     cakes = read_list_file(assets_path / "cakes.txt")
     # !memes
-    # TODO? instead, iterate over or otherwise choose from the contents of assets/memes/
+    # TODO? instead, iterate over or choose from the contents of memes_path
     global the_memes
     the_memes = read_list_file(memes_path / "filelist.txt")
 
-update_lists() # Initialize the lists
+update_lists()  # Initialize the lists
 
 logging.basicConfig(level=logging.INFO)
+
 
 def log_command(used):
     # TODO convert to Context.command. Set pass_context=True for all commands,
     # or look into overriding process_commands.
-    # Probably not worth cluttering code further than just calls to logging though.
+    # Probably not worth cluttering code further than just calls to logging.
     logging.info("Command: " + used)
 
 # https://github.com/Rapptz/discord.py/blob/async/examples/basic_bot.py
+
+
 @bot.event
 async def on_ready():
     print('Logged in as')
@@ -106,20 +116,24 @@ async def on_ready():
     print(bot.user.id)
     print('------')
 
+
 @bot.command(help='The bots have something to say')
 async def takeover():
     await bot.say("Something something robots")
+
 
 @bot.command(help='Well, what is this Lords Management then?', aliases=['lol'])
 async def dota():
     moba = random.choice(mobas)
     await bot.say("This is a strange {} mod".format(moba))
 
+
 @bot.command(enabled=False, hidden=True)
 async def annoy():
     # TODO anti-spam cooldown (probably a good idea for most commands)
     # NOTE so far untested with bot.say version, unsure if tts works
     await bot.say("Ho ho ha ha!", tts=True)
+
 
 @bot.command(help='For the unruly patron')
 async def sir():
@@ -130,15 +144,17 @@ async def sir():
     reply = "Sir, this is {}, not {}.".format(place_one, place_two)
     await bot.say(reply)
 
+
 @bot.command()
 async def assist():
-    if random.randint(1, 10) == 5: # 10%
+    if random.randint(1, 10) == 5:  # 10%
         await bot.say("Ok")
     else:
         await bot.say("Help is transient, and for some reason is not provided here.")
 
+
 @bot.command(help="👍")
-async def thumbsup(num = '1'):
+async def thumbsup(num='1'):
     if num not in ('nope', '0'):
         try:
             number = int(num)
@@ -148,35 +164,37 @@ async def thumbsup(num = '1'):
     else:
         await bot.say("Awww")
 
+
 @bot.command()
-async def cake(num = '1'):
+async def cake(num='1'):
     reply = [random.choice(cakes) for _ in range(abs(int(num)))]
     await bot.say(''.join(reply))
+
 
 @bot.command(help="Go on a quest!")
 async def adventure():
     await bot.say("Simulating adventure...")
     await bot.type()
-    await asyncio.sleep(3) # suspense!
-    if random.randint(1,10) == 5: # 10% chance to win
+    await asyncio.sleep(3)  # suspense!
+    if random.randint(1, 10) == 5:  # 10% chance to win
         reward = random.choice(rewards)
         await bot.say("You win! You got {}!".format(reward))
-    else: # Ruin!
+    else:  # Ruin!
         death = random.choice(deaths)
         killer = random.choice(killers)
         location = random.choice(locations)
         await bot.say("You were {} by {} in {}".format(death, killer, location))
 
-# Begin voice section (pending separation)
-# TODO Make optional in some way
+# Begin voice section
 
 # https://github.com/Rapptz/discord.py/blob/async/examples/playlist.py
 
 async def connect_voice(ctx):
-    # Might be nice to check if voice is True, but for now disabling commands should be enough
+    # Might be nice to check if voice is True, but for now
+    # disabling commands should be enough
 
     channel_name = ctx.message.author.voice_channel
-    if channel_name == None:
+    if channel_name is None:
         await bot.reply("Try being in a voice channel first")
         return
 
@@ -191,12 +209,13 @@ async def connect_voice(ctx):
 
 player = None
 
-# Doesn't hurt to keep enabled even if voice is False
-@bot.command()
-async def stop_voice():
-    global player # just to be explicit. Might want to set player to None later?
 
-    # TODO figure out global player (currently this is always None). voice.disconnect() covers us, but...
+@bot.command()  # Doesn't hurt to keep enabled even if voice is False
+async def stop_voice():
+    global player  # just to be explicit. Might want to set player to None later?
+
+    # TODO figure out global player (currently this is always None).
+    # voice.disconnect() covers us, but...
     if player is not None:
         player.stop()
         print("stopped player")
@@ -204,26 +223,33 @@ async def stop_voice():
     if bot.is_voice_connected():
         await bot.voice.disconnect()
 
-# Connects to message author's voice channel, plays music, then disconnects (like Airhorn Solutions)
+
 @bot.command(enabled=voice, pass_context=True, help="Lost?")
 async def memes(ctx):
     await connect_voice(ctx)
 
     # TODO figure out discord.py cogs (ext/commands/bot.py) for ex. player.stop()
-    global player # in meantime global player var?
-    player = bot.voice.create_ffmpeg_player("assets/memes/"+random.choice(the_memes), options='-af "volume=0.2"', after=stop_voice)
+    global player  # in meantime global player var?
+    player = bot.voice.create_ffmpeg_player(memes_path / random.choice(the_memes),
+                                            options='-af "volume=0.2"',
+                                            after=stop_voice)
     player.start()
 
     logging.info("Started memes")
 
-@bot.command(enabled=voice, pass_context=True, help="Plays most things supported by youtube-dl")
+
+@bot.command(enabled=voice, pass_context=True,
+             help="Plays most things supported by youtube-dl")
 async def stream(ctx, video=None):
     await connect_voice(ctx)
 
     if video is not None:
-        # TODO further testing. stop doesn't seem to trigger (might be computer-specific)
+        # TODO further testing. stop doesn't seem to trigger
+        #      (might be computer-specific)
         global player
-        player = await bot.voice.create_ytdl_player(video, options='-af "volume=0.2"', after=stop_voice)
+        player = await bot.voice.create_ytdl_player(video,
+                                                    options='-af "volume=0.2"',
+                                                    after=stop_voice)
         player.start()
 
         logging.info("Started streaming")
@@ -234,6 +260,7 @@ async def stream(ctx, video=None):
 
 # Running the bot, continued
 
+
 def poll_terminal():
     running = True
     # TODO function dict
@@ -241,14 +268,16 @@ def poll_terminal():
     while running:
         term_input = input()
         if term_input == "help":
-            print("Uh, no. I'm gonna be annoying instead.") #TODO print terminal command help
+            # TODO print terminal command help
+            print("Uh, no. I'm gonna be annoying instead.")
             # NOTES could use function.__doc__ and docstrings for function help
         elif term_input == "quit":
             # TODO figure out if it's possible to end discord.Client without KeyboardInterrupt
             #   Probably need to reimplement run() using start() with a different quit condition
-            #   Could also use run() and just throw a KeyboardInterrupt or two. Ew...
+            # Could also use run() and just throw a KeyboardInterrupt or two.
+            # Ew...
 
-            # For now, tell user how to quit so we don't leave them in the dark without a prompt
+            # For now, tell user how to quit so we don't leave them in the dark
             print("Disabling command input. Use ctrl+c to quit the bot.")
             running = False
 
