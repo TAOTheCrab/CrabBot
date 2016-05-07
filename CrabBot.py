@@ -4,19 +4,23 @@
 #
 # Requires a bot user token. See -h for details.
 
-import argparse
 import asyncio
 import discord
 from discord.ext import commands
 from pathlib import Path
 import logging
 import random
-import readline  # Only for better terminal input support, eg. history
-from threading import Thread
 
 voice_enabled = True  # Set to False to disable voice commands
 
-# Core bot function useful for startup
+bot = commands.Bot(command_prefix=commands.when_mentioned_or('!crab'),
+                   description="Huh, another bot")
+
+
+def run_bot(login):
+    bot.run(login)  # WARNING blocking call
+
+
 async def update_profile(username=None, avatar=None):
     if avatar is not None:
         # As far as I can tell, Discord's official API only supports JPEG
@@ -28,32 +32,9 @@ async def update_profile(username=None, avatar=None):
 
 # Running the bot
 
-# Do argparse first so that -h can print and exit before anything else happens
-parser = argparse.ArgumentParser(description='A silly Discord bot')
-token_args = parser.add_mutually_exclusive_group(required=True)
-token_args.add_argument('-t', '--token',
-                        help="The bot user's login token. Use this or -f.")
-token_args.add_argument('-f', '--file', type=argparse.FileType('r'),
-                        help="A file with the bot user's login token as the first line. Use this or -t")
-parser.add_argument('-u', '--username', metavar='NEW-USERNAME',
-                    help="OPTIONAL update the bot with a new username when it logs in")
-parser.add_argument('-a', '--avatar', metavar='NEW-AVATAR',
-                    help="OPTIONAL update the bot with a new avatar when it logs in")
-
 # TODO convert update_profile() to optional startup args (safer)
 # PROBLEM can't currently update until logged in, but bot.run() is blocking
 # SOLUTION? do the update in the poll thread (use terminal command instead?)
-
-args = parser.parse_args()
-
-if args.file is not None:
-    login = args.file.readline().rstrip()
-    args.file.close()
-else:
-    login = args.token
-
-bot = commands.Bot(command_prefix=commands.when_mentioned_or('!crab'),
-                   description="Huh, another bot")
 
 # End running the bot (more at end of file)
 
@@ -96,8 +77,6 @@ def update_lists():
     the_memes = read_list_file(memes_path / "filelist.txt")
 
 update_lists()  # Initialize the lists
-
-logging.basicConfig(level=logging.INFO)
 
 
 def log_command(used):
@@ -242,9 +221,9 @@ async def memes(ctx):
     # TODO figure out discord.py cogs (ext/commands/bot.py) for ex. player.stop()
     global voice_player  # in meantime global player var?
     voice_player = voice_connection.create_ffmpeg_player(
-                                            str(memes_path) + '/' + random.choice(the_memes),
-                                            options='-af "volume=0.2"',
-                                            after=stop_voice)
+        str(memes_path) + '/' + random.choice(the_memes),
+        options='-af "volume=0.2"',
+        after=stop_voice)
     voice_player.start()
 
     logging.info("Started memes")
@@ -259,9 +238,10 @@ async def stream(ctx, video=None):
         # TODO further testing. stop doesn't seem to trigger
         #      (might be computer-specific)
         global voice_player
-        voice_player = await voice_connection.create_ytdl_player(video,
-                                                    options='-af "volume=0.2"',
-                                                    after=stop_voice)
+        voice_player = await voice_connection.create_ytdl_player(
+            video,
+            options='-af "volume=0.2"',
+            after=stop_voice)
         voice_player.start()
 
         logging.info("Started streaming")
@@ -269,34 +249,3 @@ async def stream(ctx, video=None):
 # End voice section
 
 # End core bot
-
-# Running the bot, continued
-
-
-def poll_terminal():
-    running = True
-    # TODO function dict
-
-    while running:
-        term_input = input()
-        if term_input == "help":
-            # TODO print terminal command help
-            print("Uh, no. I'm gonna be annoying instead.")
-            # NOTES could use function.__doc__ and docstrings for function help
-        elif term_input == "quit":
-            # TODO figure out if it's possible to end discord.Client without KeyboardInterrupt
-            #   Probably need to reimplement run() using start() with a different quit condition
-            # Could also use run() and just throw a KeyboardInterrupt or two.
-            # Ew...
-
-            # For now, tell user how to quit so we don't leave them in the dark
-            print("Disabling command input. Use ctrl+c to quit the bot.")
-            running = False
-
-input_thread = Thread(target=poll_terminal)
-input_thread.start()
-
-# Blocking, must be last. See discord.py Client for more info.
-bot.run(login)
-
-input_thread.join()
