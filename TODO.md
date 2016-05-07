@@ -1,5 +1,11 @@
 ## Soon
 
+## Backburner
+- Convert voice section to handle its own voice client(s)
+    - discord.py now handles multiple voice clients, so Bot.voice became voice_clients()
+    - Nice enhancement? (probably need if more than one server): new subbot per server connection
+        - Probably not the way to do this, just noting this to remind myself later
+
 ## Nice to have
 - Would like to make a custom help formatter
 (see default [formatter](https://github.com/Rapptz/discord.py/blob/async/discord/ext/commands/formatter.py)

@@ -14,7 +14,7 @@ import random
 import readline  # Only for better terminal input support, eg. history
 from threading import Thread
 
-voice = True  # Set to False to disable voice commands
+voice_enabled = True  # Set to False to disable voice commands
 
 # Core bot function useful for startup
 async def update_profile(username=None, avatar=None):
@@ -189,56 +189,68 @@ async def adventure():
 
 # https://github.com/Rapptz/discord.py/blob/async/examples/playlist.py
 
+voice_connection = None
+voice_player = None
+
 async def connect_voice(ctx):
     # Might be nice to check if voice is True, but for now
     # disabling commands should be enough
 
-    channel_name = ctx.message.author.voice_channel
-    if channel_name is None:
+    logging.info("Attempting a voice connection")
+
+    user_channel = ctx.message.author.voice_channel
+    if user_channel is None:
+        logging.info("Voice connection aborted: User not in a channel")
         await bot.reply("Try being in a voice channel first")
         return
 
-    # Needed for voice
+    # Needed for voice playback
     if not discord.opus.is_loaded():
         discord.opus.load_opus('opus')
 
+    global voice_connection
+
     try:
-        await bot.join_voice_channel(channel_name)
+        voice_connection = await bot.join_voice_channel(user_channel)
+        logging.info("Voice connected to " + user_channel.name)
     except discord.ClientException as e:
         logging.info(e)
-
-player = None
 
 
 @bot.command()  # Doesn't hurt to keep enabled even if voice is False
 async def stop_voice():
-    global player  # just to be explicit. Might want to set player to None later?
+    global voice_player  # just to be explicit. Might want to set player to None later?
+
+    logging.info("Attempting to stop voice")
 
     # TODO figure out global player (currently this is always None).
     # voice.disconnect() covers us, but...
-    if player is not None:
-        player.stop()
-        print("stopped player")
+    if voice_player is not None:
+        voice_player.stop()
+        logging.info("Voice player stopped")
 
-    if bot.is_voice_connected():
-        await bot.voice.disconnect()
+    if bot.is_voice_connected(voice_connection.server):
+        logging.info("Disconnecting from voice")
+        await voice_connection.disconnect()
+        logging.info("Voice disconnected")
 
 
-@bot.command(enabled=voice, pass_context=True, help="Lost?")
+@bot.command(enabled=voice_enabled, pass_context=True, help="Lost?")
 async def memes(ctx):
     await connect_voice(ctx)
 
     # TODO figure out discord.py cogs (ext/commands/bot.py) for ex. player.stop()
-    global player  # in meantime global player var?
-    player = bot.voice.create_ffmpeg_player(memes_path / random.choice(the_memes),
+    global voice_player  # in meantime global player var?
+    voice_player = voice_connection.create_ffmpeg_player(
+                                            str(memes_path) + '/' + random.choice(the_memes),
                                             options='-af "volume=0.2"',
                                             after=stop_voice)
-    player.start()
+    voice_player.start()
 
     logging.info("Started memes")
 
 
-@bot.command(enabled=voice, pass_context=True,
+@bot.command(enabled=voice_enabled, pass_context=True,
              help="Plays most things supported by youtube-dl")
 async def stream(ctx, video=None):
     await connect_voice(ctx)
@@ -246,11 +258,11 @@ async def stream(ctx, video=None):
     if video is not None:
         # TODO further testing. stop doesn't seem to trigger
         #      (might be computer-specific)
-        global player
-        player = await bot.voice.create_ytdl_player(video,
+        global voice_player
+        voice_player = await voice_connection.create_ytdl_player(video,
                                                     options='-af "volume=0.2"',
                                                     after=stop_voice)
-        player.start()
+        voice_player.start()
 
         logging.info("Started streaming")
 
