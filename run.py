@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import CrabBot
+import crabbot
 
 import argparse
 import logging
@@ -54,6 +54,6 @@ input_thread = Thread(target=poll_terminal)
 input_thread.start()
 
 # Blocking, must be last. See discord.py Client for more info.
-CrabBot.bot.run(login)
+crabbot.bot.run(login)
 
 input_thread.join()
