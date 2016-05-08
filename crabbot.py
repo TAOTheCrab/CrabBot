@@ -7,8 +7,8 @@
 import asyncio
 import discord
 from discord.ext import commands
-from pathlib import Path
 import logging
+from pathlib import Path
 import random
 
 voice_enabled = True  # Set to False to disable voice commands
@@ -22,23 +22,34 @@ def run_bot(login):
 
 
 async def update_profile(username=None, avatar=None):
+    logging.info("Updating profile")
+
+    # BUG using new_username seems to always return BAD REQUEST, disabled for now
+    if username is not None:
+        new_username = username
+    else:
+        new_username = bot.user.name
+
+    # TODO convert to try: fields['avatar'] except KeyError, so we can use None for 'no avatar'
     if avatar is not None:
         # As far as I can tell, Discord's official API only supports JPEG
-        new_avatar = open(picture, 'rb')
-        picture_bits = new_avatar.read()
+        new_avatar = open(avatar, 'rb')
+        picture_bytes = new_avatar.read()
         new_avatar.close()
-    await bot.edit_profile(username=username, avatar=picture_bits)
-    logging.info("Updated profile")
+        await bot.edit_profile(username=username, avatar=picture_bytes)
+    else:
+        # edit_profile only skips bytes processing if avatar doesn't exist at all
+        # BUG server returns BAD REQUEST
+        await bot.edit_profile(username=new_username)
 
-# Running the bot
+    logging.info("Profile updated")
 
-# TODO convert update_profile() to optional startup args (safer)
-# PROBLEM can't currently update until logged in, but bot.run() is blocking
-# SOLUTION? do the update in the poll thread (use terminal command instead?)
 
-# End running the bot (more at end of file)
-
-# Begin core bot stuff
+def _update_profile(username=None, avatar=None):
+    logging.info("Calling update_profile")
+    up_function = update_profile(username, avatar)
+    future = asyncio.run_coroutine_threadsafe(up_function, bot.loop)
+    logging.info("update_profile completed with: " + str(future.exception()))
 
 
 def read_list_file(filepath):
@@ -202,8 +213,6 @@ async def stop_voice():
 
     logging.info("Attempting to stop voice")
 
-    # TODO figure out global player (currently this is always None).
-    # voice.disconnect() covers us, but...
     if voice_player is not None:
         voice_player.stop()
         logging.info("Voice player stopped")
@@ -237,6 +246,7 @@ async def stream(ctx, video=None):
     if video is not None:
         # TODO further testing. stop doesn't seem to trigger
         #      (might be computer-specific)
+        #      Might be silent ignore of RuntimeException for async not being awaited
         global voice_player
         voice_player = await voice_connection.create_ytdl_player(
             video,
@@ -247,5 +257,3 @@ async def stream(ctx, video=None):
         logging.info("Started streaming")
 
 # End voice section
-
-# End core bot

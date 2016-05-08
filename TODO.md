@@ -22,4 +22,9 @@ and "formatter" commands.Bot arg)
         - FFMPEG has libopus support
 - Translation strings (mostly as an excuse to shorten the help= sections)
 
+## Look at later (AKA thought this while busy with another thing)
+- cmd module for/instead of poll_terminal?
+- wrap stop_voice (and other functions called by threads) in call_soon_threadsafe()? Or create_task()? ensure_future()?
+    - discord.Client has an explicit event loop we can call into at client_instance.loop
+
 ## Fun

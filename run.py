@@ -3,6 +3,7 @@
 import crabbot
 
 import argparse
+import asyncio
 import logging
 import readline  # Only for better terminal input support, eg. history
 from threading import Thread
@@ -16,10 +17,6 @@ token_args.add_argument('-t', '--token',
                         help="The bot user's login token. Use this or -f.")
 token_args.add_argument('-f', '--file', type=argparse.FileType('r'),
                         help="A file with the bot user's login token as the first line. Use this or -t")
-parser.add_argument('-u', '--username', metavar='NEW-USERNAME',
-                    help="OPTIONAL update the bot with a new username when it logs in")
-parser.add_argument('-a', '--avatar', metavar='NEW-AVATAR',
-                    help="OPTIONAL update the bot with a new avatar when it logs in")
 
 args = parser.parse_args()
 
@@ -49,6 +46,9 @@ def poll_terminal():
             # For now, tell user how to quit so we don't leave them in the dark
             print("Disabling command input. Use ctrl+c to quit the bot.")
             running = False
+        elif term_input.startswith("update_profile"):
+            profile_args = term_input.split(' ')
+            crabbot._update_profile(username=profile_args[1], avatar=profile_args[2])
 
 input_thread = Thread(target=poll_terminal)
 input_thread.start()
