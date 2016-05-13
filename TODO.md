@@ -1,4 +1,5 @@
 ## Soon
+- *after=_stop_voice* needs fixing. Currently gets called but does nothing.
 
 ## Backburner
 - Convert voice section to handle its own voice client(s)

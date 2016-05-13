@@ -46,6 +46,7 @@ async def update_profile(username=None, avatar=None):
 
 
 def _update_profile(username=None, avatar=None):
+    # Mostly for threads, to allow them to call the update_profile coroutine
     logging.info("Calling update_profile")
     up_function = update_profile(username, avatar)
     future = asyncio.run_coroutine_threadsafe(up_function, bot.loop)
@@ -223,6 +224,16 @@ async def stop_voice():
         logging.info("Voice disconnected")
 
 
+def _stop_voice():
+    # Mostly for threads, so they can call the stop_voice coroutine
+    # BUG logging gets called, then stops seemingly without entering stop_voice.
+    #     Using the stop_voice command afterwards seems to call this again with the same result.
+    logging.info("Calling stop_voice")
+    stopvoice_coro = stop_voice.callable()  # We want the function, not a Command object
+    future = asyncio.run_coroutine_threadsafe(stopvoice_coro, bot.loop)
+    logging.info("stop_voice completed with: " + str(future.exception()))
+
+
 @bot.command(enabled=voice_enabled, pass_context=True, help="Lost?")
 async def memes(ctx):
     await connect_voice(ctx)
@@ -232,7 +243,7 @@ async def memes(ctx):
     voice_player = voice_connection.create_ffmpeg_player(
         str(memes_path) + '/' + random.choice(the_memes),
         options='-af "volume=0.2"',
-        after=stop_voice)
+        after=_stop_voice)
     voice_player.start()
 
     logging.info("Started memes")
@@ -251,7 +262,7 @@ async def stream(ctx, video=None):
         voice_player = await voice_connection.create_ytdl_player(
             video,
             options='-af "volume=0.2"',
-            after=stop_voice)
+            after=_stop_voice())
         voice_player.start()
 
         logging.info("Started streaming")
