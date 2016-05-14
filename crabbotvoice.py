@@ -66,7 +66,7 @@ async def maxvolume(new_volume):
     max_volume = min(float(new_volume), 1.0)
 
 
-@crabbot.crabcommand()
+@crabbot.crabcommand(aliases=['voice_stop', 'shutup'])
 async def stop_voice():
     global voice_player  # just to be explicit. Might want to set player to None later?
 
