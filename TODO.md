@@ -21,6 +21,7 @@
     - Check for (configurable?) role
         - alt. check user permissions (ex. Manage Server, Voice Move Member)
 - Voice volume convert from ex. 100% to 1.0 notation
+- Process voice audio before connecting to channel (reduce delay between joining and playing)
 
 ## Look at later (AKA thought this while busy with another thing)
 - cmd module for/instead of poll_terminal?
