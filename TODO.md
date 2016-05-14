@@ -42,3 +42,4 @@
 - [ ] Nice enhancement? (probably need if more than one Discord server): new subbot per server connection
     - [ ] Probably not the way to do this, just noting this to remind myself later
 - [ ] Figure out if there's some, say, preprocessing we can do on voice audio to reduce slowdown
+- [ ] Case-insensitive commands (not that important, just interesting)
