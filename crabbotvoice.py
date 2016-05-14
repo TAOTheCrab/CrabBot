@@ -93,13 +93,14 @@ def end_playback():
 
 @crabbot.crabcommand(pass_context=True, help="Lost?")
 async def memes(ctx):
+    await connect_voice(ctx)
+
     global voice_player  # in meantime global player var?
     voice_player = voice_connection.create_ffmpeg_player(
         str(memes_path) + '/' + random.choice(the_memes),
         after=end_playback)
     voice_player.volume = voice_volume
 
-    await connect_voice(ctx)
     voice_player.start()
 
     logging.info("Started memes")
@@ -109,7 +110,9 @@ async def memes(ctx):
                      help="Plays most things supported by youtube-dl")
 async def stream(ctx, video=None):
     if video is not None:
-        # TODO further testing. stop doesn't seem to trigger
+        await connect_voice(ctx)
+
+        # TODO further testing. end_playback doesn't seem to trigger
         #      (might be computer-specific)
         #      Might be silent ignore of RuntimeException for async not being awaited
         global voice_player
@@ -118,7 +121,6 @@ async def stream(ctx, video=None):
             after=end_playback)
         voice_player.volume = voice_volume
 
-        await connect_voice(ctx)
         voice_player.start()
 
         logging.info("Started streaming " + voice_player.title)
