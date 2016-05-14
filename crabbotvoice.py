@@ -55,6 +55,7 @@ async def connect_voice(ctx):
 
 @crabbot.crabcommand()
 async def volume(new_volume):
+    global voice_volume
     voice_volume = min(float(new_volume), max_volume)
 
     if voice_player is not None:
@@ -63,6 +64,7 @@ async def volume(new_volume):
 
 @crabbot.crabcommand()
 async def maxvolume(new_volume):
+    global max_volume
     max_volume = min(float(new_volume), 1.0)
 
 
