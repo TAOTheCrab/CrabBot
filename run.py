@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import crabbot
+import crabbotvoice # comment out to disable voice commands
 
 import argparse
 import asyncio
@@ -30,6 +31,7 @@ else:
 def poll_terminal():
     running = True
     # TODO function dict
+    # TODO handle KeyboardInterrupt exception (cleans up console output)
 
     while running:
         term_input = input()

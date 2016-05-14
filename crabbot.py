@@ -11,10 +11,10 @@ import logging
 from pathlib import Path
 import random
 
-voice_enabled = True  # Set to False to disable voice commands
-
 bot = commands.Bot(command_prefix=commands.when_mentioned_or('!crab'),
                    description="Huh, another bot")
+
+#bot.loop.set_debug(True)
 
 
 def run_bot(login):
@@ -61,7 +61,6 @@ def read_list_file(filepath):
 
 # TODO make configurable
 assets_path = Path("assets")
-memes_path = Path("assets/memes")
 
 
 def update_lists():
@@ -83,10 +82,7 @@ def update_lists():
     # !cake
     global cakes
     cakes = read_list_file(assets_path / "cakes.txt")
-    # !memes
-    # TODO? instead, iterate over or choose from the contents of memes_path
-    global the_memes
-    the_memes = read_list_file(memes_path / "filelist.txt")
+
 
 update_lists()  # Initialize the lists
 
@@ -176,95 +172,13 @@ async def adventure():
         location = random.choice(locations)
         await bot.say("You were {} by {} in {}".format(death, killer, location))
 
-# Begin voice section
-
-# https://github.com/Rapptz/discord.py/blob/async/examples/playlist.py
-
-voice_connection = None
-voice_player = None
-
-async def connect_voice(ctx):
-    # Might be nice to check if voice is True, but for now
-    # disabling commands should be enough
-
-    logging.info("Attempting a voice connection")
-
-    user_channel = ctx.message.author.voice_channel
-    if user_channel is None:
-        logging.info("Voice connection aborted: User not in a channel")
-        await bot.reply("Try being in a voice channel first")
-        return
-
-    # Needed for voice playback
-    if not discord.opus.is_loaded():
-        discord.opus.load_opus('opus')
-
-    global voice_connection
-
-    try:
-        voice_connection = await bot.join_voice_channel(user_channel)
-        logging.info("Voice connected to " + user_channel.name)
-    except discord.ClientException as e:
-        logging.info(e)
+# Helper functions for addon modules
 
 
-@bot.command()  # Doesn't hurt to keep enabled even if voice is False
-async def stop_voice():
-    global voice_player  # just to be explicit. Might want to set player to None later?
+def crabcommand(*args, **kwargs):
+    ''' Register a bot command to CrabBot '''
 
-    logging.info("Attempting to stop voice")
+    def decorator(func):
+        bot.command(*args, **kwargs)(func)
 
-    if voice_player is not None:
-        voice_player.stop()
-        logging.info("Voice player stopped")
-
-    if bot.is_voice_connected(voice_connection.server):
-        logging.info("Disconnecting from voice")
-        await voice_connection.disconnect()
-        logging.info("Voice disconnected")
-
-
-def _stop_voice():
-    # Mostly for threads, so they can call the stop_voice coroutine
-    # BUG logging gets called, then stops seemingly without entering stop_voice.
-    #     Using the stop_voice command afterwards seems to call this again with the same result.
-    logging.info("Calling stop_voice")
-    stopvoice_coro = stop_voice.callable()  # We want the function, not a Command object
-    future = asyncio.run_coroutine_threadsafe(stopvoice_coro, bot.loop)
-    logging.info("stop_voice completed with: " + str(future.exception()))
-
-
-@bot.command(enabled=voice_enabled, pass_context=True, help="Lost?")
-async def memes(ctx):
-    await connect_voice(ctx)
-
-    # TODO figure out discord.py cogs (ext/commands/bot.py) for ex. player.stop()
-    global voice_player  # in meantime global player var?
-    voice_player = voice_connection.create_ffmpeg_player(
-        str(memes_path) + '/' + random.choice(the_memes),
-        options='-af "volume=0.2"',
-        after=_stop_voice)
-    voice_player.start()
-
-    logging.info("Started memes")
-
-
-@bot.command(enabled=voice_enabled, pass_context=True,
-             help="Plays most things supported by youtube-dl")
-async def stream(ctx, video=None):
-    await connect_voice(ctx)
-
-    if video is not None:
-        # TODO further testing. stop doesn't seem to trigger
-        #      (might be computer-specific)
-        #      Might be silent ignore of RuntimeException for async not being awaited
-        global voice_player
-        voice_player = await voice_connection.create_ytdl_player(
-            video,
-            options='-af "volume=0.2"',
-            after=_stop_voice())
-        voice_player.start()
-
-        logging.info("Started streaming")
-
-# End voice section
+    return decorator
