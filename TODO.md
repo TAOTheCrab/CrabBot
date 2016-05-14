@@ -37,5 +37,4 @@
     - discord.py does useful things in 'except KeyBoardInterrupt' though
 - Nice enhancement? (probably need if more than one Discord server): new subbot per server connection
     - Probably not the way to do this, just noting this to remind myself later
-
-## Fun
+- Figure out if there's some, say, preprocessing we can do on voice audio to reduce slowdown
