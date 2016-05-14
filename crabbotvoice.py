@@ -84,8 +84,8 @@ async def memes(ctx):
     global voice_player  # in meantime global player var?
     voice_player = voice_connection.create_ffmpeg_player(
         str(memes_path) + '/' + random.choice(the_memes),
-        options='-af "volume=0.2"',
         after=end_playback)
+    voice_player.volume = 0.2
     voice_player.start()
 
     logging.info("Started memes")
@@ -103,8 +103,8 @@ async def stream(ctx, video=None):
         global voice_player
         voice_player = await voice_connection.create_ytdl_player(
             video,
-            options='-af "volume=0.2"',
             after=end_playback)
+        voice_player.volume = 0.2
         voice_player.start()
 
         logging.info("Started streaming")

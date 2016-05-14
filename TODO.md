@@ -1,7 +1,6 @@
 ## Soon
 - *after=end_playback* needs fixing. Currently gets called but does nothing.
     - Relook at discord.py playlist.py, was redone recently
-- Switch volume control from ffmpeg to new discord.py player volume
 
 ## Backburner
 - Convert voice section to handle its own voice client(s)
@@ -23,6 +22,7 @@ and "formatter" commands.Bot arg)
     - Might be worth tweaking discord.py's calls to FFMPEG for places we can't bypass it entirely
         - FFMPEG has libopus support
         - Alternately, make our own StreamPlayer
+        - youtube-dl --audio-format opus
 - Translation strings (mostly as an excuse to shorten the help= sections)
 
 ## Look at later (AKA thought this while busy with another thing)
