@@ -7,14 +7,15 @@ import logging
 from pathlib import Path
 import random
 
-# Based off of:
-# https://github.com/Rapptz/discord.py/blob/async/examples/playlist.py
 
 memes_path = Path("assets/memes")
 
 # NOTE code should be reworked to remove these, using checks for exists instead of None
 voice_connection = None
 voice_player = None
+
+voice_volume = 0.2
+max_volume = 1.0
 
 
 def update_voice_list():
@@ -25,6 +26,7 @@ def update_voice_list():
 
 # Initialize list
 update_voice_list()
+
 
 async def connect_voice(ctx):
     # Might be nice to check if voice is True, but for now
@@ -49,6 +51,19 @@ async def connect_voice(ctx):
         logging.info("Voice connected to " + user_channel.name)
     except discord.ClientException as e:
         logging.info(e)
+
+
+@crabbot.crabcommand()
+async def volume(new_volume):
+    voice_volume = min(float(new_volume), max_volume)
+
+    if voice_player is not None:
+        voice_player.volume = voice_volume
+
+
+@crabbot.crabcommand()
+async def maxvolume(new_volume):
+    max_volume = min(float(new_volume), 1.0)
 
 
 @crabbot.crabcommand()
@@ -78,14 +93,13 @@ def end_playback():
 
 @crabbot.crabcommand(pass_context=True, help="Lost?")
 async def memes(ctx):
-    await connect_voice(ctx)
-
-    # TODO figure out discord.py cogs (ext/commands/bot.py) for ex. player.stop()
     global voice_player  # in meantime global player var?
     voice_player = voice_connection.create_ffmpeg_player(
         str(memes_path) + '/' + random.choice(the_memes),
         after=end_playback)
-    voice_player.volume = 0.2
+    voice_player.volume = voice_volume
+
+    await connect_voice(ctx)
     voice_player.start()
 
     logging.info("Started memes")
@@ -94,8 +108,6 @@ async def memes(ctx):
 @crabbot.crabcommand(pass_context=True,
                      help="Plays most things supported by youtube-dl")
 async def stream(ctx, video=None):
-    await connect_voice(ctx)
-
     if video is not None:
         # TODO further testing. stop doesn't seem to trigger
         #      (might be computer-specific)
@@ -104,7 +116,9 @@ async def stream(ctx, video=None):
         voice_player = await voice_connection.create_ytdl_player(
             video,
             after=end_playback)
-        voice_player.volume = 0.2
+        voice_player.volume = voice_volume
+
+        await connect_voice(ctx)
         voice_player.start()
 
-        logging.info("Started streaming")
+        logging.info("Started streaming " + voice_player.title)

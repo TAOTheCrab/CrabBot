@@ -14,7 +14,7 @@ import random
 bot = commands.Bot(command_prefix=commands.when_mentioned_or('!crab'),
                    description="Huh, another bot")
 
-#bot.loop.set_debug(True)
+# bot.loop.set_debug(True)
 
 
 def run_bot(login):
