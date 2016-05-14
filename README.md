@@ -14,3 +14,11 @@ For voice (voice commands will throw errors if not installed, but other commands
 - ffmpeg (for voice file playback. provided test sound requires libvorbis support.)
 
 Needs a bot user token. See -h for details.
+
+Common usage is
+
+`python3 run.py -f FileWithUserTokenAsFirstLine`
+
+or
+
+`python3 run.py -t UserToken`
