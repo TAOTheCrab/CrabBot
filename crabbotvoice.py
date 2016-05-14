@@ -53,7 +53,7 @@ async def connect_voice(ctx):
         logging.info(e)
 
 
-@crabbot.crabcommand()
+@crabbot.crabcommand(help="Set the voice volume. 0.0 - 1.0")
 async def volume(new_volume):
     global voice_volume
     voice_volume = min(float(new_volume), max_volume)
