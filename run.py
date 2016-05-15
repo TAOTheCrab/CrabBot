@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import crabbot
-import crabbotvoice # comment out to disable voice commands
+import crabbotvoice  # comment out to disable voice commands
 
 import argparse
 import asyncio
@@ -55,7 +55,9 @@ def poll_terminal():
 input_thread = Thread(target=poll_terminal)
 input_thread.start()
 
+crabbot.add_cog(crabbotvoice.Voice)
+
 # Blocking, must be last. See discord.py Client for more info.
-crabbot.bot.run(login)
+crabbot.run_bot(login)
 
 input_thread.join()

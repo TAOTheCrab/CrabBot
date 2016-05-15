@@ -21,6 +21,10 @@ def run_bot(login):
     bot.run(login)  # WARNING blocking call
 
 
+def add_cog(cog, *args, **kwargs):
+    bot.add_cog(cog(bot, *args, **kwargs))
+
+
 async def update_profile(username=None, avatar=None):
     logging.info("Updating profile")
 
@@ -171,14 +175,3 @@ async def adventure():
         killer = random.choice(killers)
         location = random.choice(locations)
         await bot.say("You were {} by {} in {}".format(death, killer, location))
-
-# Helper functions for addon modules
-
-
-def crabcommand(*args, **kwargs):
-    ''' Register a bot command to CrabBot '''
-
-    def decorator(func):
-        bot.command(*args, **kwargs)(func)
-
-    return decorator

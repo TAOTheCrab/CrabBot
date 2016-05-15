@@ -1,128 +1,117 @@
 #!/usr/bin/env python3
 
-import crabbot
+import crabbot  # needed for read_list_file to create the_memes
 
 import discord
+from discord.ext import commands
 import logging
 from pathlib import Path
 import random
 
 
-memes_path = Path("assets/memes")
+class Voice:
+    def __init__(self, bot):
+        # TODO make configurable
+        self.memes_path = Path("assets/memes")
+        self.the_memes = None
 
-# NOTE code should be reworked to remove these, using checks for exists instead of None
-voice_connection = None
-voice_player = None
+        self.bot = bot
 
-voice_volume = 0.2
-max_volume = 1.0
+        # NOTE code should be reworked to remove these, using checks for exists instead of None
+        self.voice_connection = None
+        self.voice_player = None
 
+        self.voice_volume = 0.2
+        self.max_volume = 1.0
 
-def update_voice_list():
-    # !memes
-    # TODO? instead, iterate over or choose from the contents of memes_path
-    global the_memes
-    the_memes = crabbot.read_list_file(memes_path / "filelist.txt")
+        # Initialize list
+        self.update_voice_list()
 
-# Initialize list
-update_voice_list()
+    def update_voice_list(self):
+        # !memes
+        # TODO? instead, iterate over or choose from the contents of memes_path
+        self.the_memes = crabbot.read_list_file(self.memes_path / "filelist.txt")
 
+    async def connect_voice(self, ctx):
 
-async def connect_voice(ctx):
-    # Might be nice to check if voice is True, but for now
-    # disabling commands should be enough
+        logging.info("Attempting a voice connection")
 
-    logging.info("Attempting a voice connection")
+        user_channel = ctx.message.author.voice_channel
+        if user_channel is None:
+            logging.info("Voice connection aborted: User not in a channel")
+            await self.bot.reply("Try being in a voice channel first")
+            return
 
-    user_channel = ctx.message.author.voice_channel
-    if user_channel is None:
-        logging.info("Voice connection aborted: User not in a channel")
-        await crabbot.bot.reply("Try being in a voice channel first")
-        return
+        # Needed for voice playback
+        if not discord.opus.is_loaded():
+            discord.opus.load_opus('opus')
 
-    # Needed for voice playback
-    if not discord.opus.is_loaded():
-        discord.opus.load_opus('opus')
+        try:
+            self.voice_connection = await self.bot.join_voice_channel(user_channel)
+            logging.info("Voice connected to " + user_channel.name)
+        except discord.ClientException as e:
+            logging.info(e)
 
-    global voice_connection
+    @commands.command(help="Set the voice volume. 0.0 - 1.0")
+    async def volume(self, new_volume):
+        self.voice_volume = min(float(new_volume), max_volume)
 
-    try:
-        voice_connection = await crabbot.bot.join_voice_channel(user_channel)
-        logging.info("Voice connected to " + user_channel.name)
-    except discord.ClientException as e:
-        logging.info(e)
+        if self.voice_player is not None:
+            self.voice_player.volume = self.voice_volume
 
+    @commands.command()
+    async def maxvolume(self, new_volume):
+        self.max_volume = min(float(new_volume), 1.0)
 
-@crabbot.crabcommand(help="Set the voice volume. 0.0 - 1.0")
-async def volume(new_volume):
-    global voice_volume
-    voice_volume = min(float(new_volume), max_volume)
+    @commands.command(aliases=['voice_stop', 'shutup'])
+    async def stop_voice(self):
+        logging.info("Attempting to stop voice")
 
-    if voice_player is not None:
-        voice_player.volume = voice_volume
+        if self.voice_player is not None:
+            self.voice_player.stop()
+            logging.info("Voice player stopped")
 
+        # Even if there is no connection, disconnect() should simply do nothing
+        logging.info("Disconnecting from voice")
+        await self.voice_connection.disconnect()
+        logging.info("Voice disconnected")
 
-@crabbot.crabcommand()
-async def maxvolume(new_volume):
-    global max_volume
-    max_volume = min(float(new_volume), 1.0)
+    def end_playback(self):
+        # NOTE put any playback queue checks here
 
+        logging.info("Ending voice playback")
+        disconnect_function = self.voice_connection.disconnect()
+        # BUG seems to get stuck here. Related to Python docs section 18.5.9.6?
+        self.bot.loop.call_soon_threadsafe(disconnect_function)
+        logging.info("Voice playback ended")
 
-@crabbot.crabcommand(aliases=['voice_stop', 'shutup'])
-async def stop_voice():
-    global voice_player  # just to be explicit. Might want to set player to None later?
+    @commands.command(pass_context=True, help="Lost?")
+    async def memes(self, ctx):
+        await self.connect_voice(ctx)
 
-    logging.info("Attempting to stop voice")
+        self.voice_player = self.voice_connection.create_ffmpeg_player(
+            str(self.memes_path) + '/' + random.choice(self.the_memes),
+            after=self.end_playback)
+        self.voice_player.volume = self.voice_volume
 
-    if voice_player is not None:
-        voice_player.stop()
-        logging.info("Voice player stopped")
+        self.voice_player.start()
 
-    # Even if there is no connection, disconnect() should simply do nothing
-    logging.info("Disconnecting from voice")
-    await voice_connection.disconnect()
-    logging.info("Voice disconnected")
+        logging.info("Started memes")
 
+    @commands.command(pass_context=True,
+                      help="Plays most things supported by youtube-dl")
+    async def stream(self, ctx, video=None):
+        if video is not None:
+            await self.connect_voice(ctx)
 
-def end_playback():
-    # NOTE put any playback queue checks here
+            # TODO further testing. end_playback doesn't seem to trigger
+            #      (might be computer-specific)
+            #      Might be silent ignore of RuntimeException for async not being awaited
+            self.voice_player = await self.voice_connection.create_ytdl_player(
+                video,
+                after=self.end_playback)
+            self.voice_player.volume = self.voice_volume
 
-    logging.info("Ending voice playback")
-    disconnect_function = voice_connection.disconnect()
-    crabbot.bot.loop.call_soon_threadsafe(disconnect_function)
-    logging.info("Voice playback ended")
+            self.voice_player.start()
 
-
-@crabbot.crabcommand(pass_context=True, help="Lost?")
-async def memes(ctx):
-    await connect_voice(ctx)
-
-    global voice_player  # in meantime global player var?
-    voice_player = voice_connection.create_ffmpeg_player(
-        str(memes_path) + '/' + random.choice(the_memes),
-        after=end_playback)
-    voice_player.volume = voice_volume
-
-    voice_player.start()
-
-    logging.info("Started memes")
-
-
-@crabbot.crabcommand(pass_context=True,
-                     help="Plays most things supported by youtube-dl")
-async def stream(ctx, video=None):
-    if video is not None:
-        await connect_voice(ctx)
-
-        # TODO further testing. end_playback doesn't seem to trigger
-        #      (might be computer-specific)
-        #      Might be silent ignore of RuntimeException for async not being awaited
-        global voice_player
-        voice_player = await voice_connection.create_ytdl_player(
-            video,
-            after=end_playback)
-        voice_player.volume = voice_volume
-
-        voice_player.start()
-
-        logging.info("Started streaming " + voice_player.title)
+            logging.info("Started streaming " + self.voice_player.title)
