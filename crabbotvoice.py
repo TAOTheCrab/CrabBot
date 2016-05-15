@@ -54,7 +54,7 @@ class Voice:
 
     @commands.command(help="Set the voice volume. 0.0 - 1.0")
     async def volume(self, new_volume):
-        self.voice_volume = min(float(new_volume), max_volume)
+        self.voice_volume = min(float(new_volume), self.max_volume)
 
         if self.voice_player is not None:
             self.voice_player.volume = self.voice_volume
