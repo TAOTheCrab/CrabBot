@@ -19,6 +19,8 @@
     - ex. for maxvolume command
     - Check for (configurable?) role
         - alt. check user permissions (ex. Manage Server, Voice Move Member)
+- [ ] Messages cog (mobas, adventure, etc.)
+- [ ] crabbot.py just a class and/or library of shared state/functions
 
 ## Voice
 - [ ] Voice command queueing
