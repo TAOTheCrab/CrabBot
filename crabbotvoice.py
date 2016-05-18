@@ -13,7 +13,8 @@ class Voice:
     def __init__(self, bot):
         # TODO make configurable
         self.memes_path = Path("assets/memes")
-        self.the_memes = None
+        # Initialize list
+        self.update_voice_list()
 
         self.bot = bot
 
@@ -23,9 +24,6 @@ class Voice:
 
         self.voice_volume = 0.2
         self.max_volume = 1.0
-
-        # Initialize list
-        self.update_voice_list()
 
     def update_voice_list(self):
         # !memes

@@ -19,8 +19,8 @@
     - ex. for maxvolume command
     - Check for (configurable?) role
         - alt. check user permissions (ex. Manage Server, Voice Move Member)
-- [ ] Messages cog (mobas, adventure, etc.)
 - [ ] crabbot.py just a class and/or library of shared state/functions
+    - mostly done, needs a few checks/lookovers
 
 ## Voice
 - [ ] Voice command queueing
@@ -44,3 +44,6 @@
     - Probably not the way to do this, just noting this to remind myself later
 - [ ] Figure out if there's some, say, preprocessing we can do on voice audio to reduce slowdown
 - [ ] Case-insensitive commands (not that important, just interesting)
+- [ ] Make super-function for update_lists of various cogs
+    - super-class?
+    - register function, like the bot commands?
