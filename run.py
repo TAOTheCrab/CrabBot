@@ -22,7 +22,7 @@ token_args.add_argument('-f', '--file', type=argparse.FileType('r'),
                         help="A file with the bot user's login token as the first line. Use this or -t")
 parser.add_argument('-p', '--prefix', default="!crab",
                     help="Command prefix the bot responds to")
-parser.add_argument('--use-libav', action='store-true',
+parser.add_argument('--use-libav', action='store_true',
                     help="Voice uses Libav instead of FFmpeg")
 
 args = parser.parse_args()
