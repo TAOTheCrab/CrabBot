@@ -32,6 +32,8 @@
             - Need Encoder class (the whole idea is reducing the step of opus.encoder)
 - [ ] Voice volume convert from ex. 100% to 1.0 notation
 - [ ] Process voice audio before connecting to channel (reduce delay between joining and playing)
+- [ ] Command line option to disable voice
+    - Move import to conditional?
 
 # Assorted notes (AKA thought this while busy with another thing)
 - [ ] cmd module for/instead of poll_terminal?
