@@ -2,7 +2,7 @@
 
 import crabbot
 import crabbotmessages
-import crabbotvoice  # comment out to disable voice commands
+import crabbotvoice  # comment out to disable voice commands entirely
 
 import argparse
 import asyncio
@@ -60,6 +60,15 @@ def poll_terminal():
         elif term_input.startswith("update_profile"):
             profile_args = term_input.split(' ')
             bot._update_profile(username=profile_args[1], avatar=profile_args[2])
+        elif term_input.startswith("disable_voice"):
+            logging.info("Disabling voice commands")
+            bot.remove_cog("Voice")
+        elif term_input.startswith("enable_voice"):
+            if "crabbotvoice" in sys.modules:
+                logging.info("Enabling voice commands")
+                bot.add_cog(crabbotvoice.Voice(bot, args.use_libav))
+            else:
+                logging.info("Voice disabled in source. Add/uncomment import for crabbotvoice and relaunch.")
 
 input_thread = Thread(target=poll_terminal)
 input_thread.start()
