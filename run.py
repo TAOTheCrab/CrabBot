@@ -29,6 +29,9 @@ else:
     login = args.token
 
 
+bot = crabbot.CrabBot()
+
+
 def poll_terminal():
     running = True
     # TODO function dict
@@ -51,15 +54,15 @@ def poll_terminal():
             running = False
         elif term_input.startswith("update_profile"):
             profile_args = term_input.split(' ')
-            crabbot._update_profile(username=profile_args[1], avatar=profile_args[2])
+            bot._update_profile(username=profile_args[1], avatar=profile_args[2])
 
 input_thread = Thread(target=poll_terminal)
 input_thread.start()
 
-crabbot.add_cog(crabbotmessages.Messages)
-crabbot.add_cog(crabbotvoice.Voice)
+bot.add_cog(crabbotmessages.Messages(bot))
+bot.add_cog(crabbotvoice.Voice(bot))
 
 # Blocking, must be last. See discord.py Client for more info.
-crabbot.run_bot(login)
+bot.run(login)
 
 input_thread.join()
