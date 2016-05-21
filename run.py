@@ -8,6 +8,7 @@ import argparse
 import asyncio
 import logging
 import readline  # Only for better terminal input support, eg. history
+import sys
 from threading import Thread
 
 logging.basicConfig(level=logging.INFO)
@@ -62,7 +63,9 @@ input_thread = Thread(target=poll_terminal)
 input_thread.start()
 
 bot.add_cog(crabbotmessages.Messages(bot))
-bot.add_cog(crabbotvoice.Voice(bot))
+# Comment out import of voice to disable voice commands
+if "crabbotvoice" in sys.modules:
+    bot.add_cog(crabbotvoice.Voice(bot))
 
 # Blocking, must be last. See discord.py Client for more info.
 bot.run(login)
