@@ -12,9 +12,11 @@ Requires:
 - [discord.py](https://github.com/Rapptz/discord.py) v0.10 (async beta)
 - Python 3.5+ (uses async syntax, can be edited to work with 3.4)
 
-For voice (voice commands will throw errors if not installed, but other commands should still work):
-- libopus / opus (for voice transmission)
-- ffmpeg (for voice file playback. provided test sound requires libvorbis support.)
+For voice (can be disabled, or errors safely ignored):
+- libopus0 *or* opus (for voice transmission. Package name depends on package manager)
+- ffmpeg (for voice file playback)
+    - Voice module can be configured to use avconv/libav instead
+- youtube-dl (for stream command)
 
 Needs a bot user token. See -h for details.
 
