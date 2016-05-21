@@ -10,13 +10,14 @@ import random
 
 
 class Voice:
-    def __init__(self, bot):
+    def __init__(self, bot, use_libav=False):
         # TODO make configurable
         self.memes_path = Path("assets/memes")
         # Initialize list
         self.update_voice_list()
 
         self.bot = bot
+        self.use_libav = use_libav
 
         # NOTE code should be reworked to remove these, using checks for exists instead of None
         self.voice_connection = None
@@ -89,6 +90,7 @@ class Voice:
 
         self.voice_player = self.voice_connection.create_ffmpeg_player(
             str(self.memes_path) + '/' + random.choice(self.the_memes),
+            use_avconv=use_libav,
             after=self.end_playback)
         self.voice_player.volume = self.voice_volume
 
@@ -107,6 +109,7 @@ class Voice:
             #      Might be silent ignore of RuntimeException for async not being awaited
             self.voice_player = await self.voice_connection.create_ytdl_player(
                 video,
+                use_avconv=use_libav,
                 after=self.end_playback)
             self.voice_player.volume = self.voice_volume
 

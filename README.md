@@ -15,7 +15,7 @@ Requires:
 For voice (can be disabled, or errors safely ignored):
 - libopus0 *or* opus (for voice transmission. Package name depends on package manager)
 - ffmpeg (for voice file playback)
-    - Voice module can be configured to use avconv/libav instead
+    - Voice module can be configured to use avconv/libav instead (eg. for Debian)
 - youtube-dl (for stream command)
 
 Needs a bot user token. See -h for details.

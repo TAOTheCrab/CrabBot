@@ -22,6 +22,8 @@ token_args.add_argument('-f', '--file', type=argparse.FileType('r'),
                         help="A file with the bot user's login token as the first line. Use this or -t")
 parser.add_argument('-p', '--prefix', default="!crab",
                     help="Command prefix the bot responds to")
+parser.add_argument('--use-libav', action='store-true',
+                    help="Voice uses Libav instead of FFmpeg")
 
 args = parser.parse_args()
 
@@ -65,7 +67,7 @@ input_thread.start()
 bot.add_cog(crabbotmessages.Messages(bot))
 # Comment out import of voice to disable voice commands
 if "crabbotvoice" in sys.modules:
-    bot.add_cog(crabbotvoice.Voice(bot))
+    bot.add_cog(crabbotvoice.Voice(bot, args.use_libav))
 
 # Blocking, must be last. See discord.py Client for more info.
 bot.run(login)
