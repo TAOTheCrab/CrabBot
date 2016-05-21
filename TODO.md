@@ -29,6 +29,7 @@
         - FFmpeg has libopus support
         - Alternately, make our own FFmpeg wrapper for StreamPlayer
             - youtube-dl --audio-format opus
+            - Need Encoder class (the whole idea is reducing the step of opus.encoder)
 - [ ] Voice volume convert from ex. 100% to 1.0 notation
 - [ ] Process voice audio before connecting to channel (reduce delay between joining and playing)
 
