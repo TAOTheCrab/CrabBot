@@ -14,6 +14,7 @@ import random
 
 class CrabBot(commands.Bot):
     def __init__(self, prefix='!crab'):
+        # Could just use command_prefix arg, but this allows for a default prefix
         super().__init__(command_prefix=commands.when_mentioned_or(prefix),
                          description="Huh, another bot")
         # loop.set_debug(True)  # Set asyncio loop to output more info for debugging

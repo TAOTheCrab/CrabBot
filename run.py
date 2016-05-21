@@ -19,6 +19,8 @@ token_args.add_argument('-t', '--token',
                         help="The bot user's login token. Use this or -f.")
 token_args.add_argument('-f', '--file', type=argparse.FileType('r'),
                         help="A file with the bot user's login token as the first line. Use this or -t")
+parser.add_argument('-p', '--prefix', default="!crab",
+                    help="Command prefix the bot responds to")
 
 args = parser.parse_args()
 
@@ -29,7 +31,7 @@ else:
     login = args.token
 
 
-bot = crabbot.CrabBot()
+bot = crabbot.CrabBot(prefix=args.prefix)
 
 
 def poll_terminal():
