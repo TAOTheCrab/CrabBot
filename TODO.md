@@ -9,7 +9,10 @@
 - [ ] Would like to make a custom help formatter
     - see default discord.py commands.formatter.py and "formatter" commands.Bot arg
 - [ ] Look into an exit more graceful than Interrupt (requires using client.start() instead of run())
-- [ ] Command logging (probably Logging.INFO level. Timestamp. Usage stats?)
+- [ ] Full command logging
+    - Logging.INFO level
+    - Timestamp
+    - Usage stats?
 - [ ] user.cfg. Look into argparse's fromfile_prefix_chars, otherwise have default location and arg-defined location
     - Currently would only save passing -f or -t every launch, but we might want more options later
 - [ ] Translation strings (mostly as an excuse to shorten the help= sections)
@@ -19,15 +22,13 @@
     - ex. for maxvolume command
     - Check for (configurable?) role
         - alt. check user permissions (ex. Manage Server, Voice Move Member)
-- [ ] crabbot.py just a class and/or library of shared state/functions
-    - mostly done, needs a few checks/lookovers
 - [ ] setup.py
 
 ## Voice
 - [ ] Voice command queueing
 - [ ] Voice pre-encoded for opus (see AirhornBot's use of DCA)
     - Might be worth tweaking discord.py's calls to FFmpeg for places we can't bypass it entirely
-        - FFmpeg has libopus support
+        - FFmpeg and Libav have libopus support
         - Alternately, make our own FFmpeg wrapper for StreamPlayer
             - youtube-dl --audio-format opus
             - Need Encoder class (the whole idea is reducing the step of opus.encoder)
@@ -35,7 +36,6 @@
 - [ ] Process voice audio before connecting to channel (reduce delay between joining and playing)
 - [ ] Command line option to disable voice
     - Move import to conditional?
-    - Maybe dynamically disable voice with a terminal input?
 - [ ] Check for youtube-dl module in stream?
     - Mostly so the log can tell the user to pip install it instead of exception vomit
 
