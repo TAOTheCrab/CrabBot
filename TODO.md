@@ -21,6 +21,7 @@
         - alt. check user permissions (ex. Manage Server, Voice Move Member)
 - [ ] crabbot.py just a class and/or library of shared state/functions
     - mostly done, needs a few checks/lookovers
+- [ ] setup.py
 
 ## Voice
 - [ ] Voice command queueing
@@ -34,6 +35,9 @@
 - [ ] Process voice audio before connecting to channel (reduce delay between joining and playing)
 - [ ] Command line option to disable voice
     - Move import to conditional?
+    - Maybe dynamically disable voice with a terminal input?
+- [ ] Check for youtube-dl module in stream?
+    - Mostly so the log can tell the user to pip install it instead of exception vomit
 
 # Assorted notes (AKA thought this while busy with another thing)
 - [ ] cmd module for/instead of poll_terminal?
