@@ -2,7 +2,6 @@ Station
 Garage
 Apocalypse
 Diner
-Garage
 Dungeon
 Hell
 Heck
