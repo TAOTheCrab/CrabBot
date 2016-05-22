@@ -23,7 +23,7 @@ class Messages:
         # !dota
         self.mobas = crabbot.read_list_file(self.assets_path / "mobas.txt")
         # !sir
-        self.places = crabbot.read_list_file(self.assets_path / "sir-places.txt")
+        self.sirplaces = crabbot.read_list_file(self.assets_path / "sir-places.txt")
         # !adventure
         self.deaths = crabbot.read_list_file(self.assets_path / "adventure-deaths.txt")
         self.killers = crabbot.read_list_file(self.assets_path / "adventure-killers.txt")
@@ -32,9 +32,9 @@ class Messages:
         # !cake
         self.cakes = crabbot.read_list_file(self.assets_path / "cakes.txt")
         # !band
-        self.adjectives = crabbot.read_list_file(self.assets_path / "band-adjectives.txt")
-        self.nouns = crabbot.read_list_file(self.assets_path / "band-nouns.txt")
-        self.places = crabbot.read_list_file(self.assets_path / "band-places.txt")
+        self.bandadjectives = crabbot.read_list_file(self.assets_path / "band-adjectives.txt")
+        self.bandnouns = crabbot.read_list_file(self.assets_path / "band-nouns.txt")
+        self.bandplaces = crabbot.read_list_file(self.assets_path / "band-places.txt")
 
     @commands.command(help='The bots have something to say')
     async def takeover(self):
@@ -53,8 +53,8 @@ class Messages:
     @commands.command(help='For the unruly patron')
     async def sir(self):
         # Yes, possibly having repeats is intentional, more fun that way
-        place_one = random.choice(self.places)
-        place_two = random.choice(self.places)
+        place_one = random.choice(self.sirplaces)
+        place_two = random.choice(self.sirplaces)
         reply = "Sir, this is {}, not {}.".format(place_one, place_two)
         await self.bot.say(reply)
 
@@ -97,7 +97,7 @@ class Messages:
 
     @commands.command(help="Need a band name?")
     async def band(self):
-        adjective = random.choice(self.adjectives)
-        noun = random.choice(self.nouns)
-        place = random.choice(self.places)
+        adjective = random.choice(self.bandadjectives)
+        noun = random.choice(self.bandnouns)
+        place = random.choice(self.bandplaces)
         await self.bot.say("Your new band name is {} {} {}".format(adjective, noun, place))
