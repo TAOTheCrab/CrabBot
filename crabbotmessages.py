@@ -96,7 +96,7 @@ class Messages:
             await self.bot.say("You were {} by {} in {}".format(death, killer, location))
 
     @commands.command(help="Need a band name?")
-    async def band():
+    async def band(self):
         adjective = random.choice(self.adjectives)
         noun = random.choice(self.nouns)
         place = random.choice(self.places)
