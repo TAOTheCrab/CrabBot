@@ -23,3 +23,5 @@ git clone *CrabBot git*
 cd CrabBot
 python3 run.py (whichever token method) --use-libav
 ```
+
+GNU screen is handy for remote work. Run CrabBot in screen, then `ctrl+a d`. screen -R to reattach.
