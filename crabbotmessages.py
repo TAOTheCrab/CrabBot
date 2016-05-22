@@ -31,6 +31,10 @@ class Messages:
         self.rewards = crabbot.read_list_file(self.assets_path / "adventure-rewards.txt")
         # !cake
         self.cakes = crabbot.read_list_file(self.assets_path / "cakes.txt")
+        # !band
+        self.adjectives = crabbot.read_list_file(self.assets_path / "band-adjectives.txt")
+        self.nouns = crabbot.read_list_file(self.assets_path / "band-nouns.txt")
+        self.places = crabbot.read_list_file(self.assets_path / "band-places.txt")
 
     @commands.command(help='The bots have something to say')
     async def takeover(self):
@@ -90,3 +94,10 @@ class Messages:
             killer = random.choice(self.killers)
             location = random.choice(self.locations)
             await self.bot.say("You were {} by {} in {}".format(death, killer, location))
+
+    @commands.command(help="Need a band name?")
+    async def band():
+        adjective = random.choice(self.adjectives)
+        noun = random.choice(self.nouns)
+        place = random.choice(self.places)
+        await self.bot.say("Your new band name is {} {} {}".format(adjective, noun, place))
