@@ -3,7 +3,7 @@ Platypus
 Robot
 Bob-omb
 Harpy
-Luchadore
+Luchador
 Lover
 Buttlicker
 Happiness-generator
