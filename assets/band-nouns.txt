@@ -2,3 +2,12 @@ Wolf
 Platypus
 Robot
 Bob-omb
+Harpy
+Luchadore
+Lover
+Buttlicker
+Happiness-generator
+Crab
+Shellfish
+Muppet
+Witchwizard
