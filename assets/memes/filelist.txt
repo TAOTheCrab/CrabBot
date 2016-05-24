@@ -1,5 +1,5 @@
 DEATH.ogg
 wayShort.ogg
 HisNameIsEB.wav
-icanfight.mp3
-
+icanfightshort.ogg
+icanfightblade.ogg
