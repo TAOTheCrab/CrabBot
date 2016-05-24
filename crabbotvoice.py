@@ -93,8 +93,8 @@ class Voice(crabbot.CrabBotCog):
 
         self.voice_player = self.voice_connection.create_ffmpeg_player(
             str(self.memes_path) + '/' + random.choice(self.the_memes),
-            use_avconv=self.use_libav,
-            after=self.end_playback)
+            use_avconv=self.use_libav)
+        # after=self.end_playback) #  Not working currently, seems to just lag stop_voice
         self.voice_player.volume = self.voice_volume
 
         self.voice_player.start()
@@ -112,8 +112,8 @@ class Voice(crabbot.CrabBotCog):
             #      Might be silent ignore of RuntimeException for async not being awaited
             self.voice_player = await self.voice_connection.create_ytdl_player(
                 video,
-                use_avconv=self.use_libav,
-                after=self.end_playback)
+                use_avconv=self.use_libav)
+            # after=self.end_playback) #  See comment on memes command
             self.voice_player.volume = self.voice_volume
 
             self.voice_player.start()
