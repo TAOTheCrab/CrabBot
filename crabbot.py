@@ -57,6 +57,17 @@ class CrabBot(commands.Bot):
         logging.info("update_profile completed with: " + str(future.exception()))
 
 
+class CrabBotCog:
+    has_lists = False  # Set to true in your subclass if you implement update_lists()
+
+    # Superclass defining the interface for CrabBot cogs
+    def __init__(self, bot):
+        self.bot = bot
+
+    def update_lists():
+        raise NotImplementedError("Either implement update_lists or initialize cog with has_list=False")
+
+
 def read_list_file(filepath):
     with filepath.open() as file_list:
         words = [x.rstrip() for x in file_list]

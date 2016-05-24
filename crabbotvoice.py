@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import crabbot  # needed for read_list_file to create the_memes
+import crabbot
 
 import discord
 from discord.ext import commands
@@ -9,14 +9,17 @@ from pathlib import Path
 import random
 
 
-class Voice:
+class Voice(crabbot.CrabBotCog):
+    has_lists = True
+
     def __init__(self, bot, use_libav=False):
+        super().__init__(bot)
+
         # TODO make configurable
         self.memes_path = Path("assets/memes")
         # Initialize list
-        self.update_voice_list()
+        self.update_lists()
 
-        self.bot = bot
         self.use_libav = use_libav
 
         # NOTE code should be reworked to remove these, using checks for exists instead of None
@@ -26,7 +29,7 @@ class Voice:
         self.voice_volume = 0.2
         self.max_volume = 1.0
 
-    def update_voice_list(self):
+    def update_lists(self):
         # !memes
         # TODO? instead, iterate over or choose from the contents of memes_path
         self.the_memes = crabbot.read_list_file(self.memes_path / "filelist.txt")

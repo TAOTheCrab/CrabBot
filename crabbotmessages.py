@@ -10,16 +10,18 @@ from pathlib import Path
 import random
 
 
-class Messages:
+class Messages(crabbot.CrabBotCog):
+    has_lists = True
+
     def __init__(self, bot):
+        super().__init__(bot)
+
         # TODO make configurable (class arg?)
         self.assets_path = Path("assets")
         # Initialize the lists
-        self.update_messages_lists()
+        self.update_lists()
 
-        self.bot = bot
-
-    def update_messages_lists(self):
+    def update_lists(self):
         # !dota
         self.mobas = crabbot.read_list_file(self.assets_path / "mobas.txt")
         # !sir
