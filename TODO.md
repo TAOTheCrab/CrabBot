@@ -36,7 +36,7 @@
 - [ ] Process voice audio before connecting to channel (reduce delay between joining and playing)
 - [ ] Command line option to disable voice
     - Move import to conditional?
-- [ ] Check for youtube-dl module in stream?
+- [ ] Check for youtube-dl module in stream command?
     - Mostly so the log can tell the user to pip install it instead of exception vomit
 
 # Assorted notes (AKA thought this while busy with another thing)
@@ -51,6 +51,3 @@
     - Probably not the way to do this, just noting this to remind myself later
 - [ ] Figure out if there's some, say, preprocessing we can do on voice audio to reduce slowdown
 - [ ] Case-insensitive commands (not that important, just interesting)
-- [ ] Make super-function for update_lists of various cogs
-    - super-class?
-    - register function, like the bot commands?

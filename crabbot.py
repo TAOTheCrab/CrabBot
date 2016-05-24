@@ -20,6 +20,8 @@ class CrabBot(commands.Bot):
         # loop.set_debug(True)  # Set asyncio loop to output more info for debugging
         # self.add_listener(self.on_ready)  # TIL on_ready in a Bot subclass is already registered
 
+        self.cogs_update_lists = {}
+
     async def on_ready(self):
         print('Logged in as')
         print(self.user.name)
@@ -55,6 +57,23 @@ class CrabBot(commands.Bot):
         up_function = self.update_profile(username, avatar)
         future = asyncio.run_coroutine_threadsafe(up_function, self.loop)
         logging.info("update_profile completed with: " + str(future.exception()))
+
+    def update_all_lists(self):
+        for cog_name, cog_function in self.cogs_update_lists.items():
+            cog_function()
+            logging.info("Updated lists for {}".format(cog_name))
+
+    def add_cog(self, cog):
+        super(CrabBot, self).add_cog(cog)
+        logging.info("Added cog {}".format(cog.__class__.__name__))
+        if isinstance(cog, CrabBotCog) and cog.has_lists is True:
+            self.cogs_update_lists[cog.__class__.__name__] = cog.update_lists
+
+    def remove_cog(self, cog_name):
+        super(CrabBot, self).remove_cog(cog_name)
+        logging.info("Removed cog {}".format(cog_name))
+        if cog_name in self.cogs_update_lists:
+            del self.cogs_update_lists[cog_name]
 
 
 class CrabBotCog:

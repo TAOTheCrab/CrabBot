@@ -69,6 +69,8 @@ def poll_terminal():
                 bot.add_cog(crabbotvoice.Voice(bot, args.use_libav))
             else:
                 logging.info("Voice disabled in source. Add/uncomment import for crabbotvoice and relaunch.")
+        elif term_input.startswith("update_lists"):
+            bot.update_all_lists()
 
 input_thread = Thread(target=poll_terminal)
 input_thread.start()
