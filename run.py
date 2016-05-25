@@ -23,7 +23,9 @@ token_args.add_argument('-f', '--file', type=argparse.FileType('r'),
 parser.add_argument('-p', '--prefix', default="!crab",
                     help="Command prefix the bot responds to")
 parser.add_argument('--use-libav', action='store_true',
-                    help="Voice uses Libav instead of FFmpeg")
+                    help="Make Voice use Libav instead of FFmpeg")
+parser.add_argument('--disable-voice', action='store_true',
+                    help="Disable Voice commands (can be enabled later)")
 
 args = parser.parse_args()
 
@@ -77,7 +79,7 @@ input_thread.start()
 
 bot.add_cog(crabbotmessages.Messages(bot))
 # Comment out import of voice to disable voice commands
-if "crabbotvoice" in sys.modules:
+if "crabbotvoice" in sys.modules and args.disable-voice is False:
     bot.add_cog(crabbotvoice.Voice(bot, args.use_libav))
 
 # Blocking, must be last. See discord.py Client for more info.
