@@ -44,6 +44,7 @@
 - [ ] Give crabbotvoice its own asyncio thread/loop somehow?
     - stop_voice is notably delayed sometimes. player.stop() seems to work now, but bot lingers in channel
         - this causes a bug if it's awaiting a disconnect and someone calls an audio command during a long delay
+            - disabling end_playback does NOT fix this. Seems related to how long voice plays?
     - Esp. with audio playing, responsiveness is important
 - [ ] Call loop.stop() to exit bot.run()?
     - discord.py does useful things in 'except KeyBoardInterrupt' though
