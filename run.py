@@ -79,7 +79,7 @@ input_thread.start()
 
 bot.add_cog(crabbotmessages.Messages(bot))
 # Comment out import of voice to disable voice commands
-if "crabbotvoice" in sys.modules and args.disable-voice is False:
+if "crabbotvoice" in sys.modules and args.disable_voice is False:
     bot.add_cog(crabbotvoice.Voice(bot, args.use_libav))
 
 # Blocking, must be last. See discord.py Client for more info.
