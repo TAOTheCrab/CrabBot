@@ -1,15 +1,16 @@
 #!/usr/bin/env python3
 
-import crabbot
-import crabbotmessages
-import crabbotvoice  # comment out to disable voice commands entirely
-
 import argparse
 import asyncio
 import logging
 import readline  # Only for better terminal input support, eg. history
 import sys
 from threading import Thread
+
+import crabbot.common
+import crabbot.messages
+import crabbot.voice  # comment out to disable voice commands entirely
+
 
 logging.basicConfig(level=logging.INFO)
 
@@ -36,7 +37,7 @@ else:
     login = args.token
 
 
-bot = crabbot.CrabBot(prefix=args.prefix)
+bot = crabbot.common.CrabBot(prefix=args.prefix)
 
 
 def poll_terminal():
@@ -66,21 +67,21 @@ def poll_terminal():
             logging.info("Disabling voice commands")
             bot.remove_cog("Voice")
         elif term_input.startswith("enable_voice"):
-            if "crabbotvoice" in sys.modules:
+            if "crabbot.voice" in sys.modules:
                 logging.info("Enabling voice commands")
-                bot.add_cog(crabbotvoice.Voice(bot, args.use_libav))
+                bot.add_cog(crabbot.voice.Voice(bot, args.use_libav))
             else:
-                logging.info("Voice disabled in source. Add/uncomment import for crabbotvoice and relaunch.")
+                logging.info("Voice disabled in source. Add/uncomment import for crabbot.voice and relaunch.")
         elif term_input.startswith("update_lists"):
             bot.update_all_lists()
 
 input_thread = Thread(target=poll_terminal)
 input_thread.start()
 
-bot.add_cog(crabbotmessages.Messages(bot))
+bot.add_cog(crabbot.messages.Messages(bot))
 # Comment out import of voice to disable voice commands
-if "crabbotvoice" in sys.modules and args.disable_voice is False:
-    bot.add_cog(crabbotvoice.Voice(bot, args.use_libav))
+if "crabbot.voice" in sys.modules and args.disable_voice is False:
+    bot.add_cog(crabbot.voice.Voice(bot, args.use_libav))
 
 # Blocking, must be last. See discord.py Client for more info.
 bot.run(login)

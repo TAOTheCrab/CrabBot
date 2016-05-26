@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
 
-import crabbot
-
 import discord
 from discord.ext import commands
 import logging
 from pathlib import Path
 import random
 
+import crabbot.common
 
-class Voice(crabbot.CrabBotCog):
+
+class Voice(crabbot.common.CrabBotCog):
     has_lists = True
 
     def __init__(self, bot, use_libav=False):
@@ -32,7 +32,7 @@ class Voice(crabbot.CrabBotCog):
     def update_lists(self):
         # !memes
         # TODO? instead, iterate over or choose from the contents of memes_path
-        self.the_memes = crabbot.read_list_file(self.memes_path / "filelist.txt")
+        self.the_memes = crabbot.common.read_list_file(self.memes_path / "filelist.txt")
 
     async def connect_voice(self, ctx):
 

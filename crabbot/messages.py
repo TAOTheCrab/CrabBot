@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 
-import crabbot
-
 import asyncio
 import discord
 from discord.ext import commands
@@ -9,8 +7,10 @@ import logging
 from pathlib import Path
 import random
 
+import crabbot.common
 
-class Messages(crabbot.CrabBotCog):
+
+class Messages(crabbot.common.CrabBotCog):
     has_lists = True
 
     def __init__(self, bot):
@@ -23,20 +23,20 @@ class Messages(crabbot.CrabBotCog):
 
     def update_lists(self):
         # !dota
-        self.mobas = crabbot.read_list_file(self.assets_path / "mobas.txt")
+        self.mobas = crabbot.common.read_list_file(self.assets_path / "mobas.txt")
         # !sir
-        self.sirplaces = crabbot.read_list_file(self.assets_path / "sir-places.txt")
+        self.sirplaces = crabbot.common.read_list_file(self.assets_path / "sir-places.txt")
         # !adventure
-        self.deaths = crabbot.read_list_file(self.assets_path / "adventure-deaths.txt")
-        self.killers = crabbot.read_list_file(self.assets_path / "adventure-killers.txt")
-        self.locations = crabbot.read_list_file(self.assets_path / "adventure-locations.txt")
-        self.rewards = crabbot.read_list_file(self.assets_path / "adventure-rewards.txt")
+        self.deaths = crabbot.common.read_list_file(self.assets_path / "adventure-deaths.txt")
+        self.killers = crabbot.common.read_list_file(self.assets_path / "adventure-killers.txt")
+        self.locations = crabbot.common.read_list_file(self.assets_path / "adventure-locations.txt")
+        self.rewards = crabbot.common.read_list_file(self.assets_path / "adventure-rewards.txt")
         # !cake
-        self.cakes = crabbot.read_list_file(self.assets_path / "cakes.txt")
+        self.cakes = crabbot.common.read_list_file(self.assets_path / "cakes.txt")
         # !band
-        self.bandadjectives = crabbot.read_list_file(self.assets_path / "band-adjectives.txt")
-        self.bandnouns = crabbot.read_list_file(self.assets_path / "band-nouns.txt")
-        self.bandplaces = crabbot.read_list_file(self.assets_path / "band-places.txt")
+        self.bandadjectives = crabbot.common.read_list_file(self.assets_path / "band-adjectives.txt")
+        self.bandnouns = crabbot.common.read_list_file(self.assets_path / "band-nouns.txt")
+        self.bandplaces = crabbot.common.read_list_file(self.assets_path / "band-places.txt")
 
     @commands.command(help='The bots have something to say')
     async def takeover(self):
