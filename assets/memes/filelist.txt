@@ -2,5 +2,4 @@ DEATH.ogg
 wayShort.ogg
 HisNameIsEB.wav
 icanfightshort.ogg
-icanfightblade.ogg
 nicedotamemes.ogg
