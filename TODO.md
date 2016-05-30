@@ -1,7 +1,4 @@
 # Soon
-- [ ] *after=end_playback* needs fixing. Currently gets called but does nothing.
-    - Relook at discord.py playlist.py, was redone recently
-        - It does call_soon_threadsafe, but only to signal an asyncio.Event() to stop waiting
 
 # Nice to have
 
@@ -25,7 +22,8 @@
 - [ ] setup.py
 
 ## Voice
-- [ ] Voice command queueing
+- [x] Voice command queueing
+    - Needs a target channel for each queue entry, but otherwise done
 - [ ] Voice pre-encoded for opus (see AirhornBot's use of DCA)
     - Might be worth tweaking discord.py's calls to FFmpeg for places we can't bypass it entirely
         - FFmpeg and Libav have libopus support
@@ -34,18 +32,13 @@
             - Need Encoder class (the whole idea is reducing the step of opus.encoder)
 - [ ] Voice volume convert from ex. 100% to 1.0 notation
 - [ ] Process voice audio before connecting to channel (reduce delay between joining and playing)
-- [ ] Command line option to disable voice
+- [x] Command line option to disable voice
     - Move import to conditional?
 - [ ] Check for youtube-dl module in stream command?
     - Mostly so the log can tell the user to pip install it instead of exception vomit
 
 # Assorted notes (AKA thought this while busy with another thing)
 - [ ] cmd module for/instead of poll_terminal?
-- [ ] Give crabbotvoice its own asyncio thread/loop somehow?
-    - stop_voice is notably delayed sometimes. player.stop() seems to work now, but bot lingers in channel
-        - this causes a bug if it's awaiting a disconnect and someone calls an audio command during a long delay
-            - disabling end_playback does NOT fix this. Seems related to how long voice plays?
-    - Esp. with audio playing, responsiveness is important
 - [ ] Call loop.stop() to exit bot.run()?
     - discord.py does useful things in 'except KeyBoardInterrupt' though
 - [ ] Nice enhancement? (probably need if more than one Discord server): new subbot per server connection

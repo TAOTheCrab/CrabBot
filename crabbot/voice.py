@@ -1,10 +1,14 @@
 #!/usr/bin/env python3
+# Parts taken from discord.py/examples/playlist.py
+# https://github.com/Rapptz/discord.py/blob/async/examples/playlist.py
 
-import discord
-from discord.ext import commands
+import asyncio
 import logging
 from pathlib import Path
 import random
+
+import discord
+from discord.ext import commands
 
 import crabbot.common
 
@@ -14,108 +18,273 @@ class Voice(crabbot.common.CrabBotCog):
 
     def __init__(self, bot, use_libav=False):
         super().__init__(bot)
+        self.use_libav = use_libav
 
         # TODO make configurable
         self.memes_path = Path("assets/memes")
-        # Initialize list
+        # Initialize lists
         self.update_lists()
 
-        self.use_libav = use_libav
+        # dict: server->voice_connection
+        self.voice_connections = {}
 
-        # NOTE code should be reworked to remove these, using checks for exists instead of None
-        self.voice_connection = None
-        self.voice_player = None
-
-        self.voice_volume = 0.2
-        self.max_volume = 1.0
+    # Special function used by discord.py for remove_cog
+    def __unload(self):
+        # Cancel all audio tasks and disconnect
+        for server, connection in self.voice_connections.items():
+            logging.info("Cancelling connection to {}".format(server))
+            try:
+                connection.audio_player.cancel()
+                if connection.voice is not None:
+                    # BUG can take a long time if cog is removed while playing
+                    self.bot.loop.create_task(connection.voice.disconnect())
+            except:
+                pass
 
     def update_lists(self):
         # !memes
         # TODO? instead, iterate over or choose from the contents of memes_path
+        #     Would make dynamic list easier, but maybe more abusable?
+        #     Could do Path.glob("*.opus") and insist on a single file format
         self.the_memes = crabbot.common.read_list_file(self.memes_path / "filelist.txt")
 
-    async def connect_voice(self, ctx):
+    def remove_voice_connection(self, server):
+        logging.info("Removing connection to voice {}".format(server))
+        del self.voice_connections[server]
 
-        logging.info("Attempting a voice connection")
+    def create_voice_connection(self, ctx):
+        logging.info("Creating a voice connection")
 
-        user_channel = ctx.message.author.voice_channel
-        if user_channel is None:
-            logging.info("Voice connection aborted: User not in a channel")
-            await self.bot.reply("Try being in a voice channel first")
-            return
+        user_voice_channel = ctx.message.author.voice_channel
+        if user_voice_channel is None:
+            logging.info("Voice connection not created: User not in a channel")
+            self.bot.loop.create_task(self.bot.reply("Try being in a voice channel first"))
+            return None
 
-        # Needed for voice playback
+        # Needed for voice playback. Deferred until we start possibly needing it
         if not discord.opus.is_loaded():
             discord.opus.load_opus('opus')
 
-        try:
-            self.voice_connection = await self.bot.join_voice_channel(user_channel)
-            logging.info("Voice connected to " + user_channel.name)
-        except discord.ClientException as e:
-            logging.info(e)
+        existing_connection = self.voice_connections.get(ctx.message.server)
+        if existing_connection is not None:
+            logging.info("Using existing voice connection")
+            return existing_connection
 
-    @commands.command(help="Set the voice volume. 0.0 - 1.0")
-    async def volume(self, new_volume):
-        self.voice_volume = min(float(new_volume), self.max_volume)
+        else:
+            new_connection = VoiceConnection(
+                self.bot,
+                after=self.remove_voice_connection)
+            self.voice_connections[ctx.message.server] = new_connection
+            logging.info("New voice connection to {} added".format(ctx.message.server))
+            return new_connection
 
-        if self.voice_player is not None:
-            self.voice_player.volume = self.voice_volume
+    @commands.command(pass_context=True)
+    async def volume(self, ctx, new_volume):
+        existing_connection = self.voice_connections.get(ctx.message.server)
+        if existing_connection is not None:
+            existing_connection.set_volume(new_volume)
+        else:
+            await self.bot.say("No voice connection to set a volume for")
+            # TODO think about persistent volume settings
 
-    @commands.command()
-    async def maxvolume(self, new_volume):
-        self.max_volume = min(float(new_volume), 1.0)
+    @commands.command(pass_context=True)
+    async def maxvolume(self, ctx, new_volume):
+        existing_connection = self.voice_connections.get(ctx.message.server)
+        if existing_connection is not None:
+            existing_connection.set_maxvolume(new_volume)
+        else:
+            await self.bot.say("No voice connection to set a volume for")
+            # TODO think about persistent volume settings
 
-    @commands.command(aliases=['voice_stop', 'shutup'])
-    async def stop_voice(self):
-        logging.info("Attempting to stop voice")
+    @commands.command(aliases=['voice_stop', 'shutup'], pass_context=True)
+    async def stop_voice(self, ctx):
+        logging.info("Ending voice connection to {}".format(ctx.message.server))
+        existing_connection = self.voice_connections.get(ctx.message.server)
+        if existing_connection is not None:
+            logging.info("Stopping the voice player")
+            # TODO check current_player "is not None"
+            #   It shouldn't be None too often, but eg. stream's delay might cause an edge case
+            # Stop the current audio ASAP
+            existing_connection.current_entry.player.stop()
 
-        if self.voice_player is not None:
-            self.voice_player.stop()
-            logging.info("Voice player stopped")
+            # Since we can't be sure there isn't more audio queued, force stop the task
+            existing_connection.audio_player.cancel()
+            logging.info("Disconnecting voice")
+            await existing_connection.voice.disconnect()
+            logging.info("Voice connection ended")
 
-        # Even if there is no connection, disconnect() should simply do nothing
-        logging.info("Disconnecting from voice")
-        await self.voice_connection.disconnect()
-        logging.info("Voice disconnected")
+            self.remove_voice_connection(ctx.message.server)
+        else:
+            logging.info("No voice connection to end")
+            await self.bot.say("No voice connection to {}".format(ctx.message.server))
+        # TODO think about persistent volume settings
 
-    def end_playback(self):
-        # NOTE put any playback queue checks here
-
-        logging.info("Ending voice playback")
-        disconnect_function = self.voice_connection.disconnect()
-        # BUG seems to get stuck here. Related to Python docs section 18.5.9.6?
-        self.bot.loop.call_soon_threadsafe(disconnect_function)
-        logging.info("Voice playback ended")
+    @commands.command(aliases=['current_stop', 'skip'], pass_context=True)
+    async def stop_current(self, ctx):
+        logging.info("Stopping current audio entry for {}".format(ctx.message.server))
+        existing_connection = self.voice_connections.get(ctx.message.server)
+        if existing_connection is not None:
+            logging.info("Stopping the voice player")
+            # TODO check current_player "is not None"
+            existing_connection.current_entry.player.stop()
+            # Audio player task should now continue
 
     @commands.command(pass_context=True, help="Lost?")
     async def memes(self, ctx):
-        await self.connect_voice(ctx)
+        logging.info("Memeing it up")
+        # TODO don't move connection immediately. See connect() call to move_to()
+        voice_connection = self.create_voice_connection(ctx)
+        # Very basic voice error checking
+        if voice_connection is not None:
+            chosen_meme = random.choice(self.the_memes)
 
-        self.voice_player = self.voice_connection.create_ffmpeg_player(
-            str(self.memes_path) + '/' + random.choice(self.the_memes),
-            use_avconv=self.use_libav)
-        # after=self.end_playback) #  Not working currently, seems to just lag stop_voice
-        self.voice_player.volume = self.voice_volume
+            target_voice_channel = ctx.message.author.voice_channel
+            # Initialize voice if not already created
+            if voice_connection.voice is None:
+                await voice_connection.connect(target_voice_channel)
+                target_voice_channel = None
 
-        self.voice_player.start()
+            # Build a VoiceEntry
+            player = voice_connection.voice.create_ffmpeg_player(
+                str(self.memes_path) + '/' + chosen_meme,
+                use_avconv=self.use_libav,
+                after=voice_connection.toggle_next)
+            new_entry = VoiceEntry(player, chosen_meme, target_voice_channel)
 
-        logging.info("Started memes")
+            logging.info("Queueing new voice entry for {}".format(new_entry.name))
+            await voice_connection.audio_queue.put(new_entry)
 
     @commands.command(pass_context=True,
                       help="Plays most things supported by youtube-dl")
     async def stream(self, ctx, video=None):
         if video is not None:
-            await self.connect_voice(ctx)
+            logging.info("Streaming")
+            voice_connection = self.create_voice_connection(ctx)
+            # Very basic voice error checking
+            if voice_connection is not None:
+                # Give user feedback when recieved
+                await self.bot.reply("Stream queued")
 
-            # TODO further testing. end_playback doesn't seem to trigger
-            #      (might be computer-specific)
-            #      Might be silent ignore of RuntimeException for async not being awaited
-            self.voice_player = await self.voice_connection.create_ytdl_player(
-                video,
-                use_avconv=self.use_libav)
-            # after=self.end_playback) #  See comment on memes command
-            self.voice_player.volume = self.voice_volume
+                target_voice_channel = ctx.message.author.voice_channel
+                # Initialize voice if not already created
+                if voice_connection.voice is None:
+                    await voice_connection.connect(target_voice_channel)
+                    target_voice_channel = None
 
-            self.voice_player.start()
+                # Build a VoiceEntry
+                player = await voice_connection.voice.create_ytdl_player(
+                    video,
+                    use_avconv=self.use_libav,
+                    after=voice_connection.toggle_next)
+                new_entry = VoiceEntry(
+                    player, player.title,
+                    target_voice_channel, ctx.message)
 
-            logging.info("Started streaming " + self.voice_player.title)
+                logging.info("Queueing new voice entry for {}".format(new_entry.name))
+                await voice_connection.audio_queue.put(new_entry)
+
+
+class VoiceConnection:
+    def __init__(self, bot, after):
+        self.bot = bot
+        self.after = after
+
+        self.voice = None
+        self.current_entry = None
+        self.play_next_in_queue = asyncio.Event()
+        self.audio_queue = asyncio.Queue()
+        self.audio_player = self.bot.loop.create_task(self.audio_player_task())
+        self.maxvolume = 1.0
+        self.volume = 0.2
+
+    def set_volume(self, new_volume):
+        self.volume = min(float(new_volume), self.maxvolume)
+        if self.current_entry is not None:
+            self.current_entry.player.volume = self.volume
+
+    def set_maxvolume(self, new_volume):
+        self.maxvolume = min(float(new_volume), 1.0)  # Max volume hardcoded to 100%
+
+    def toggle_next(self):
+        self.bot.loop.call_soon_threadsafe(self.play_next_in_queue.set)
+
+    async def connect(self, channel):
+        if self.voice is None:
+            logging.info("Attempting voice connection to {}".format(channel.name))
+            try:
+                self.voice = await self.bot.join_voice_channel(channel)
+                logging.info("Voice connected to {}".format(channel.name))
+            except discord.ClientException as e:
+                logging.info(e)
+                await self.bot.say("Sorry, something went wrong with voice")
+        else:
+            logging.info("Moving existing voice connection to {}".format(channel.name))
+            await self.voice.move_to(channel)
+
+    async def audio_player_task(self):
+        # Play audio until the queue is empty, then disconnect
+        # We're assuming at least one entry comes in per VoiceConnection
+        # which seems to be a problem mostly with ytdl and its processing time
+        queue_has_entries = True
+        while queue_has_entries:
+            self.play_next_in_queue.clear()
+
+            # Wait for a VoiceEntry
+            logging.info("Audio player task ready. Waiting for next VoiceEntry")
+            self.current_entry = await self.audio_queue.get()
+            logging.info("VoiceEntry recieved")
+
+            # Connect to a voice channel. None means the command did it already.
+            if self.current_entry.voice_channel is not None:
+                await self.connect(self.current_entry.voice_channel)
+
+            logging.info("Playing {} on {}".format(
+                self.current_entry.name, self.voice.channel))
+            # Log the duration (eg. for ytdl_player)
+            if hasattr(self.current_entry.player, 'duration'):
+                logging.info("Player length is {0[0]}m {0[1]}s".format(
+                    divmod(self.current_entry.player.duration, 60)))
+            if self.current_entry.requester is not None:
+                # Notify the requester at the text channel the request was sent from
+                logging.info("Requested by {}".format(self.current_entry.requester))
+                msg = "{0.mention}, Playing your stream: {1}".format(
+                    self.current_entry.requester, self.current_entry.name)
+                await self.bot.send_message(self.current_entry.text_channel, msg)
+
+            self.current_entry.player.volume = self.volume
+            self.current_entry.player.start()
+
+            # Wait for playback to finish (player.after = *connection_instance*.toggle_next())
+            await self.play_next_in_queue.wait()
+            logging.info("Audio finished")
+
+            # Small pause between entries
+            asyncio.sleep(1)
+            queue_has_entries = not self.audio_queue.empty()
+
+        logging.info("Audio queue finished. Disconnecting.")
+        asyncio.sleep(1)  # The disconnect sound doesn't make a good sudden end
+
+        # BUG there's a small window where you can call a command while it's disconnecting
+        #  So the command goes through, but the VoiceEntry disappears
+        await self.voice.disconnect()
+        self.after(self.voice.server)
+        # return
+
+
+class VoiceEntry:
+    def __init__(self, player, name, voice_channel, message=None):
+        self.player = player
+        self.name = name
+        self.voice_channel = voice_channel
+        if message is not None:
+            self.requester = message.author
+            self.text_channel = message.channel
+        else:
+            self.requester = None
+            self.text_channel = None
+
+# playlist.py has a VoiceState class per server.
+# VoiceState awaits on self.songs.get() until the handler Music class
+# calls state.songs.put() using a VoiceEntry class containing the ytdl_player
+# (plus info on the song requester)
