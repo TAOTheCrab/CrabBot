@@ -10,6 +10,7 @@
     - Logging.INFO level
     - Timestamp
     - Usage stats?
+    - logging.Formatter() (see Python docs entry "Logging HOWTO")
 - [ ] user.cfg. Look into argparse's fromfile_prefix_chars, otherwise have default location and arg-defined location
     - Currently would only save passing -f or -t every launch, but we might want more options later
 - [ ] Translation strings (mostly as an excuse to shorten the help= sections)

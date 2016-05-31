@@ -178,6 +178,7 @@ class Voice(crabbot.common.CrabBotCog):
             target_voice_channel = None
 
         # Build a VoiceEntry
+        # TODO ytdl_options = {cachedir: tempfile.gettempdir()}
         player = await voice_connection.voice.create_ytdl_player(
             video,
             use_avconv=self.use_libav,
@@ -292,4 +293,5 @@ class VoiceConnection:
         await self.voice.disconnect()
         # TODO maybe instead just set voice to None for ex. volume persistence per server
         #      Currently the VoiceConnection has to remove itself to reset the task
+        #      Just put the ending stuff in a queue.empty() check and change to "while True"?
         self.after(self.voice.server)
