@@ -43,9 +43,6 @@ class Voice(crabbot.common.CrabBotCog):
 
     def update_lists(self):
         # !memes
-        # TODO? instead, iterate over or choose from the contents of memes_path
-        #     Would make dynamic list easier, but maybe more abusable?
-        #     Could do Path.glob("*.opus") and insist on a single file format
         self.the_memes = crabbot.common.read_list_file(self.memes_path / "filelist.txt")
 
     def remove_voice_connection(self, server):
@@ -132,56 +129,78 @@ class Voice(crabbot.common.CrabBotCog):
     @commands.command(pass_context=True, help="Lost?")
     async def memes(self, ctx):
         logging.info("Memeing it up")
-        # TODO don't move connection immediately. See connect() call to move_to()
+
         voice_connection = self.create_voice_connection(ctx)
-        # Very basic voice error checking
-        if voice_connection is not None:
-            chosen_meme = random.choice(self.the_memes)
+        # If the user was not found to be in a voice channel, end the command
+        if voice_connection is None:
+            return
 
-            target_voice_channel = ctx.message.author.voice_channel
-            # Initialize voice if not already created
-            if voice_connection.voice is None:
-                await voice_connection.connect(target_voice_channel)
-                target_voice_channel = None
+        chosen_meme = random.choice(self.the_memes)
 
-            # Build a VoiceEntry
-            player = voice_connection.voice.create_ffmpeg_player(
-                str(self.memes_path) + '/' + chosen_meme,
-                use_avconv=self.use_libav,
-                after=voice_connection.toggle_next)
-            new_entry = VoiceEntry(player, chosen_meme, target_voice_channel)
+        target_voice_channel = ctx.message.author.voice_channel
+        # Initialize voice if not already created
+        if voice_connection.voice is None:
+            await voice_connection.connect(target_voice_channel)
+            target_voice_channel = None
 
-            logging.info("Queueing new voice entry for {}".format(new_entry.name))
-            await voice_connection.audio_queue.put(new_entry)
+        # Build a VoiceEntry
+        player = voice_connection.voice.create_ffmpeg_player(
+            str(self.memes_path) + '/' + chosen_meme,
+            use_avconv=self.use_libav,
+            after=voice_connection.toggle_next)
+        new_entry = VoiceEntry(player, chosen_meme, target_voice_channel)
+
+        logging.info("Queueing new voice entry for {}".format(new_entry.name))
+        await voice_connection.audio_queue.put(new_entry)
 
     @commands.command(pass_context=True,
                       help="Plays most things supported by youtube-dl")
     async def stream(self, ctx, video=None):
-        if video is not None:
-            logging.info("Streaming")
-            voice_connection = self.create_voice_connection(ctx)
-            # Very basic voice error checking
-            if voice_connection is not None:
-                # Give user feedback when recieved
-                await self.bot.reply("Stream queued")
+        if video is None:
+            # TODO check if video is a valid streamable (YoutubeDL.py simulate?)
+            self.bot.reply("Nothing to stream")
+            return
 
-                target_voice_channel = ctx.message.author.voice_channel
-                # Initialize voice if not already created
-                if voice_connection.voice is None:
-                    await voice_connection.connect(target_voice_channel)
-                    target_voice_channel = None
+        logging.info("Streaming")
 
-                # Build a VoiceEntry
-                player = await voice_connection.voice.create_ytdl_player(
-                    video,
-                    use_avconv=self.use_libav,
-                    after=voice_connection.toggle_next)
-                new_entry = VoiceEntry(
-                    player, player.title,
-                    target_voice_channel, ctx.message)
+        voice_connection = self.create_voice_connection(ctx)
+        # If the user was not found to be in a voice channel, end the command
+        if voice_connection is None:
+            return
 
-                logging.info("Queueing new voice entry for {}".format(new_entry.name))
-                await voice_connection.audio_queue.put(new_entry)
+        # Give user feedback when recieved
+        await self.bot.reply("Stream queued")
+
+        target_voice_channel = ctx.message.author.voice_channel
+        # Initialize voice if not already created
+        if voice_connection.voice is None:
+            await voice_connection.connect(target_voice_channel)
+            target_voice_channel = None
+
+        # Build a VoiceEntry
+        player = await voice_connection.voice.create_ytdl_player(
+            video,
+            use_avconv=self.use_libav,
+            after=voice_connection.toggle_next)
+        new_entry = VoiceEntry(
+            player, player.title,
+            target_voice_channel, ctx.message)
+
+        logging.info("Queueing new voice entry for {}".format(new_entry.name))
+        await voice_connection.audio_queue.put(new_entry)
+
+
+class VoiceEntry:
+    def __init__(self, player, name, voice_channel, message=None):
+        self.player = player
+        self.name = name
+        self.voice_channel = voice_channel
+        if message is not None:
+            self.requester = message.author
+            self.text_channel = message.channel
+        else:
+            self.requester = None
+            self.text_channel = None
 
 
 class VoiceConnection:
@@ -203,7 +222,8 @@ class VoiceConnection:
             self.current_entry.player.volume = self.volume
 
     def set_maxvolume(self, new_volume):
-        self.maxvolume = min(float(new_volume), 1.0)  # Max volume hardcoded to 100%
+        # Max volume hardcoded to 100%
+        self.maxvolume = min(float(new_volume), 1.0)
 
     def toggle_next(self):
         self.bot.loop.call_soon_threadsafe(self.play_next_in_queue.set)
@@ -262,29 +282,14 @@ class VoiceConnection:
             asyncio.sleep(1)
             queue_has_entries = not self.audio_queue.empty()
 
-        logging.info("Audio queue finished. Disconnecting.")
-        asyncio.sleep(1)  # The disconnect sound doesn't make a good sudden end
+        logging.info("Audio queue finished")
+        # The disconnect sound doesn't make a good sudden end
+        asyncio.sleep(1)
 
+        logging.info("Disconnecting from voice channel {}".format(self.voice.channel))
         # BUG there's a small window where you can call a command while it's disconnecting
         #  So the command goes through, but the VoiceEntry disappears
         await self.voice.disconnect()
+        # TODO maybe instead just set voice to None for ex. volume persistence per server
+        #      Currently the VoiceConnection has to remove itself to reset the task
         self.after(self.voice.server)
-        # return
-
-
-class VoiceEntry:
-    def __init__(self, player, name, voice_channel, message=None):
-        self.player = player
-        self.name = name
-        self.voice_channel = voice_channel
-        if message is not None:
-            self.requester = message.author
-            self.text_channel = message.channel
-        else:
-            self.requester = None
-            self.text_channel = None
-
-# playlist.py has a VoiceState class per server.
-# VoiceState awaits on self.songs.get() until the handler Music class
-# calls state.songs.put() using a VoiceEntry class containing the ytdl_player
-# (plus info on the song requester)
