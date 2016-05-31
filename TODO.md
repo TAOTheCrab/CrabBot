@@ -36,6 +36,16 @@
     - Move import to conditional?
 - [ ] Check for youtube-dl module in stream command?
     - Mostly so the log can tell the user to pip install it instead of exception vomit
+- [ ] Set up YoutubeDL cachedir
+    - tempfile.TemporaryDirectory() for cross-platform?
+- [ ] Iterate over or choose from the contents of memes_path, instead of filelist.txt
+    - Would make dynamic list easier, but maybe more abusable?
+    - Could do ex. `Path.glob("*.opus")` and insist on a single file format
+        - Multiple file formats would create too many hardcoded globs
+            - Could try to use a library like [audioread](https://pypi.python.org/pypi/audioread)
+        - Could do both, make a single (pre-encoded) format auto-detected, plus a manual filelist.txt
+            - Pre-encoding is a bit annoying, so this is more user-friendly?
+                - Alt. could make some kind of helper. Terminal command?
 
 # Assorted notes (AKA thought this while busy with another thing)
 - [ ] cmd module for/instead of poll_terminal?
