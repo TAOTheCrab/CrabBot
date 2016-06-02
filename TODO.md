@@ -47,6 +47,7 @@
         - Could do both, make a single (pre-encoded) format auto-detected, plus a manual filelist.txt
             - Pre-encoding is a bit annoying, so this is more user-friendly?
                 - Alt. could make some kind of helper. Terminal command?
+- [ ] Command for info about current song (eg. a link)
 
 # Assorted notes (AKA thought this while busy with another thing)
 - [ ] cmd module for/instead of poll_terminal?
