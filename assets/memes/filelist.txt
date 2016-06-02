@@ -1,5 +1,1 @@
-DEATH.ogg
-wayShort.ogg
-HisNameIsEB.wav
-icanfightshort.ogg
-nicedotamemes.ogg
+HisNameIsEB.ogg
