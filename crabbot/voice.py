@@ -133,6 +133,10 @@ class Voice(crabbot.common.CrabBotCog):
         voice_connection = self.create_voice_connection(ctx)
         # If the user was not found to be in a voice channel, end the command
         if voice_connection is None:
+            # BUG? seems like sometimes this triggers even on logged valid connections
+            #      after it disconnects the first time. Reconnects and then nothing plays.
+            #      Queueing log doesn't trigger
+            logging.info("No voice connection found. Aborting memes.")
             return
 
         chosen_meme = random.choice(self.the_memes)
@@ -140,6 +144,7 @@ class Voice(crabbot.common.CrabBotCog):
         target_voice_channel = ctx.message.author.voice_channel
         # Initialize voice if not already created
         if voice_connection.voice is None:
+            logging.info("Initializing voice from memes command")
             await voice_connection.connect(target_voice_channel)
             target_voice_channel = None
 
@@ -166,14 +171,13 @@ class Voice(crabbot.common.CrabBotCog):
         voice_connection = self.create_voice_connection(ctx)
         # If the user was not found to be in a voice channel, end the command
         if voice_connection is None:
+            logging.info("No voice connection found. Aborting stream")
             return
-
-        # Give user feedback when recieved
-        await self.bot.reply("Stream queued")
 
         target_voice_channel = ctx.message.author.voice_channel
         # Initialize voice if not already created
         if voice_connection.voice is None:
+            logging.info("Initializing voice from stream command")
             await voice_connection.connect(target_voice_channel)
             target_voice_channel = None
 
@@ -187,6 +191,8 @@ class Voice(crabbot.common.CrabBotCog):
             player, player.title,
             target_voice_channel, ctx.message)
 
+        # Give user feedback when recieved
+        await self.bot.reply("Stream queued")
         logging.info("Queueing new voice entry for {}".format(new_entry.name))
         await voice_connection.audio_queue.put(new_entry)
 
@@ -262,9 +268,12 @@ class VoiceConnection:
             logging.info("Playing {} on {}".format(
                 self.current_entry.name, self.voice.channel))
             # Log the duration (eg. for ytdl_player)
-            if hasattr(self.current_entry.player, 'duration'):
-                logging.info("Player length is {0[0]}m {0[1]}s".format(
-                    divmod(self.current_entry.player.duration, 60)))
+            # if hasattr(self.current_entry.player, 'duration'):
+            #    # BUG TypeError: unsupported operand type(s) for divmod(): 'NoneType' and 'int'
+            #    #   Guess ytdl_player always has duration, just not always with an answer
+            #    #   ex. for raw mp3 files. Disabling for now.
+            #    logging.info("Player length is {0[0]}m {0[1]}s".format(
+            #        divmod(self.current_entry.player.duration, 60)))
             if self.current_entry.requester is not None:
                 # Notify the requester at the text channel the request was sent from
                 logging.info("Requested by {}".format(self.current_entry.requester))
