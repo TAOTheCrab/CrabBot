@@ -13,11 +13,10 @@ import crabbot.common
 class Messages(crabbot.common.CrabBotCog):
     has_lists = True
 
-    def __init__(self, bot):
+    def __init__(self, bot, assets_path):
         super().__init__(bot)
 
-        # TODO make configurable (class arg?)
-        self.assets_path = Path("assets")
+        self.assets_path = Path(assets_path)
         # Initialize the lists
         self.update_lists()
 

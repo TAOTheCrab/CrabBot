@@ -16,12 +16,11 @@ import crabbot.common
 class Voice(crabbot.common.CrabBotCog):
     has_lists = True
 
-    def __init__(self, bot, use_libav=False):
+    def __init__(self, bot, memes_path, use_libav=False):
         super().__init__(bot)
         self.use_libav = use_libav
 
-        # TODO make configurable
-        self.memes_path = Path("assets/memes")
+        self.memes_path = Path(memes_path)
         # Initialize lists
         self.update_lists()
 

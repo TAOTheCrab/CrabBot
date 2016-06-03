@@ -23,6 +23,10 @@ token_args.add_argument('-f', '--file', type=argparse.FileType('r'),
                         help="A file with the bot user's login token as the first line. Use this or -t")
 parser.add_argument('-p', '--prefix', default="!crab",
                     help="Command prefix the bot responds to")
+parser.add_argument('--assets-path', default="assets/",
+                    help="Path for general assets (ex. sir-places.txt)")
+parser.add_argument('--memes-path', default="assets/memes",
+                    help="Path for memes audio clips (and its filelist.txt)")
 parser.add_argument('--use-libav', action='store_true',
                     help="Make Voice use Libav instead of FFmpeg")
 parser.add_argument('--disable-voice', action='store_true',
@@ -69,7 +73,7 @@ def poll_terminal():
         elif term_input.startswith("enable_voice"):
             if "crabbot.voice" in sys.modules:
                 logging.info("Enabling voice commands")
-                bot.add_cog(crabbot.voice.Voice(bot, args.use_libav))
+                bot.add_cog(crabbot.voice.Voice(bot, args.memes_path, args.use_libav))
             else:
                 logging.info("Voice disabled in source. Add/uncomment import for crabbot.voice and relaunch.")
         elif term_input.startswith("update_lists"):
@@ -78,10 +82,10 @@ def poll_terminal():
 input_thread = Thread(target=poll_terminal)
 input_thread.start()
 
-bot.add_cog(crabbot.messages.Messages(bot))
+bot.add_cog(crabbot.messages.Messages(bot, args.assets_path))
 # Comment out import of voice to disable voice commands
 if "crabbot.voice" in sys.modules and args.disable_voice is False:
-    bot.add_cog(crabbot.voice.Voice(bot, args.use_libav))
+    bot.add_cog(crabbot.voice.Voice(bot, args.memes_path, args.use_libav))
 
 # Blocking, must be last. See discord.py Client for more info.
 bot.run(login)
