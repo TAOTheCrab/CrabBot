@@ -48,6 +48,7 @@
             - Pre-encoding is a bit annoying, so this is more user-friendly?
                 - Alt. could make some kind of helper. Terminal command?
 - [ ] Command for info about current song (eg. a link)
+- [ ] Memes number selector
 
 # Assorted notes (AKA thought this while busy with another thing)
 - [ ] cmd module for/instead of poll_terminal?
@@ -57,3 +58,7 @@
     - Probably not the way to do this, just noting this to remind myself later
 - [ ] Figure out if there's some, say, preprocessing we can do on voice audio to reduce slowdown
 - [ ] Case-insensitive commands (not that important, just interesting)
+- [ ] Put cogs in a "cogs" package? To make it clearer that they're modules instead of main code.
+- [ ] Look into libav vs ffmpeg on Raspberry Pi
+    - Seems like libav performs faster?
+    - YouTube-DL needs one of those two, otherwise we might be able to use a simpler decoder?
