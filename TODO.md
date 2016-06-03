@@ -21,6 +21,8 @@
     - Check for (configurable?) role
         - alt. check user permissions (ex. Manage Server, Voice Move Member)
 - [ ] setup.py
+- [ ] Terminal command to change assets_path/memes_path
+    - Probably would just have to remove then re-add related cog
 
 ## Voice
 - [x] Voice command queueing
