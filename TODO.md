@@ -23,18 +23,35 @@
 - [ ] setup.py
 - [ ] Terminal command to change assets_path/memes_path
     - Probably would just have to remove then re-add related cog
+- [ ] Add type hints to functions (see [typing](https://docs.python.org/3/library/typing.html))
+    - Python 3.5 specific, so have to straight abandon pretense of 3.4 usability
+    - Mostly just nice for keeping track of ex. which class is expected for function calls on args
+        - (reading discord.py reminded me that duck typing is confusing with custom classes)
 
 ## Voice
-- [x] Voice command queueing
-    - Needs a target channel for each queue entry, but otherwise done
 - [ ] Voice pre-encoded for opus (see AirhornBot's use of DCA)
     - Might be worth tweaking discord.py's calls to FFmpeg for places we can't bypass it entirely
         - FFmpeg and Libav have libopus support
         - Alternately, make our own FFmpeg wrapper for StreamPlayer
             - youtube-dl --audio-format opus
-            - Need Encoder class (the whole idea is reducing the step of opus.encoder)
+            - Need Encoder class
+                - encoder.frame_size
+                - encoder.frame_length
+    - Airhornbot's [load function](https://github.com/hammerandchisel/airhornbot/blob/master/cmd/bot/bot.go#L233):
+        - Basically follows this part of the [spec](https://github.com/bwmarrin/dca/wiki/DCA1-specification#audio-data)
+        - Reads the 16-bit signed little endian int header for the audio length in bytes
+        - Uses that length to put the rest of the file into a bytes array
+        - Simply appends the bytes array onto another bytes array as a buffer/queue
+            - That buffer gets fed straight into an OpusSend of a Discord VoiceConnection
+    - discord.py's opus.Encoder.encode() passes all audio through libopus's opus_encode
+        - VoiceClient.play_audio(encode=False) skips encode()
+            - For ffmpeg_player, StreamPlayer(player=play_audio)
+                - Streamplayer(player=(lambda data: play_audio(data, encode=False)))
 - [ ] Voice volume convert from ex. 100% to 1.0 notation
-- [ ] Process voice audio before connecting to channel (reduce delay between joining and playing)
+- [x] Process voice audio before connecting to channel (reduce delay between joining and playing)
+    - discord.py needs a voice connection before audio processing can start, so not possible
+        - Obviously could break out of using discord.py to process audio
+    - Probably solved by pre-encoding TODO (at least, would have do to our own processing)
 - [x] Command line option to disable voice
     - Move import to conditional?
 - [ ] Check for youtube-dl module in stream command?
@@ -50,6 +67,7 @@
             - Pre-encoding is a bit annoying, so this is more user-friendly?
                 - Alt. could make some kind of helper. Terminal command?
 - [ ] Command for info about current song (eg. a link)
+    - Only really important when the stream message is either deleted or heavily buried
 - [ ] Memes number selector
 
 # Assorted notes (AKA thought this while busy with another thing)
@@ -61,6 +79,3 @@
 - [ ] Figure out if there's some, say, preprocessing we can do on voice audio to reduce slowdown
 - [ ] Case-insensitive commands (not that important, just interesting)
 - [ ] Put cogs in a "cogs" package? To make it clearer that they're modules instead of main code.
-- [ ] Look into libav vs ffmpeg on Raspberry Pi
-    - Seems like libav performs faster?
-    - YouTube-DL needs one of those two, otherwise we might be able to use a simpler decoder?
