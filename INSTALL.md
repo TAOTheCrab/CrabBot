@@ -38,13 +38,14 @@ Use `pyvenv` to create virtual environments
 #!/bin/bash
 
 CRABBOTENV=*CrabBotVEnvDir*
+CRABBOTARGS="*either file or token args* *additional args, ex. --memes-path*"
 
 cd $CRABBOTENV
 source bin/activate  # Can remove this if not using a virtual env
 cd CrabBot  # Can also remove this if not using a virtual env
 
 # Create a new detached screen
-screen -d -m -S CrabBotRun python3 run.py *either file or token arg*
+screen -d -m -S CrabBotRun python3 run.py $CRABBOTARGS
 echo "Use \`screen -R CrabBotRun\` to control CrabBot"
 
 ```
