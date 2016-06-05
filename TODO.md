@@ -27,6 +27,8 @@
     - Python 3.5 specific, so have to straight abandon pretense of 3.4 usability
     - Mostly just nice for keeping track of ex. which class is expected for function calls on args
         - (reading discord.py reminded me that duck typing is confusing with custom classes)
+- [ ] Some kind of status check command(s)
+    - List contents of eg. the_memes (ex. check if --memes-path was correct without voice command)
 
 ## Voice
 - [ ] Voice pre-encoded for opus (see AirhornBot's use of DCA)
