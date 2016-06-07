@@ -63,6 +63,3 @@ target/
 .ipynb_checkpoints
 
 ## End Python template
-
-# Avoid leaking credentials
-user.cfg
