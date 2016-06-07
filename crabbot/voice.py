@@ -1,11 +1,15 @@
 #!/usr/bin/env python3
+# CrabBot general voice commands
+#
 # Parts taken from discord.py/examples/playlist.py
 # https://github.com/Rapptz/discord.py/blob/async/examples/playlist.py
 
 import asyncio
+import importlib.util
 import logging
 from pathlib import Path
 import random
+import tempfile
 
 import discord
 from discord.ext import commands
@@ -35,7 +39,7 @@ class Voice(crabbot.common.CrabBotCog):
             try:
                 connection.audio_player.cancel()
                 if connection.voice is not None:
-                    # BUG can take a long time if cog is removed while playing
+                    # can take a long time if cog is removed while playing. Is there a fix?
                     self.bot.loop.create_task(connection.voice.disconnect())
             except:
                 pass
@@ -82,6 +86,7 @@ class Voice(crabbot.common.CrabBotCog):
         else:
             await self.bot.say("No voice connection to set a volume for")
             # TODO think about persistent volume settings
+            #      maybe instead create a new voice connection with no connect()?
 
     @commands.command(pass_context=True)
     async def maxvolume(self, ctx, new_volume):
@@ -98,10 +103,10 @@ class Voice(crabbot.common.CrabBotCog):
         existing_connection = self.voice_connections.get(ctx.message.server)
         if existing_connection is not None:
             logging.info("Stopping the voice player")
-            # TODO check current_player "is not None"
-            #   It shouldn't be None too often, but eg. stream's delay might cause an edge case
-            # Stop the current audio ASAP
-            existing_connection.current_entry.player.stop()
+
+            if existing_connection.current_entry.player is not None:
+                # Stop the current audio ASAP
+                existing_connection.current_entry.player.stop()
 
             # Since we can't be sure there isn't more audio queued, force stop the task
             existing_connection.audio_player.cancel()
@@ -109,11 +114,11 @@ class Voice(crabbot.common.CrabBotCog):
             await existing_connection.voice.disconnect()
             logging.info("Voice connection ended")
 
+            # TODO think about persistent volume settings
             self.remove_voice_connection(ctx.message.server)
         else:
             logging.info("No voice connection to end")
             await self.bot.say("No voice connection to {}".format(ctx.message.server))
-        # TODO think about persistent volume settings
 
     @commands.command(aliases=['current_stop', 'skip'], pass_context=True)
     async def stop_current(self, ctx):
@@ -121,8 +126,8 @@ class Voice(crabbot.common.CrabBotCog):
         existing_connection = self.voice_connections.get(ctx.message.server)
         if existing_connection is not None:
             logging.info("Stopping the voice player")
-            # TODO check current_player "is not None"
-            existing_connection.current_entry.player.stop()
+            if existing_connection.current_entry.player is not None:
+                existing_connection.current_entry.player.stop()
             # Audio player task should now continue
 
     @commands.command(pass_context=True, help="Lost?")
@@ -135,6 +140,7 @@ class Voice(crabbot.common.CrabBotCog):
             # BUG? seems like sometimes this triggers even on logged valid connections
             #      after it disconnects the first time. Reconnects and then nothing plays.
             #      Queueing log doesn't trigger
+            #      Seems to be gone now? Might have been an error hidden by aysncio?
             logging.info("No voice connection found. Aborting memes.")
             return
 
@@ -167,6 +173,12 @@ class Voice(crabbot.common.CrabBotCog):
 
         logging.info("Streaming")
 
+        if importlib.util.find_spec("youtube_dl") is None:
+            # Preempt import error and silent failure with a more useful message and user feedback
+            logging.error("Memes command requires youtube-dl module. Install with pip.")
+            self.bot.reply("Bot is not configured to stream")
+            return
+
         voice_connection = self.create_voice_connection(ctx)
         # If the user was not found to be in a voice channel, end the command
         if voice_connection is None:
@@ -181,10 +193,15 @@ class Voice(crabbot.common.CrabBotCog):
             target_voice_channel = None
 
         # Build a VoiceEntry
-        # TODO ytdl_options = {cachedir: tempfile.gettempdir()}
+        # See YoutubeDL.py for ytdl options:
+        # https://github.com/rg3/youtube-dl/blob/master/youtube_dl/YoutubeDL.py#L128
+        ytdl_opts = {
+            "ignoreerrors": True  # Mostly so it won't stop on bad playlist entries
+        }
         player = await voice_connection.voice.create_ytdl_player(
             video,
             use_avconv=self.use_libav,
+            ytdl_options=ytdl_opts,
             after=voice_connection.toggle_next)
         new_entry = VoiceEntry(
             player, player.title,

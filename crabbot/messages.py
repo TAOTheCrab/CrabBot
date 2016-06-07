@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# CrabBot general message commands (mostly fun phrasal template responses)
 
 import asyncio
 import discord

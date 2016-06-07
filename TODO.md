@@ -56,7 +56,7 @@
     - Probably solved by pre-encoding TODO (at least, would have do to our own processing)
 - [x] Command line option to disable voice
     - Move import to conditional?
-- [ ] Check for youtube-dl module in stream command?
+- [x] Check for youtube-dl module in stream command?
     - Mostly so the log can tell the user to pip install it instead of exception vomit
 - [ ] Set up YoutubeDL cachedir
     - tempfile.TemporaryDirectory() for cross-platform?

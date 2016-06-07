@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+# Run script for CrabBot
+# A mess of config args and terminal polling code
+#
+# See -h or read the argparse setup for argument details
 
 import argparse
 import asyncio
@@ -54,12 +58,12 @@ def poll_terminal():
         if term_input == "help":
             # TODO print terminal command help
             print("Uh, no. I'm gonna be annoying instead.")
-            # NOTES could use function.__doc__ and docstrings for function help
+            # NOTE could use function.__doc__ and docstrings for function help
         elif term_input == "quit":
             # TODO figure out if it's possible to end discord.Client without KeyboardInterrupt
             #   Probably need to reimplement run() using start() with a different quit condition
-            # Could also use run() and just throw a KeyboardInterrupt or two.
-            # Ew...
+            #   Could also use run() and just throw a KeyboardInterrupt or two.
+            #   Ew...
 
             # For now, tell user how to quit so we don't leave them in the dark
             print("Disabling command input. Use ctrl+c to quit the bot.")
@@ -79,7 +83,8 @@ def poll_terminal():
         elif term_input.startswith("update_lists"):
             bot.update_all_lists()
 
-input_thread = Thread(target=poll_terminal)
+# Start polling thread as a daemon so the program exits without waiting if ex. the bot crashes
+input_thread = Thread(target=poll_terminal, daemon=True)
 input_thread.start()
 
 bot.add_cog(crabbot.messages.Messages(bot, args.assets_path))
@@ -89,5 +94,3 @@ if "crabbot.voice" in sys.modules and args.disable_voice is False:
 
 # Blocking, must be last. See discord.py Client for more info.
 bot.run(login)
-
-input_thread.join()

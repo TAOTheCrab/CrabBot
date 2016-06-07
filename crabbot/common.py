@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
-# NOTE: using Python3.5+ async syntax
 # Simple Discord chatbot for fun
+# Main bot management plus some functions common between command cogs.
 #
-# Requires a bot user token. See -h for details.
+# Contains class CrabBotCog, which defines an optional interface
+# used by CrabBot to interact with cogs.
+#
+# Requires a bot user token.
 
 import asyncio
 import discord
@@ -31,6 +34,7 @@ class CrabBot(commands.Bot):
     async def update_profile(self, username=None, avatar=None):
         logging.info("Updating profile")
 
+        # TODO probably just convert this to require both args, since single arg seems too buggy
         # BUG using new_username seems to always return BAD REQUEST, disabled for now
         if username is not None:
             new_username = username
@@ -38,6 +42,7 @@ class CrabBot(commands.Bot):
             new_username = self.user.name
 
         # TODO convert to try: fields['avatar'] except KeyError, so we can use None for 'no avatar'
+        #      to signal edit_profile() to use the existing profile fields instead
         if avatar is not None:
             # As far as I can tell, Discord's official API only supports JPEG
             new_avatar = open(avatar, 'rb')
@@ -91,4 +96,5 @@ def read_list_file(filepath):
     with filepath.open() as file_list:
         words = [x.rstrip() for x in file_list]
     # TODO check whether trailing newlines make it into the list as blank strings
+    #      Needs live check of the list. So far blank lines haven't shown up in commands, but...
     return words
