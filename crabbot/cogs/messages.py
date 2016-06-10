@@ -37,6 +37,8 @@ class Messages(crabbot.common.CrabBotCog):
         self.bandadjectives = crabbot.common.read_list_file(self.assets_path / "band-adjectives.txt")
         self.bandnouns = crabbot.common.read_list_file(self.assets_path / "band-nouns.txt")
         self.bandplaces = crabbot.common.read_list_file(self.assets_path / "band-places.txt")
+        # !band genre
+        self.bandgenres = crabbot.common.read_list_file(self.assets_path / "band-genres.txt")
 
     @commands.command(help='The bots have something to say')
     async def takeover(self):
@@ -97,9 +99,14 @@ class Messages(crabbot.common.CrabBotCog):
             location = random.choice(self.locations)
             await self.bot.say("You were {} by {} in {}".format(death, killer, location))
 
-    @commands.command(help="Need a band name?")
+    @commands.group(help="Need a band name?")
     async def band(self):
         adjective = random.choice(self.bandadjectives)
         noun = random.choice(self.bandnouns)
         place = random.choice(self.bandplaces)
         await self.bot.say("Your new band name is {} {} {}".format(adjective, noun, place))
+
+    @band.command(name="genre")
+    async def _genre(self):
+        genre = random.choice(self.bandgenres)
+        await self.bot.say("    which is a {} cover band.".format(genre))
