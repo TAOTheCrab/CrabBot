@@ -1,26 +1,26 @@
-Station
-Garage
 Apocalypse
-Diner
-Dungeon
-Hell
-Heck
-Loveshack
-Trench
-Farm
-Ranch
-Starship
-Boardroom
-School for Gifted Youngsters
-Sewer
 Arena
-Internet-land
-Sauna
+Boardroom
+Box
+Closet
+Computer Lab
 Cornfield
 Country
 Dictatorship
+Diner
+Dungeon
 Empire
-Computer Lab
+Farm
+Garage
+Heck
+Hell
+Internet-land
+Loveshack
 Office
-Closet
-Box
+Ranch
+Sauna
+School for Gifted Youngsters
+Sewer
+Starship
+Station
+Trench

@@ -1,33 +1,33 @@
-Lordran
-a fish bowl
-space
-the castle
-the living room
-the first dungeon
-the boss room
-the arena
-an open field
-a graveyard
-the underworld
-the opening cutscene
-a gratuitous cutscene
-a dark alleyway
 a bar fight
-an argument
-a minor squabble
-an epic battle
-a demonstration of strength
-a peace negotiation
-Legoland
-a loading screen
-a very small box
 a castle wall
+a dark alleyway
+a demonstration of strength
+a fish bowl
+a frenzied herd of cows
+a gratuitous cutscene
+a graveyard
+a loading screen
+a minor squabble
+a peace negotiation
+a very small box
+an argument
+an epic battle
+an open field
+Anor Londo
+Github
 Hogwarts
+Legoland
+Lordran
 Professor Xavier's School for Gifted Youngsters
+robot hell
+space
+the arena
+the boss room
+the castle
+the first dungeon
+the living room
 the middle of a monologue
 the opening credits
+the opening cutscene
+the underworld
 the White House
-robot hell
-Github
-Anor Londo
-a frenzied herd of cows

@@ -1,22 +1,22 @@
-Wolf
-Platypus
-Robot
 Bob-omb
-Harpy
-Luchador
-Lover
 Buttlicker
-Happiness-generator
 Crab
-Shellfish
-Muppet
-Witchwizard
-Dragon
-Toilet
-Dream
-Space-time
-Dancing Lobster
-Garbage
-Sausage
-Poop
 Cream Soda
+Dancing Lobster
+Dragon
+Dream
+Garbage
+Happiness-generator
+Harpy
+Lover
+Luchador
+Muppet
+Platypus
+Poop
+Robot
+Sausage
+Shellfish
+Space-time
+Toilet
+Witchwizard
+Wolf
