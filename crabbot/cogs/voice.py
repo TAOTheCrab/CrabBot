@@ -52,14 +52,9 @@ class Voice(crabbot.common.CrabBotCog):
         logging.info("Removing connection to voice {}".format(server))
         del self.voice_connections[server]
 
-    def create_voice_connection(self, ctx):
-        logging.info("Creating a voice connection")
-
-        user_voice_channel = ctx.message.author.voice_channel
-        if user_voice_channel is None:
-            logging.info("Voice connection not created: User not in a channel")
-            self.bot.loop.create_task(self.bot.reply("Try being in a voice channel first"))
-            return None
+    def get_voice_connection(self, ctx):
+        """Either retrieves or creates a voice connection entry for the server of the given ctx"""
+        logging.info("Getting a voice connection")
 
         # Needed for voice playback. Deferred until we start possibly needing it
         if not discord.opus.is_loaded():
@@ -69,33 +64,25 @@ class Voice(crabbot.common.CrabBotCog):
         if existing_connection is not None:
             logging.info("Using existing voice connection")
             return existing_connection
-
         else:
-            new_connection = VoiceConnection(
-                self.bot,
-                after=self.remove_voice_connection)
+            new_connection = VoiceConnection(self.bot)
             self.voice_connections[ctx.message.server] = new_connection
             logging.info("New voice connection to {} added".format(ctx.message.server))
             return new_connection
 
     @commands.command(pass_context=True)
     async def volume(self, ctx, new_volume):
-        existing_connection = self.voice_connections.get(ctx.message.server)
-        if existing_connection is not None:
-            existing_connection.set_volume(new_volume)
-        else:
-            await self.bot.say("No voice connection to set a volume for")
-            # TODO think about persistent volume settings
-            #      maybe instead create a new voice connection with no connect()?
+        logging.info("Setting volume for {} to {}".format(ctx.message.server, new_volume))
+        voice_connection = self.get_voice_connection(ctx)
+        # Barring Exceptions, we should always get back something we can set_volume for
+        voice_connection.set_volume(new_volume)
 
     @commands.command(pass_context=True)
     async def maxvolume(self, ctx, new_volume):
-        existing_connection = self.voice_connections.get(ctx.message.server)
-        if existing_connection is not None:
-            existing_connection.set_maxvolume(new_volume)
-        else:
-            await self.bot.say("No voice connection to set a volume for")
-            # TODO think about persistent volume settings
+        logging.info("Setting max volume for {} to {}".format(ctx.message.server, new_volume))
+        voice_connection = self.voice_connection(ctx)
+        # Barring Exceptions, we should always get back something we can set_maxvolume for
+        voice_connection.set_maxvolume(new_volume)
 
     @commands.command(aliases=['voice_stop', 'shutup'], pass_context=True)
     async def stop_voice(self, ctx):
@@ -134,19 +121,17 @@ class Voice(crabbot.common.CrabBotCog):
     async def memes(self, ctx):
         logging.info("Memeing it up")
 
-        voice_connection = self.create_voice_connection(ctx)
-        # If the user was not found to be in a voice channel, end the command
-        if voice_connection is None:
-            # BUG? seems like sometimes this triggers even on logged valid connections
-            #      after it disconnects the first time. Reconnects and then nothing plays.
-            #      Queueing log doesn't trigger
-            #      Seems to be gone now? Might have been an error hidden by aysncio?
-            logging.info("No voice connection found. Aborting memes.")
+        target_voice_channel = ctx.message.author.voice_channel
+
+        if target_voice_channel is None:
+            logging.info("Not memeing: User not in a voice channel")
+            self.bot.loop.create_task(self.bot.reply("Try being in a voice channel first"))
             return
+
+        voice_connection = self.get_voice_connection(ctx)
 
         chosen_meme = random.choice(self.the_memes)
 
-        target_voice_channel = ctx.message.author.voice_channel
         # Initialize voice if not already created
         if voice_connection.voice is None:
             logging.info("Initializing voice from memes command")
@@ -173,19 +158,21 @@ class Voice(crabbot.common.CrabBotCog):
 
         logging.info("Streaming")
 
+        target_voice_channel = ctx.message.author.voice_channel
+
+        if target_voice_channel is None:
+            logging.info("Not streaming: User not in a channel")
+            self.bot.loop.create_task(self.bot.reply("Try being in a voice channel first"))
+            return
+
         if importlib.util.find_spec("youtube_dl") is None:
             # Preempt import error and silent failure with a more useful message and user feedback
             logging.error("Memes command requires youtube-dl module. Install with pip.")
             self.bot.reply("Bot is not configured to stream")
             return
 
-        voice_connection = self.create_voice_connection(ctx)
-        # If the user was not found to be in a voice channel, end the command
-        if voice_connection is None:
-            logging.info("No voice connection found. Aborting stream")
-            return
+        voice_connection = self.get_voice_connection(ctx)
 
-        target_voice_channel = ctx.message.author.voice_channel
         # Initialize voice if not already created
         if voice_connection.voice is None:
             logging.info("Initializing voice from stream command")
@@ -227,9 +214,8 @@ class VoiceEntry:
 
 
 class VoiceConnection:
-    def __init__(self, bot, after):
+    def __init__(self, bot):
         self.bot = bot
-        self.after = after
 
         self.voice = None
         self.current_entry = None
@@ -265,11 +251,7 @@ class VoiceConnection:
             await self.voice.move_to(channel)
 
     async def audio_player_task(self):
-        # Play audio until the queue is empty, then disconnect
-        # We're assuming at least one entry comes in per VoiceConnection
-        # which seems to be a problem mostly with ytdl and its processing time
-        queue_has_entries = True
-        while queue_has_entries:
+        while True:
             self.play_next_in_queue.clear()
 
             # Wait for a VoiceEntry
@@ -306,17 +288,15 @@ class VoiceConnection:
 
             # Small pause between entries
             asyncio.sleep(1)
-            queue_has_entries = not self.audio_queue.empty()
 
-        logging.info("Audio queue finished")
-        # The disconnect sound doesn't make a good sudden end
-        asyncio.sleep(1)
+            if self.audio_queue.empty():
+                logging.info("Audio queue finished")
+                # The disconnect sound doesn't make a good sudden end
+                asyncio.sleep(1)
 
-        logging.info("Disconnecting from voice channel {}".format(self.voice.channel))
-        # BUG there's a small window where you can call a command while it's disconnecting
-        #  So the command goes through, but the VoiceEntry disappears
-        await self.voice.disconnect()
-        # TODO maybe instead just set voice to None for ex. volume persistence per server
-        #      Currently the VoiceConnection has to remove itself to reset the task
-        #      Just put the ending stuff in a queue.empty() check and change to "while True"?
-        self.after(self.voice.server)
+                # BUG there's a small window where you can call a command while it's disconnecting
+                #  So the command goes through, but the VoiceEntry disappears
+
+                logging.info("Disconnecting from voice channel {}".format(self.voice.channel))
+                await self.voice.disconnect()
+                self.voice = None

@@ -77,6 +77,8 @@
                 - could do Streamplayer(player=(lambda data: play_audio(data, encode=False)))
 - [ ] Command for info about current song (eg. a link)
     - Only really important when the stream message is either deleted or heavily buried
+- [ ] Look over voice commands and put shared code in a function
+    - eg. target_voice_channel check
 
 ### Nice to have
 - [ ] Voice volume convert from ex. 100% to 1.0 notation
