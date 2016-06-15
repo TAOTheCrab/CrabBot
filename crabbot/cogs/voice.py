@@ -183,7 +183,8 @@ class Voice(crabbot.common.CrabBotCog):
         # See YoutubeDL.py for ytdl options:
         # https://github.com/rg3/youtube-dl/blob/master/youtube_dl/YoutubeDL.py#L128
         ytdl_opts = {
-            "ignoreerrors": True  # Mostly so it won't stop on bad playlist entries
+            # "ignoreerrors": True  # Mostly so it won't stop on bad playlist entries
+            noplaylist: True  # Too many things broke on playlists, so...
         }
         player = await voice_connection.voice.create_ytdl_player(
             video,
