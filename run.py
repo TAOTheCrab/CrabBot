@@ -18,7 +18,7 @@ import crabbot.cogs.voice  # comment out to disable voice commands entirely
 
 
 logging.basicConfig(filename='crabbot.log', level=logging.INFO)  # Grr, ytdl doesn't log
-logging.info("Starting crabbot at " + datetime.datetime.now())
+logging.info("Starting crabbot at " + str(datetime.datetime.now()))
 
 # Do argparse first so that -h can print and exit before anything else happens
 parser = argparse.ArgumentParser(description='A silly Discord bot')
