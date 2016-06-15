@@ -70,3 +70,7 @@ WantedBy=multi-user.target
 Then `systemctl enable crabbot.service` and `systemctl start crabbot.service`
 
 Reference: [Autostart Process Gnu Screen Systemd/](http://www.linuxveda.com/2014/04/28/autostart-process-gnu-screen-systemd/)
+
+## Read the log file live
+
+`tail -f crabbot.log`
