@@ -16,7 +16,7 @@ import crabbot.cogs.messages
 import crabbot.cogs.voice  # comment out to disable voice commands entirely
 
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(filename='crabbot.log', level=logging.INFO)
 
 # Do argparse first so that -h can print and exit before anything else happens
 parser = argparse.ArgumentParser(description='A silly Discord bot')
