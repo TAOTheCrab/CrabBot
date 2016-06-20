@@ -23,6 +23,7 @@
         - Reminder: 0x1=b0001, 0x2=b0010, 0x4=b0100, 0x8=b1000
         - For link, convert to permissions hex/binary to int
     - [Add to server link docs](https://discordapp.com/developers/docs/topics/oauth2#adding-bots-to-guilds)
+- [ ] Need logging for exit/many other exceptions (see todo for clean exit)
 
 ### Nice to have
 - [ ] Would like to make a custom help formatter
@@ -79,6 +80,9 @@
     - Only really important when the stream message is either deleted or heavily buried
 - [ ] Look over voice commands and put shared code in a function
     - eg. target_voice_channel check
+- [ ] catch discord.ext.commands.errors.CommandInvokeError for eg. invalid stream URLs
+    - Disconnect from voice on error
+        - (would like to do the error-prone task before connecting, but we're not there yet)
 
 ### Nice to have
 - [ ] Voice volume convert from ex. 100% to 1.0 notation
@@ -112,3 +116,8 @@
 - [ ] Some kind of live cog reload/reimport
     - Cogs are the most modified code, would be nice to not wait for re-login
     - importlib.reload()?
+- [ ] Use multiprocessing for Voice/individual voice connections?
+    - Mostly just because a lot of Voice tasks hold up the main loop, and crash the bot
+    - Make per-connection asyncio loop
+    - Call bot loop with threadsafe(?)
+    - Need/use concurrent.futures?
