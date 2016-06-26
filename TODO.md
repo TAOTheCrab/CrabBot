@@ -14,10 +14,6 @@
     - Bot manages its own permissions? (eg. internal list of allowed users)
     - Check for (configurable?) Discord server role?
         - alt. check user permissions (ex. Manage Server, Voice Move Member)
-- [ ] Add type hints to functions (see [typing](https://docs.python.org/3/library/typing.html))
-    - Python 3.5 specific, so have to straight abandon pretense of 3.4 usability
-    - Mostly just nice for keeping track of ex. which class is expected for function calls on args
-        - (reading discord.py reminded me that duck typing is confusing with custom classes)
 - [ ] Discord permissions link generator
     - [Permissions docs](https://discordapp.com/developers/docs/topics/permissions)
         - Reminder: 0x1=b0001, 0x2=b0010, 0x4=b0100, 0x8=b1000
@@ -36,6 +32,10 @@
     - Look into existing libraries for localization loading eg. managing translation txt files
 - [ ] Module docstrings
 - [ ] Function docstrings
+- [ ] Add type hints to functions (see [typing](https://docs.python.org/3/library/typing.html))
+    - Python 3.5 specific, so have to straight abandon pretense of 3.4 usability
+    - Mostly just nice for keeping track of ex. which class is expected for function calls on args
+        - (reading discord.py reminded me that duck typing is confusing with custom classes)
 
 
 # run.py
@@ -83,6 +83,12 @@
 - [ ] catch discord.ext.commands.errors.CommandInvokeError for eg. invalid stream URLs
     - Disconnect from voice on error
         - (would like to do the error-prone task before connecting, but we're not there yet)
+- [ ] Livestreamer integration
+    - Bonus alt YouTube streamer? (claims only Live tho)
+        - Could hopefully start playing sooner than a full youtube-dl for longer videos
+        - Would lose possibility of caching videos
+    - At least look at example code for audio buffer usage (they used GStreamer for ex.)
+        - (... yes, CrabBot's audio handling is bad enough that it needs random buffer examples)
 
 ### Nice to have
 - [ ] Voice volume convert from ex. 100% to 1.0 notation
@@ -92,6 +98,7 @@
     - Could do ex. `Path.glob("*.dca")` and insist on a single file format
         - Multiple file formats would create too many hardcoded globs
             - Could instead try to use a library like [audioread](https://pypi.python.org/pypi/audioread)
+                - Pydub?
         - Could do both, make a single (pre-encoded) format auto-detected, plus a manual filelist.txt
             - Pre-encoding is a bit annoying, so this is more user-friendly?
                 - Alt. could make some kind of helper. Terminal command?
@@ -113,6 +120,11 @@
     - discord.py does useful things in 'except KeyBoardInterrupt' though
 - [ ] Figure out multi-server stuff (currently untested, but might work as-is)
 - [ ] Case-insensitive commands (not that important, just interesting)
+    - Could override bot.on_message() and do str.lower() before bot.process_commands()
+        - Problem: precludes commands having capitalizable args (eg. quotes)
+            - Could copy process_commands' use of discord.ext.StringView.get_word to get the command
+                - Doesn't work with subcommands
+    - Probably requires adding a str.lower() in process_commands() when it's getting the "invoker"
 - [ ] Some kind of live cog reload/reimport
     - Cogs are the most modified code, would be nice to not wait for re-login
     - importlib.reload()?
