@@ -71,16 +71,24 @@ class Voice(crabbot.common.CrabBotCog):
             return new_connection
 
     @commands.command(pass_context=True)
-    async def volume(self, ctx, new_volume):
-        logging.info("Setting volume for {} to {}".format(ctx.message.server, new_volume))
+    async def volume(self, ctx, new_volume=None):
         voice_connection = self.get_voice_connection(ctx)
+        if new_volume is None:
+            await self.bot.say("The current volume is {}".format(voice_connection.volume))
+            return
+
+        logging.info("Setting volume for {} to {}".format(ctx.message.server, new_volume))
         # Barring Exceptions, we should always get back something we can set_volume for
         voice_connection.set_volume(new_volume)
 
     @commands.command(pass_context=True)
-    async def maxvolume(self, ctx, new_volume):
+    async def maxvolume(self, ctx, new_volume=None):
+        voice_connection = self.get_voice_connection(ctx)
+        if new_volume is None:
+            await self.bot.say("The current max volume is {}".format(voice_connection.maxvolume))
+            return
+
         logging.info("Setting max volume for {} to {}".format(ctx.message.server, new_volume))
-        voice_connection = self.voice_connection(ctx)
         # Barring Exceptions, we should always get back something we can set_maxvolume for
         voice_connection.set_maxvolume(new_volume)
 
@@ -124,6 +132,7 @@ class Voice(crabbot.common.CrabBotCog):
         target_voice_channel = ctx.message.author.voice_channel
 
         if target_voice_channel is None:
+            # BUG if two users use this ~simultaneously, this gets called twice and crashes
             logging.info("Not memeing: User not in a voice channel")
             self.bot.loop.create_task(self.bot.reply("Try being in a voice channel first"))
             return
@@ -175,6 +184,7 @@ class Voice(crabbot.common.CrabBotCog):
 
         # Initialize voice if not already created
         if voice_connection.voice is None:
+            # BUG if two users use this ~simultaneously, this gets called twice and crashes
             logging.info("Initializing voice from stream command")
             await voice_connection.connect(target_voice_channel)
             target_voice_channel = None
