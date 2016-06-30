@@ -20,6 +20,8 @@
         - For link, convert to permissions hex/binary to int
     - [Add to server link docs](https://discordapp.com/developers/docs/topics/oauth2#adding-bots-to-guilds)
 - [ ] Need logging for exit/many other exceptions (see todo for clean exit)
+- [ ] Add println for some logged messages for user feedback (mostly for eg. disable_voice command)
+- [ ] Add logging for on_ready (currently only println)
 
 ### Nice to have
 - [ ] Would like to make a custom help formatter
