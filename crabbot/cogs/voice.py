@@ -113,8 +113,6 @@ class Voice(crabbot.common.CrabBotCog):
 
             logging.info("Voice stopped")
 
-            # TODO think about persistent volume settings
-            self.remove_voice_connection(ctx.message.server)
         else:
             logging.info("No voice connection to end")
             await self.bot.say("No voice connection to {}".format(ctx.message.server))
