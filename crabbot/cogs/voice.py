@@ -70,6 +70,25 @@ class Voice(crabbot.common.CrabBotCog):
             logging.info("New voice connection to {} added".format(ctx.message.server))
             return new_connection
 
+    async def setup_voice_connection(self, ctx):
+        target_voice_channel = ctx.message.author.voice_channel
+
+        if target_voice_channel is None:
+            logging.info("User not in a voice channel")
+            self.bot.loop.create_task(self.bot.reply("Try being in a voice channel first"))
+            return None, None
+
+        voice_connection = self.get_voice_connection(ctx)
+
+        # Initialize voice if not already created
+        if voice_connection.voice is None:
+            # BUG if two users use a command ~simultaneously, this gets called twice (voice still None) and crashes
+            logging.info("Initializing voice from a command")
+            await voice_connection.connect(target_voice_channel)
+            target_voice_channel = None
+
+        return target_voice_channel, voice_connection  # Caller generally needs both
+
     @commands.command(pass_context=True)
     async def volume(self, ctx, new_volume=None):
         voice_connection = self.get_voice_connection(ctx)
@@ -131,23 +150,13 @@ class Voice(crabbot.common.CrabBotCog):
     async def memes(self, ctx):
         logging.info("Memeing it up")
 
-        target_voice_channel = ctx.message.author.voice_channel
-
-        if target_voice_channel is None:
-            # BUG if two users use this ~simultaneously, this gets called twice and crashes
-            logging.info("Not memeing: User not in a voice channel")
-            self.bot.loop.create_task(self.bot.reply("Try being in a voice channel first"))
-            return
-
-        voice_connection = self.get_voice_connection(ctx)
-
         chosen_meme = random.choice(self.the_memes)
 
-        # Initialize voice if not already created
-        if voice_connection.voice is None:
-            logging.info("Initializing voice from memes command")
-            await voice_connection.connect(target_voice_channel)
-            target_voice_channel = None
+        target_voice_channel, voice_connection = await self.setup_voice_connection(ctx)
+
+        if voice_connection is None:
+            logging.info("Aborting memes")
+            return
 
         # Build a VoiceEntry
         player = voice_connection.voice.create_ffmpeg_player(
@@ -162,19 +171,12 @@ class Voice(crabbot.common.CrabBotCog):
     @commands.command(pass_context=True,
                       help="Plays most things supported by youtube-dl")
     async def stream(self, ctx, video=None):
+        # TODO check if video is a valid streamable (YoutubeDL.py simulate?)
         if video is None:
-            # TODO check if video is a valid streamable (YoutubeDL.py simulate?)
             self.bot.reply("Nothing to stream")
             return
 
         logging.info("Streaming")
-
-        target_voice_channel = ctx.message.author.voice_channel
-
-        if target_voice_channel is None:
-            logging.info("Not streaming: User not in a channel")
-            self.bot.loop.create_task(self.bot.reply("Try being in a voice channel first"))
-            return
 
         if importlib.util.find_spec("youtube_dl") is None:
             # Preempt import error and silent failure with a more useful message and user feedback
@@ -182,14 +184,11 @@ class Voice(crabbot.common.CrabBotCog):
             self.bot.reply("Bot is not configured to stream")
             return
 
-        voice_connection = self.get_voice_connection(ctx)
+        target_voice_channel, voice_connection = await self.setup_voice_connection(ctx)
 
-        # Initialize voice if not already created
-        if voice_connection.voice is None:
-            # BUG if two users use this ~simultaneously, this gets called twice and crashes
-            logging.info("Initializing voice from stream command")
-            await voice_connection.connect(target_voice_channel)
-            target_voice_channel = None
+        if voice_connection is None:
+            logging.info("Aborting streaming")
+            return
 
         # Build a VoiceEntry
         # See YoutubeDL.py for ytdl options:
