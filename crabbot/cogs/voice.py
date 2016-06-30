@@ -105,9 +105,13 @@ class Voice(crabbot.common.CrabBotCog):
 
             # Since we can't be sure there isn't more audio queued, force stop the task
             existing_connection.audio_player.cancel()
-            logging.info("Disconnecting voice")
-            await existing_connection.voice.disconnect()
-            logging.info("Voice connection ended")
+            if existing_connection.voice is not None:
+                # BUG? Somehow the Connection loop can set voice to None, log a dc, but not disconnect
+                logging.info("Disconnecting voice")
+                await existing_connection.voice.disconnect()
+                logging.info("Voice connection ended")
+
+            logging.info("Voice stopped")
 
             # TODO think about persistent volume settings
             self.remove_voice_connection(ctx.message.server)
