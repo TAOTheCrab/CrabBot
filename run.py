@@ -89,7 +89,7 @@ def poll_terminal():
 input_thread = Thread(target=poll_terminal, daemon=True)
 input_thread.start()
 
-bot.add_cog(crabbot.cogs.messages.Messages(bot, args.assets_path))
+bot.add_cog(crabbot.cogs.messages.Messages(bot, args.assets_path + "/messages"))
 # Comment out import of voice to disable voice commands
 if "crabbot.cogs.voice" in sys.modules and args.disable_voice is False:
     bot.add_cog(crabbot.cogs.voice.Voice(bot, args.memes_path, args.use_libav))
