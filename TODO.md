@@ -89,8 +89,9 @@
     - Bonus alt YouTube streamer? (claims only Live tho)
         - Could hopefully start playing sooner than a full youtube-dl for longer videos
         - Would lose possibility of caching videos
-    - At least look at example code for audio buffer usage (they used GStreamer for ex.)
+    - At least look at [example code](http://docs.livestreamer.io/api_guide.html#simple-player) for audio buffer usage (they used GStreamer for ex.)
         - (... yes, CrabBot's audio handling is bad enough that it needs random buffer examples)
+- [ ] Use "playing"/Discord.game for stream name/link?
 
 ### Nice to have
 - [ ] Voice volume convert from ex. 100% to 1.0 notation
