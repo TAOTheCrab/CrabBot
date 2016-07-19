@@ -6,7 +6,7 @@ Mostly prints funny messages in reply to commands, with some additional voice fu
 **This should be considered alpha-quality software.**
 There are some glaring bugs, missing features, and most of it is undocumented.  
 
-By default, use !crabhelp or "@-*botname*- help" to see a list of visible commands
+By default, use !crabhelp or "@*botname* help" to see a list of visible commands
 
 Requires:
 - [discord.py](https://github.com/Rapptz/discord.py) v0.10 (async beta)
