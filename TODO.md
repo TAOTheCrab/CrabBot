@@ -38,6 +38,8 @@
     - Python 3.5 specific, so have to straight abandon pretense of 3.4 usability
     - Mostly just nice for keeping track of ex. which class is expected for function calls on args
         - (reading discord.py reminded me that duck typing is confusing with custom classes)
+- [ ] Hidden !uptime command for CrabBot uptime
+    - Candidate for admin check
 
 
 # run.py
@@ -92,6 +94,10 @@
     - At least look at [example code](http://docs.livestreamer.io/api_guide.html#simple-player) for audio buffer usage (they used GStreamer for ex.)
         - (... yes, CrabBot's audio handling is bad enough that it needs random buffer examples)
 - [ ] Use "playing"/Discord.game for stream name/link?
+- [ ] Add a way to restart the VoiceConnection from Discord
+    - Seems like the audio_player_task loop fails sometimes and doesn't recover
+        - Big problem when the connection is persistent for volume controls
+    - Cancel or end the audio_player task when finished, then restart it when playing more?
 
 ### Nice to have
 - [ ] Voice volume convert from ex. 100% to 1.0 notation
@@ -136,3 +142,5 @@
     - Make per-connection asyncio loop
     - Call bot loop with threadsafe(?)
     - Need/use concurrent.futures?
+- [ ] Might have to move assets into crabbot for distribution
+    - Alt. could somehow split out messages.py, since it's the thing that needs the assets badly
