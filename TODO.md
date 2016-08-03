@@ -26,7 +26,10 @@
 ### Nice to have
 - [ ] Would like to make a custom help formatter
     - see default discord.py commands.formatter.py and "formatter" commands.Bot arg
-- [ ] setup.py
+- [x] setup.py
+    - Needs a main script
+    - Needs more testing
+    - Probably needs additional metadata
 - [ ] Data storage for persistent data (for ex. user permissions if those get implemented)
     - sqlite?
 - [ ] Translation strings (mostly as an excuse to shorten the help= sections)
