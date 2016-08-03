@@ -97,6 +97,7 @@
 - [ ] Add a way to restart the VoiceConnection from Discord
     - Seems like the audio_player_task loop fails sometimes and doesn't recover
         - Big problem when the connection is persistent for volume controls
+        - Might be that it crashes, continues, then somehow doesn't None the voice so it doesn't reconnect
     - Cancel or end the audio_player task when finished, then restart it when playing more?
 
 ### Nice to have
@@ -144,3 +145,6 @@
     - Need/use concurrent.futures?
 - [ ] Might have to move assets into crabbot for distribution
     - Alt. could somehow split out messages.py, since it's the thing that needs the assets badly
+- [ ] Rename run.py to __main__.py?
+    - Allows automatic execution by calling the module name
+    - for, ex., [zipapp](https://docs.python.org/3/library/zipapp.html)
