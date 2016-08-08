@@ -105,11 +105,6 @@
         - Big problem when the connection is persistent for volume controls
         - Might be that it crashes, continues, then somehow doesn't None the voice so it doesn't reconnect
     - Cancel or end the audio_player task when finished, then restart it when playing more?
-- [ ] Make audio_player task stop when the queue is empty
-    - Just need to change "while True" to check queue instead, disconnect from voice after loop
-    - Needs checks in bot commands for task status
-        - Probably add as a function to VoiceConnection
-        - Task.done() should work, barring timing issues
 
 ### Nice to have
 - [ ] Voice volume convert from ex. 100% to 1.0 notation
