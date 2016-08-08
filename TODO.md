@@ -30,6 +30,9 @@
     - Needs a main script
     - Needs more testing
     - Probably needs additional metadata
+    - Needs assets installed as extra data for setup()
+        - crabbot.\_\_file\_\_ will give module path
+    - use import+execfile script on a __main__.py?
 - [ ] Data storage for persistent data (for ex. user permissions if those get implemented)
     - sqlite?
 - [ ] Translation strings (mostly as an excuse to shorten the help= sections)
