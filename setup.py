@@ -11,7 +11,7 @@ discordpy_version = '==0.10.0'
 
 setup(
     # More permanent entries
-    name='CrabBot',
+    name='crabbot',
     author='TAOTheCrab',
     url='https://github.com/TAOTheCrab/CrabBot',
     license='MIT',
@@ -36,4 +36,6 @@ setup(
             'youtube_dl'
         ]
     }
+
+    # scripts=['__main__.py']
 )
