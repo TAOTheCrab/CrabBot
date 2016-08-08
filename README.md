@@ -4,7 +4,9 @@ Silly Discord bot for funsies
 Mostly prints funny messages in reply to commands, with some additional voice functionality
 
 **This should be considered alpha-quality software.**
-There are some glaring bugs, missing features, and most of it is undocumented.  
+There are some glaring bugs, missing features, and most of it is undocumented.
+
+**Do not use the setup.py, it is WIP** 
 
 By default, use !crabhelp or "@*botname* help" to see a list of visible commands
 
