@@ -45,7 +45,7 @@ source bin/activate  # Can remove this if not using a virtual env
 cd CrabBot  # Can also remove this if not using a virtual env
 
 # Create a new detached screen
-screen -d -m -S CrabBotRun python3 run.py $CRABBOTARGS
+screen -d -m -S CrabBotRun python3 __main__.py $CRABBOTARGS
 echo "Use \`screen -R CrabBotRun\` to control CrabBot"
 
 ```
