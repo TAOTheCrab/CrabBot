@@ -111,7 +111,8 @@ class Voice(crabbot.common.CrabBotCog):
         # Barring Exceptions, we should always get back something we can set_maxvolume for
         voice_connection.set_maxvolume(new_volume)
 
-    @commands.command(aliases=['voice_stop', 'shutup'], pass_context=True)
+    @commands.command(aliases=['voice_stop', 'shutup'], pass_context=True,
+                      help="Stop all playback and empty the play queue")
     async def stop_voice(self, ctx):
         logging.info("Ending voice connection to {}".format(ctx.message.server))
         existing_connection = self.voice_connections.get(ctx.message.server)
@@ -122,13 +123,17 @@ class Voice(crabbot.common.CrabBotCog):
                 # Stop the current audio ASAP
                 existing_connection.current_entry.player.stop()
 
-            # Since we can't be sure there isn't more audio queued, force stop the task
-            existing_connection.audio_player.cancel()
+            # Empty the queue and get the audio player task to cleanup itself
+            existing_connection.empty_queue()
+            existing_connection.toggle_next()
+
+            # Audio player task should do this cleanup for us, but just in case (ex. crash?)
             if existing_connection.voice is not None:
                 # BUG? Somehow the Connection loop can set voice to None, log a dc, but not disconnect
                 logging.info("Disconnecting voice")
                 await existing_connection.voice.disconnect()
                 logging.info("Voice connection ended")
+                existing_connection.voice = None
 
             logging.info("Voice stopped")
 
@@ -136,7 +141,8 @@ class Voice(crabbot.common.CrabBotCog):
             logging.info("No voice connection to end")
             await self.bot.say("No voice connection to {}".format(ctx.message.server))
 
-    @commands.command(aliases=['current_stop', 'skip'], pass_context=True)
+    @commands.command(aliases=['current_stop', 'skip'], pass_context=True,
+                      help="Skip the currently playing audio for the next queued entry")
     async def stop_current(self, ctx):
         logging.info("Stopping current audio entry for {}".format(ctx.message.server))
         existing_connection = self.voice_connections.get(ctx.message.server)
@@ -166,6 +172,7 @@ class Voice(crabbot.common.CrabBotCog):
         new_entry = VoiceEntry(player, chosen_meme, target_voice_channel)
 
         logging.info("Queueing new voice entry for {}".format(new_entry.name))
+        voice_connection.prepare_player()
         await voice_connection.audio_queue.put(new_entry)
 
     @commands.command(pass_context=True,
@@ -208,7 +215,9 @@ class Voice(crabbot.common.CrabBotCog):
 
         # Give user feedback when recieved
         await self.bot.reply("Stream queued")
+
         logging.info("Queueing new voice entry for {}".format(new_entry.name))
+        voice_connection.prepare_player()
         await voice_connection.audio_queue.put(new_entry)
 
 
@@ -262,8 +271,18 @@ class VoiceConnection:
             logging.info("Moving existing voice connection to {}".format(channel.name))
             await self.voice.move_to(channel)
 
+    def prepare_player(self):
+        ''' Ensure audio player is in a usable state '''
+        # This mostly involves restarting the task if it's done
+        if self.audio_player.done():
+            self.audio_player = self.bot.loop.create_task(self.audio_player_task())
+
+    def empty_queue(self):
+        # Remake the queue as a way of emptying it
+        self.audio_queue = asyncio.Queue()
+
     async def audio_player_task(self):
-        while True:
+        while True:  # We want to wait for at least one entry, so can't check empty() here
             self.play_next_in_queue.clear()
 
             # Wait for a VoiceEntry
@@ -302,13 +321,21 @@ class VoiceConnection:
             asyncio.sleep(1)
 
             if self.audio_queue.empty():
-                logging.info("Audio queue finished")
-                # The disconnect sound doesn't make a good sudden end
-                asyncio.sleep(1)
+                break
 
-                # BUG there's a small window where you can call a command while it's disconnecting
-                #  So the command goes through, but the VoiceEntry disappears
+            # End of loop
 
-                logging.info("Disconnecting from voice channel {}".format(self.voice.channel))
-                await self.voice.disconnect()
-                self.voice = None
+        logging.info("Audio queue finished")
+        # The disconnect sound doesn't make a good sudden end
+        asyncio.sleep(1)
+
+        # BUG there's a small window where you can call a command while it's disconnecting
+        #  So the command goes through, but the VoiceEntry disappears
+
+        voice_channel_name = self.voice.channel
+        logging.info("Disconnecting from voice channel {}".format(voice_channel_name))
+        await self.voice.disconnect()
+        logging.info("Voice has been disconnected for channel {}".format(voice_channel_name))
+        self.voice = None
+
+        # End of task, be sure to restart task if it is needed again
