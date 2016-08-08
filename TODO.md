@@ -109,6 +109,7 @@
     - Just need to change "while True" to check queue instead, disconnect from voice after loop
     - Needs checks in bot commands for task status
         - Probably add as a function to VoiceConnection
+        - Task.done() should work, barring timing issues
 
 ### Nice to have
 - [ ] Voice volume convert from ex. 100% to 1.0 notation
