@@ -3,7 +3,7 @@
 from setuptools import setup, find_packages
 
 # We want to restrict newer versions while we deal with upstream breaking changes.
-discordpy_version = '==0.10.0'
+discordpy_version = '==0.11.0'
 
 # TODO read README(.rst? .md looks bad on pypi) for long_description.
 #      Could use pandoc, but the end user shouldn't need to do this in setup.
