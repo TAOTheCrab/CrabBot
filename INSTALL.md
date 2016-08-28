@@ -52,11 +52,14 @@ echo "Use \`screen -R CrabBotRun\` to control CrabBot"
 
 ## crabbot.service (for systemd)
 
+Some help from [Red's docs](https://twentysix26.github.io/Red-Docs/red_guide_linux_autostart/)
+
 Put in `/etc/systemd/system`
 
 ```
 [Unit]
 Description=Start CrabBot at startup.
+After=network-online.target  # might be too early?
 
 [Service]
 Type=forking
@@ -64,10 +67,10 @@ User=*USERNAME*
 ExecStart=*CrabBotDir*/start-crabbot.sh
 ExecStop=screen -X -S CrabBotRun quit  # KillSignal=SIGINT instead? Phantom login bug currently
 WorkingDirectory=*CrabBotDir*
+# Restart=always
 
 [Install]
 WantedBy=multi-user.target
-After=network-online.target
 ```
 
 Notes: [NetworkTarget](https://www.freedesktop.org/wiki/Software/systemd/NetworkTarget/)
