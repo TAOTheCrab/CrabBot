@@ -62,11 +62,11 @@ Description=Start CrabBot at startup.
 Type=forking
 User=*USERNAME*
 ExecStart=*CrabBotDir*/start-crabbot.sh
-ExecStop=screen -X -S CrabBotRun quit
+ExecStop=screen -X -S CrabBotRun quit  # KillSignal=SIGINT instead? Phantom login bug currently
 WorkingDirectory=*CrabBotDir*
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=network-online.target
 ```
 
 Then `systemctl enable crabbot.service` and `systemctl start crabbot.service`
