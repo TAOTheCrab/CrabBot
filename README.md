@@ -12,7 +12,7 @@ By default, use !crabhelp or "@*botname* help" to see a list of visible commands
 
 Requires:
 - [discord.py](https://github.com/Rapptz/discord.py) v0.10+ (async beta)
-    - `pip install discord.py[voice]` for voice support
+    - `pip3 install discord.py[voice]` for voice support
 - Python 3.5+ (uses async syntax, can be edited to work with 3.4)
 
 For voice (can be disabled, or errors safely ignored):
