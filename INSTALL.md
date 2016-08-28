@@ -66,8 +66,11 @@ ExecStop=screen -X -S CrabBotRun quit  # KillSignal=SIGINT instead? Phantom logi
 WorkingDirectory=*CrabBotDir*
 
 [Install]
-WantedBy=network-online.target
+WantedBy=multi-user.target
+After=network-online.target
 ```
+
+Notes: [NetworkTarget](https://www.freedesktop.org/wiki/Software/systemd/NetworkTarget/)
 
 Then `systemctl enable crabbot.service` and `systemctl start crabbot.service`
 
