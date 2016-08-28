@@ -6,12 +6,13 @@ Mostly prints funny messages in reply to commands, with some additional voice fu
 **This should be considered alpha-quality software.**
 There are some glaring bugs, missing features, and most of it is undocumented.
 
-**Do not use the setup.py, it is WIP** 
+**Do not use the setup.py, it is WIP**
 
 By default, use !crabhelp or "@*botname* help" to see a list of visible commands
 
 Requires:
-- [discord.py](https://github.com/Rapptz/discord.py) v0.10 (async beta)
+- [discord.py](https://github.com/Rapptz/discord.py) v0.10+ (async beta)
+    - `pip install discord.py[voice]` for voice support
 - Python 3.5+ (uses async syntax, can be edited to work with 3.4)
 
 For voice (can be disabled, or errors safely ignored):
