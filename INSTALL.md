@@ -52,7 +52,7 @@ echo "Use \`screen -R CrabBotRun\` to control CrabBot"
 
 ## crabbot.service (for systemd)
 
-Put in `/usr/lib/systemd/system`
+Put in `/etc/systemd/system`
 
 ```
 [Unit]
