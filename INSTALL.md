@@ -2,7 +2,7 @@
 
 # Debian Jesse (ex. Raspberry Pi Raspian)
 ```
-apt-get install libffi-dev libreadline-dev libssl-dev libopus0
+apt install libffi-dev libreadline-dev libssl-dev libopus0
 
 # Compile Python 3.5
 wget *python 3.5+*
@@ -21,7 +21,7 @@ pip3 install *discord.py git async branch*
 pip3 install youtube-dl
 git clone *CrabBot git*
 cd CrabBot
-python3 run.py (whichever token method) --use-libav
+python3 __main__.py (whichever token method) --use-libav
 ```
 
 Rasbian alternately has ffmpeg in jesse-backports
@@ -51,6 +51,8 @@ echo "Use \`screen -R CrabBotRun\` to control CrabBot"
 ```
 
 ## crabbot.service (for systemd)
+
+Put in `/usr/lib/systemd/system`
 
 ```
 [Unit]

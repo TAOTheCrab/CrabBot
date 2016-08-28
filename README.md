@@ -25,8 +25,8 @@ Needs a bot user token. See -h for details.
 
 Common usage is
 
-`python3 run.py -f FileWithUserTokenAsFirstLine`
+`python3 __main__.py -f FileWithUserTokenAsFirstLine`
 
 or
 
-`python3 run.py -t UserToken`
+`python3 __main_.py -t UserToken`
