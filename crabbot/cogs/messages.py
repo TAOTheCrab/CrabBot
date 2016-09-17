@@ -4,7 +4,6 @@
 import asyncio
 import discord
 from discord.ext import commands
-import json
 import logging
 from pathlib import Path
 import random
@@ -111,39 +110,3 @@ class Messages(crabbot.common.CrabBotCog):
     async def _style(self):
         style = random.choice(self.bandstyles)
         await self.bot.say("    which is a {} cover band.".format(style))
-
-    @commands.command()
-    async def quotes(self, query=""):
-        if query == "":
-            return
-
-        # Might want to remove this if "quotes quotes" is a problem
-        if not query.lower().startswith("quotes"):
-            return
-
-        # Same here
-        query = query[6:].strip()
-
-        if query.lower() == "help":
-            print ("New quote: quotes [name] \"Insert quote here!\"")
-            print ("Get random quote: quotes [name]")
-        else:
-            name = query.split("\"")[0].strip()
-            query = query.replace(name, "").replace("\"", "").strip()
-
-            with open("quotes.json") as f:
-                quotes = json.load(f)
-
-            if query == "":
-                await self.bot.say(random.choice(quotes[name]))
-                return
-
-            if name not in quotes:
-                quotes[name] = []
-
-            if query not in quotes[name]:
-                quotes[name].append(query)
-                await self.bot.say("Added quote for " + name + ".")
-
-            with open("quotes.json", "w") as f:
-                json.dump(quotes, f)

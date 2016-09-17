@@ -14,6 +14,7 @@ from threading import Thread
 
 import crabbot.common
 import crabbot.cogs.messages
+import crabbot.cogs.quotes
 import crabbot.cogs.voice  # comment out to disable voice commands entirely
 
 
@@ -90,6 +91,7 @@ input_thread = Thread(target=poll_terminal, daemon=True)
 input_thread.start()
 
 bot.add_cog(crabbot.cogs.messages.Messages(bot, args.assets_path + "/messages"))
+bot.add_cog(crabbot.cogs.quotes.Quotes(bot, args.assets_path + "/quotes.json"))
 # Comment out import of voice to disable voice commands
 if "crabbot.cogs.voice" in sys.modules and args.disable_voice is False:
     bot.add_cog(crabbot.cogs.voice.Voice(bot, args.memes_path, args.use_libav))
