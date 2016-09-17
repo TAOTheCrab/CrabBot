@@ -130,6 +130,21 @@
     - Probably solved by pre-encoding TODO (at least, would have do to our own processing)
 
 
+# Quotes
+
+- [ ] Add command to remove a quote
+    - Would be difficult with current data structure if quotes db gets too big
+        - Could use some sort of quote id
+- [ ] Figure out quotes data structure
+    - Name
+    - Quote
+    - ID?
+        - Per-name id number?
+        - Could be difficult to determine non-colliding id
+- [ ] Could use some way to reload quotes.json file while live
+    - Currently it is always overridden while CrabBot is running, when the add command is used
+
+
 # Assorted notes (AKA thought this while busy with another thing)
 - [ ] cmd module for/instead of poll_terminal?
 - [ ] Call loop.stop() to exit bot.run()?
