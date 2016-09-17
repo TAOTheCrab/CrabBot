@@ -50,6 +50,9 @@ class Quotes:
 
         name = ctx.subcommand_passed  # attempt to get the rest of the message
 
+        if name is None:
+            name = random.choice(list(self.quotes.keys()))
+
         # TODO if name is "", pick any old random quote
 
         if name in self.quotes:
