@@ -78,7 +78,7 @@ class Quotes:
 
         if quote not in self.quotes[name]:
             self.quotes[name].append(quote)
-            await self.bot.say("...Quote added")
+            await self.bot.say("Quote added")
 
         # NOTE: We're being somewhat unsafe by overwriting this all the time.
         #       Have to reboot CrabBot to actually load this.
