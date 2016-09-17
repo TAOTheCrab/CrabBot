@@ -25,18 +25,17 @@ class Quotes:
         with self.quotes_db_path.open() as f:  # TODO file open error checking
             self.quotes = json.load(f)
 
-    @commands.command()
-    async def quote(self):
-        await self.bot.say("QUOTE YOURSELF")
-
     @commands.group(pass_context=True,
                     help=('Read or add quotes! See "help quotes" for details\n'
                           'New quote: quotes [name] "Insert quote here!"\n'
                           'Get random quote: quotes [name]'))
-    async def quotes(self, ctx, query=""):
+    async def quote(self, ctx):
         if ctx.invoked_subcommand is not None:
             return
 
+        await self.bot.say("Be more quotable, then maybe we'd finish this command. :neutral_face:")
+
+        '''
         # Might want to remove this if "quotes quotes" is a problem
         if not query.lower().startswith("quotes"):
             return
@@ -60,7 +59,8 @@ class Quotes:
 
         with self.quotes_db_path.open() as f:
             json.dump(quotes, f)
+        '''
 
-    @quotes.command()
+    @quote.command()
     async def add(self, name, quote):
-        await self.bot.say('Sorry {name}, we cannot add the quote "{quote}" due to oppressive overloards.')
+        await self.bot.say('Sorry {name}, we cannot add the quote "{quote}" due to oppressive overlords.'.format(name=name, quote=quote))
