@@ -3,6 +3,18 @@
 #
 # Partially inspired by LRRBot
 
+'''
+JSON format
+{
+    Name1: [
+        "Quote1"
+        "Quote2"
+        ...
+    ],
+    Name2: [
+    ...
+'''
+
 import discord
 from discord.ext import commands
 import json
@@ -17,50 +29,57 @@ class Quotes:
     def __init__(self, bot, quotes_db_path):
         self.bot = bot
         self.quotes_db_path = Path(quotes_db_path)
-        self.quotes = None
+        self.quotes = {}  # Fallback quote initialization TODO: check what we want initialized
 
         # Load the db into memory
         # NOTE currently CrabBot does not have a mechanism for shutting down gracefully
-        #      so for now we're gonna jsut write out changes whenever they happen
-        with self.quotes_db_path.open() as f:  # TODO file open error checking
-            self.quotes = json.load(f)
+        #      so for now we're gonna just write out changes whenever they happen
+        if self.quotes_db_path.exists():
+            with self.quotes_db_path.open() as f:
+                self.quotes = json.load(f)
 
     @commands.group(pass_context=True,
-                    help=('Read or add quotes! See "help quotes" for details\n'
-                          'New quote: quotes [name] "Insert quote here!"\n'
-                          'Get random quote: quotes [name]'))
+                    help=('Read or add quotes! See "help quote" for details\n'
+                          '\n'
+                          'If no command is given, a random quote is printed'))
     async def quote(self, ctx):
         if ctx.invoked_subcommand is not None:
             return
 
-        await self.bot.say("Be more quotable, then maybe we'd finish this command. :neutral_face:")
+        # await self.bot.say("Be more quotable, then maybe we'd finish this command. :neutral_face:")
 
-        '''
-        # Might want to remove this if "quotes quotes" is a problem
-        if not query.lower().startswith("quotes"):
-            return
+        name = ctx.subcommand_passed  # attempt to get the rest of the message
 
-        # Same here
-        query = query[6:].strip()
+        # TODO if name is "", pick any old random quote
 
-        name = query.split("\"")[0].strip()
-        query = query.replace(name, "").replace("\"", "").strip()
+        if name in self.quotes:
+            selected_quote = random.choice(self.quotes[name])
+            await self.bot.say("{quote} \n  —{name}".format(quote=selected_quote, name=name))
+        else:
+            await self.bot.say("No quotes from {name}".format(name=name))
 
-        if query == "":
-            await self.bot.say(random.choice(quotes[name]))
-            return
-
-        if name not in quotes:
-            quotes[name] = []
-
-        if query not in quotes[name]:
-            quotes[name].append(query)
-            await self.bot.say("Added quote for " + name + ".")
-
-        with self.quotes_db_path.open() as f:
-            json.dump(quotes, f)
-        '''
-
-    @quote.command()
+    @quote.command(help=('Add a quote.\n'
+                         'Say the name of the person being quoted, then '
+                         'write the quote in quotation marks.\n'
+                         'eg. quote add Steve "Steve said this thing"\n'
+                         '\n'
+                         'You can also put quotation marks around the author to add a name with spaces'))
     async def add(self, name, quote):
-        await self.bot.say('Sorry {name}, we cannot add the quote "{quote}" due to oppressive overlords.'.format(name=name, quote=quote))
+        # await self.bot.say('Sorry {name}, we cannot add the quote "{quote}" due to oppressive overlords.'.format(name=name, quote=quote))
+
+        # TODO think about data structure. Would kind of like to number quote for reference purposes.
+        # TODO? allow use of @User id numbers instead of hardcoded names
+
+        if name not in self.quotes:
+            self.quotes[name] = []
+
+        if quote not in self.quotes[name]:
+            self.quotes[name].append(quote)
+            await self.bot.say("...Quote added")
+
+        # NOTE: We're being somewhat unsafe by overwriting this all the time.
+        #       Have to reboot CrabBot to actually load this.
+        with self.quotes_db_path.open('w') as f:  # Remove if graceful shutdown and/or autosave is implemented
+            json.dump(self.quotes, f)
+
+    # TODO 'remove' command
