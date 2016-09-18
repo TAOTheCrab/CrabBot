@@ -35,6 +35,7 @@ class Quotes:
         # NOTE currently CrabBot does not have a mechanism for shutting down gracefully
         #      so for now we're gonna just write out changes whenever they happen
         if self.quotes_db_path.exists():
+            # TODO JSON error checking
             with self.quotes_db_path.open() as f:
                 self.quotes = json.load(f)
 
