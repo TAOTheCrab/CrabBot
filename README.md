@@ -30,3 +30,7 @@ Common usage is
 or
 
 `python3 __main_.py -t UserToken`
+
+## Similar projects
+
+[Red](https://github.com/Twentysix26/Red-DiscordBot) - Another discord.py bot, similarly uses cogs for most commands
