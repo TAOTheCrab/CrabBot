@@ -4,6 +4,8 @@
 # General
 - [ ] Look into an exit more graceful than Interrupt
     - requires using client.start() instead of run()
+    - Could try code after bot.run() as a hacky start
+    - LRRBot, with a similar arch for startup, uses try except (KeyBoardInterrupt, SystemExit) finally
 - [ ] Full command logging
     - Logging.INFO level
     - Timestamp
