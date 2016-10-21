@@ -107,6 +107,8 @@
         - Big problem when the connection is persistent for volume controls
         - Might be that it crashes, continues, then somehow doesn't None the voice so it doesn't reconnect
     - Cancel or end the audio_player task when finished, then restart it when playing more?
+- [ ] Some kind of stream target link validation/error handling
+    - Whole thing just crashes if you give it eg. "stream <blah>"
 
 ### Nice to have
 - [ ] Voice volume convert from ex. 100% to 1.0 notation
@@ -145,6 +147,9 @@
         - Could be difficult to determine non-colliding id
 - [ ] Could use some way to reload quotes.json file while live
     - Currently it is always overridden while CrabBot is running, when the add command is used
+- [ ] Quotes queries
+    - List recorded authors
+    - Advanced: search
 
 
 # Assorted notes (AKA thought this while busy with another thing)
