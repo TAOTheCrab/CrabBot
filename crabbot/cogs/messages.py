@@ -39,6 +39,8 @@ class Messages(crabbot.common.CrabBotCog):
         self.bandplaces = crabbot.common.read_list_file(self.assets_path / "band-places.txt")
         # !band style
         self.bandstyles = crabbot.common.read_list_file(self.assets_path / "band-styles.txt")
+        # !new world
+        self.worldwords = crabbot.common.read_list_file(self.assets_path / "world-words.txt")
 
     @commands.command(help='The bots have something to say')
     async def takeover(self):
@@ -110,3 +112,10 @@ class Messages(crabbot.common.CrabBotCog):
     async def _style(self):
         style = random.choice(self.bandstyles)
         await self.bot.say("    which is a {} cover band.".format(style))
+
+    @commands.command(name="world", help="Name a new Land! Thanks, Homestuck!")
+    async def new_world(self):
+        # Repeat words are OK
+        word1 = random.choice(self.worldwords)
+        word2 = random.choice(self.worldwords)
+        await self.bot.say("The Land of {} and {}".format(word1, word2))
