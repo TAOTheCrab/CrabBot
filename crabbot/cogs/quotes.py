@@ -49,6 +49,8 @@ class Quotes:
 
         # await self.bot.say("Be more quotable, then maybe we'd finish this command. :neutral_face:")
 
+        # TODO consider using name.lower() to standardize input. Or some kind of fuzzy matching.
+
         name = ctx.subcommand_passed  # attempt to get the rest of the message
 
         if name is None:
@@ -69,10 +71,15 @@ class Quotes:
                          '\n'
                          'You can also put quotation marks around the author to add a name with spaces'))
     async def add(self, name, quote):
+        # Testing code
         # await self.bot.say('Sorry {name}, we cannot add the quote "{quote}" due to oppressive overlords.'.format(name=name, quote=quote))
 
         # TODO think about data structure. Would kind of like to number quote for reference purposes.
         # TODO? allow use of @User id numbers instead of hardcoded names
+        #       problem: using @User notifies user of the message
+        #       Try to match string name with in-server user and store their ID for later matching?
+
+        # TODO consider using name.lower() to standardize input
 
         if name not in self.quotes:
             self.quotes[name] = []
