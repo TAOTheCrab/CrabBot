@@ -109,6 +109,9 @@
     - Cancel or end the audio_player task when finished, then restart it when playing more?
 - [ ] Some kind of stream target link validation/error handling
     - Whole thing just crashes if you give it eg. "stream <blah>"
+- [ ] The queue seems to only work without problem with a short queue (~1 queue entry). Investigate
+    - Might be related to host's low amount of memory
+    - FFmpeg gets killed after a while? Usually the queued entry cuts out soon after starting.
 
 ### Nice to have
 - [ ] Voice volume convert from ex. 100% to 1.0 notation
