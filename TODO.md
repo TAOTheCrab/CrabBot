@@ -153,6 +153,8 @@
 - [ ] Quotes queries
     - List recorded authors
     - Advanced: search
+- [ ] User names with spaces
+    - Mostly for lookup, currently cannot look up quote authors with spaces
 
 
 # Assorted notes (AKA thought this while busy with another thing)
