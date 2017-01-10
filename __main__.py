@@ -5,7 +5,6 @@
 # See -h or read the argparse setup for argument details
 
 import argparse
-import asyncio
 import datetime
 import logging
 import readline  # Only for better terminal input support, eg. history

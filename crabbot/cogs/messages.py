@@ -2,11 +2,10 @@
 # CrabBot general message commands (mostly fun phrasal template responses)
 
 import asyncio
-import discord
-from discord.ext import commands
-import logging
 from pathlib import Path
 import random
+
+from discord.ext import commands
 
 import crabbot.common
 

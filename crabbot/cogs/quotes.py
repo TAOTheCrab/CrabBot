@@ -15,13 +15,12 @@ JSON format
     ...
 '''
 
-import discord
-from discord.ext import commands
 import json
-import logging
 from pathlib import Path
 import random
 # import sqlite3  # Leaving as a note of possible db alternatives
+
+from discord.ext import commands
 
 
 class Quotes:

@@ -8,11 +8,12 @@
 # Requires a bot user token.
 
 import asyncio
-import discord
-from discord.ext import commands
 import logging
 from pathlib import Path
 import random
+
+import discord
+from discord.ext import commands
 
 
 class CrabBot(commands.Bot):
