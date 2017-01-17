@@ -94,7 +94,8 @@ class Quotes:
         #       problem: using @User notifies user of the message
         #       Try to match string name with in-server user and store their ID for later matching?
 
-        # TODO consider using name.lower() to standardize input
+        # TODO consider using name.lower() to standardize input.
+        #       Would like to preserve capitalization for display though.
 
         if name not in self.quotes:
             self.quotes[name] = []
