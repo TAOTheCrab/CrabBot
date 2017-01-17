@@ -42,12 +42,8 @@ class Quotes:
                     help=('Read or add quotes! See "help quote" for details\n'
                           '\n'
                           'If no command is given, a random quote is printed'))
-    async def quote(self, ctx):
+    async def quote(self, ctx, *, name=None):
         # TODO consider using name.lower() to standardize input. Or some kind of fuzzy matching.
-
-        # TODO do something different to get names, currently spaces are ignored
-        #       Can't have quote take args, then subcommands don't work
-        name = ctx.subcommand_passed  # attempt to get the rest of the message
 
         # TODO? maybe detect blank strings to help with user error?
         if name is None:
