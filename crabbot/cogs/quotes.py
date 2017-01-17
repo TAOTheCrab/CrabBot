@@ -45,7 +45,6 @@ class Quotes:
     async def quote(self, ctx, *, name=None):
         # TODO consider using name.lower() to standardize input. Or some kind of fuzzy matching.
 
-        # TODO? maybe detect blank strings to help with user error?
         if name is None:
             name = random.choice(list(self.quotes.keys()))
 
