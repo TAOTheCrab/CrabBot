@@ -4,27 +4,30 @@
 ```
 apt install libffi-dev libreadline-dev libssl-dev libopus0
 
-# Compile Python 3.5
+# Compile Python 3.5 if it doesn't exist as a package
 wget *python 3.5+*
 tar xzf *python*.tgz
 cd *python*
 ./configure (--prefix=*blah*)
 make -j(*numCPUs*)
 make install
-
-# Set up virtual env
 cd ..
+
+# (optional) Set up virtual env
 (*blah*/)pyvenv ./CrabBotEnv
 cd CrabBotEnv
 source bin/activate
-pip3 install *discord.py git async branch*
+
+# Install Python module dependencies
+pip3 install discord.py[voice]
 pip3 install youtube-dl
+
 git clone *CrabBot git*
 cd CrabBot
 python3 __main__.py (whichever token method) --use-libav
 ```
 
-Rasbian alternately has ffmpeg in jesse-backports
+Rasbian alternately has ffmpeg (instead of libav) in jesse-backports
 
 GNU screen is handy for remote work. Run CrabBot in `screen -S CrabBotRun`, then `ctrl+a d`. `screen -R` to reattach.
 
@@ -77,7 +80,7 @@ Notes: [NetworkTarget](https://www.freedesktop.org/wiki/Software/systemd/Network
 
 Then `systemctl enable crabbot.service` and `systemctl start crabbot.service`
 
-Reference: [Autostart Process Gnu Screen Systemd/](http://www.linuxveda.com/2014/04/28/autostart-process-gnu-screen-systemd/)
+Reference: [Autostart Process Gnu Screen Systemd](http://www.linuxveda.com/2014/04/28/autostart-process-gnu-screen-systemd/)
 
 ## Read the log file live
 
