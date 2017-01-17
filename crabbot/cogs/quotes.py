@@ -80,7 +80,7 @@ class Quotes:
                                       "LIMIT 1", ('%'+query+'%',))
         quote = self.quotes_db_cursor.fetchone()
 
-        await self.bot.say("{quote} \n  –{name}".format(quote=quote[1],
+        await self.bot.say("{quote} \n  —{name}".format(quote=quote[1],
                                                         name=quote[0]))
 
     @quote.command(help=('Add a quote.\n'
