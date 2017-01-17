@@ -52,12 +52,35 @@ class Quotes:
             selected_quote = random.choice(self.quotes[name])
             await self.bot.say("{quote} \n  —{name}".format(quote=selected_quote, name=name))
         else:
-            await self.bot.say("No quotes from {name}".format(name=name))
+            await self.bot.say("No quotes from {name}.".format(name=name))
 
     @quote.command(help='List all authors of recorded quotes')
     async def authors(self):
         authors = sorted(self.quotes.keys(), key=str.lower)
         await self.bot.say(";  ".join(authors))
+
+    @quote.command(help='Search for a random quote with the given string in it.\n'
+                        '\n'
+                        'Only searches quote contents and returns exact matches.\n'
+                        'Not case sensitive.')
+    async def search(self, *, query: str):
+        results = {}
+        # We want all matching quotes so we can randomly select one
+        for author, quote_list in self.quotes.items():
+            for quote in quote_list:
+                # Match without case sensitivity (may want an option later?)
+                if query.lower() in quote.lower():
+                    if author not in results:
+                        results[author] = []
+                    results[author].append(quote)
+        
+        if any(results) is True:
+            selected_author = random.choice(list(results.keys()))
+            selected_quote = (selected_author, random.choice(results[selected_author]))
+            await self.bot.say("{quote} \n  —{name}".format(quote=selected_quote[1],
+                                                            name=selected_quote[0]))
+        else:
+            await self.bot.say('No quotes containing "{query}" were found.'.format(query=query))
 
     @quote.command(help=('Add a quote.\n'
                          'Say the name of the person being quoted, then '
