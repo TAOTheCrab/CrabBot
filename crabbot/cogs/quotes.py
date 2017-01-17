@@ -57,7 +57,7 @@ class Quotes:
 
     @quote.command(help='List all authors of recorded quotes')
     async def authors(self):
-        authors = self.quotes.keys()
+        authors = sorted(self.quotes.keys(), key=str.lower)
         await self.bot.say(";  ".join(authors))
 
     @quote.command(help=('Add a quote.\n'
