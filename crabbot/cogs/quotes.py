@@ -65,10 +65,22 @@ class Quotes:
 
     @quote.command(help='Search for a random quote with the given string in it.\n'
                         '\n'
-                        'Only searches quote contents and returns exact matches.\n'
+                        'Only searches quote contents and returns word-for-word matches.\n'
                         'Not case sensitive.')
     async def search(self, *, query: str):
-        pass
+        ''' Get a random quote containing the word-for-word query in it'''
+        # LIKE is case-insensitive for ASCII-range letters only.
+        #   Also, it is claimed LIKE is slow for searches starting with %,
+        #   so maybe keep an eye out if it becomes a problem.
+        #   There are the SQLite FTS extensions, but they're not enabled by default.
+        self.quotes_db_cursor.execute("SELECT * FROM quotes "
+                                      "WHERE quote LIKE ? "
+                                      "ORDER BY RANDOM() "
+                                      "LIMIT 1", ('%'+query+'%',))
+        quote = self.quotes_db_cursor.fetchone()
+
+        await self.bot.say("{quote} \n  –{name}".format(quote=quote[1],
+                                                        name=quote[0]))
 
     @quote.command(help=('Add a quote.\n'
                          'Say the name of the person being quoted, then '
