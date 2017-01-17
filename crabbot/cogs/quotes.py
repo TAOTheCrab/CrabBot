@@ -4,21 +4,15 @@
 # Partially inspired by LRRBot
 
 '''
-JSON format
-{
-    Name1: [
-        "Quote1"
-        "Quote2"
-        ...
-    ],
-    Name2: [
-    ...
+SQL format
+Table "quotes"
+    author: text
+    quote: text
 '''
 
-import json
-from pathlib import Path
+from pathlib import PurePath
 import random
-# import sqlite3  # Leaving as a note of possible db alternatives
+import sqlite3
 
 from discord.ext import commands
 
@@ -27,16 +21,13 @@ class Quotes:
 
     def __init__(self, bot, quotes_db_path):
         self.bot = bot
-        self.quotes_db_path = Path(quotes_db_path)
-        self.quotes = {}  # Fallback quote initialization TODO: check what we want initialized
+        self.quotes_db_path = PurePath(quotes_db_path)
 
-        # Load the db into memory
-        # NOTE currently CrabBot does not have a mechanism for shutting down gracefully
-        #      so for now we're gonna just write out changes whenever they happen
-        if self.quotes_db_path.exists():
-            # TODO JSON error checking
-            with self.quotes_db_path.open() as f:
-                self.quotes = json.load(f)
+        # TODO SQL error handling (applies to most of this module)
+        self.quotes_db_connection = sqlite3.connect(str(self.quotes_db_path / "quotes.sqlite3"))
+        self.quotes_db_cursor = self.quotes_db_connection.cursor()
+        self.quotes_db_cursor.execute("CREATE TABLE IF NOT EXISTS quotes "
+                                      "(author text NOT NULL, quote text NOT NULL)")
 
     @commands.group(pass_context=True, invoke_without_command=True,
                     help=('Read or add quotes! See "help quote" for details\n'
@@ -45,42 +36,51 @@ class Quotes:
     async def quote(self, ctx, *, name=None):
         # TODO consider using name.lower() to standardize input. Or some kind of fuzzy matching.
 
-        if name is None:
-            name = random.choice(list(self.quotes.keys()))
+        self.quotes_db_cursor.execute("SELECT DISTINCT author FROM quotes")
+        # DB query result is a list of 1-tuples, so we extract the contained strs
+        authors = [x[0] for x in self.quotes_db_cursor.fetchall()]
 
-        if name in self.quotes:
-            selected_quote = random.choice(self.quotes[name])
-            await self.bot.say("{quote} \n  —{name}".format(quote=selected_quote, name=name))
+        if name is None:  # User wants any random quote, so we pick an author
+            name = random.choice(authors)
+
+        if name in authors:
+            self.quotes_db_cursor.execute("SELECT quote FROM quotes "
+                                          "WHERE author IS ? "
+                                          "ORDER BY RANDOM()"
+                                          "LIMIT 1", (name,))
+            # Just escape one 1-tuple. We already have the name, so meh.
+            selected_quote = self.quotes_db_cursor.fetchone()[0]
+            await self.bot.say("{quote} \n  —{name}".format(quote=selected_quote,
+                                                            name=name))
         else:
             await self.bot.say("No quotes from {name}.".format(name=name))
 
     @quote.command(help='List all authors of recorded quotes')
     async def authors(self):
-        authors = sorted(self.quotes.keys(), key=str.lower)
+        self.quotes_db_cursor.execute("SELECT DISTINCT author FROM quotes")
+        # DB query result is a list of 1-tuples, so we extract the contained strs
+        authors = [x[0] for x in self.quotes_db_cursor.fetchall()]
+
         await self.bot.say(";  ".join(authors))
 
     @quote.command(help='Search for a random quote with the given string in it.\n'
                         '\n'
-                        'Only searches quote contents and returns exact matches.\n'
+                        'Only searches quote contents and returns word-for-word matches.\n'
                         'Not case sensitive.')
     async def search(self, *, query: str):
-        results = {}
-        # We want all matching quotes so we can randomly select one
-        for author, quote_list in self.quotes.items():
-            for quote in quote_list:
-                # Match without case sensitivity (may want an option later?)
-                if query.lower() in quote.lower():
-                    if author not in results:
-                        results[author] = []
-                    results[author].append(quote)
+        ''' Get a random quote containing the word-for-word query in it'''
+        # LIKE is case-insensitive for ASCII-range letters only.
+        #   Also, it is claimed LIKE is slow for searches starting with %,
+        #   so maybe keep an eye out if it becomes a problem.
+        #   There are the SQLite FTS extensions, but they're not enabled by default.
+        self.quotes_db_cursor.execute("SELECT * FROM quotes "
+                                      "WHERE quote LIKE ? "
+                                      "ORDER BY RANDOM() "
+                                      "LIMIT 1", ('%'+query+'%',))
+        quote = self.quotes_db_cursor.fetchone()
 
-        if any(results) is True:
-            selected_author = random.choice(list(results.keys()))
-            selected_quote = (selected_author, random.choice(results[selected_author]))
-            await self.bot.say("{quote} \n  —{name}".format(quote=selected_quote[1],
-                                                            name=selected_quote[0]))
-        else:
-            await self.bot.say('No quotes containing "{query}" were found.'.format(query=query))
+        await self.bot.say("{quote} \n  –{name}".format(quote=quote[1],
+                                                        name=quote[0]))
 
     @quote.command(help=('Add a quote.\n'
                          'Say the name of the person being quoted, then '
@@ -88,8 +88,8 @@ class Quotes:
                          'eg. quote add Steve "Steve said this thing"\n'
                          '\n'
                          'You can also put quotation marks around the author to add a name with spaces'))
-    async def add(self, name, *, quote: str):
-        # TODO think about data structure. Would kind of like to number quote for reference purposes.
+    async def add(self, name: str, *, quote: str):
+        # TODO? Would kind of like to number quote for reference purposes.
         # TODO? allow use of @User id numbers instead of hardcoded names
         #       problem: using @User notifies user of the message
         #       Try to match string name with in-server user and store their ID for later matching?
@@ -97,16 +97,13 @@ class Quotes:
         # TODO consider using name.lower() to standardize input.
         #       Would like to preserve capitalization for display though.
 
-        if name not in self.quotes:
-            self.quotes[name] = []
+        # TODO error handling.
+        self.quotes_db_cursor.execute("INSERT INTO quotes VALUES "
+                                      "(?, ?)", (name, quote))
 
-        if quote not in self.quotes[name]:
-            self.quotes[name].append(quote)
-            await self.bot.say("Quote added")
+        # For safety (CrabBot has no graceful shutdown), just write the changes now
+        self.quotes_db_connection.commit()
 
-        # NOTE: We're being somewhat unsafe by overwriting this all the time.
-        #       Have to reboot CrabBot to actually load this.
-        with self.quotes_db_path.open('w') as f:  # Remove if graceful shutdown and/or autosave is implemented
-            json.dump(self.quotes, f)
+        await self.bot.say("Quote added.")
 
     # TODO 'remove' command
