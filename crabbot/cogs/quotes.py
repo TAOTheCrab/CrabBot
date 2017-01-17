@@ -73,7 +73,7 @@ class Quotes:
                     if author not in results:
                         results[author] = []
                     results[author].append(quote)
-        
+
         if any(results) is True:
             selected_author = random.choice(list(results.keys()))
             selected_quote = (selected_author, random.choice(results[selected_author]))
@@ -89,9 +89,6 @@ class Quotes:
                          '\n'
                          'You can also put quotation marks around the author to add a name with spaces'))
     async def add(self, name, *, quote: str):
-        # Testing code
-        # await self.bot.say('Sorry {name}, we cannot add the quote "{quote}" due to oppressive overlords.'.format(name=name, quote=quote))
-
         # TODO think about data structure. Would kind of like to number quote for reference purposes.
         # TODO? allow use of @User id numbers instead of hardcoded names
         #       problem: using @User notifies user of the message
