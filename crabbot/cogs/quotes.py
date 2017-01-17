@@ -38,16 +38,11 @@ class Quotes:
             with self.quotes_db_path.open() as f:
                 self.quotes = json.load(f)
 
-    @commands.group(pass_context=True,
+    @commands.group(pass_context=True, invoke_without_command=True,
                     help=('Read or add quotes! See "help quote" for details\n'
                           '\n'
                           'If no command is given, a random quote is printed'))
     async def quote(self, ctx):
-        if ctx.invoked_subcommand is not None:
-            return
-
-        # await self.bot.say("Be more quotable, then maybe we'd finish this command. :neutral_face:")
-
         # TODO consider using name.lower() to standardize input. Or some kind of fuzzy matching.
 
         # TODO do something different to get names, currently spaces are ignored
