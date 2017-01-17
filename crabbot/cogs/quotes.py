@@ -73,14 +73,22 @@ class Quotes:
                          'eg. quote add Steve "Steve said this thing"\n'
                          '\n'
                          'You can also put quotation marks around the author to add a name with spaces'))
-    async def add(self, name, *, quote: str):
-        # TODO Would kind of like to number quote for reference purposes.
+    async def add(self, name: str, *, quote: str):
+        # TODO? Would kind of like to number quote for reference purposes.
         # TODO? allow use of @User id numbers instead of hardcoded names
         #       problem: using @User notifies user of the message
         #       Try to match string name with in-server user and store their ID for later matching?
 
         # TODO consider using name.lower() to standardize input.
         #       Would like to preserve capitalization for display though.
-        pass
+
+        # TODO error handling.
+        self.quotes_db_cursor.execute("INSERT INTO quotes VALUES "
+                                      "(?, ?)", (name, quote))
+
+        # For safety (CrabBot has no graceful shutdown), just write the changes now
+        self.quotes_db_connection.commit()
+
+        await self.bot.say("Quote added.")
 
     # TODO 'remove' command
