@@ -51,12 +51,12 @@ class Quotes:
         # TODO consider using name.lower() to standardize input. Or some kind of fuzzy matching.
 
         # TODO do something different to get names, currently spaces are ignored
+        #       Can't have quote take args, then subcommands don't work
         name = ctx.subcommand_passed  # attempt to get the rest of the message
 
+        # TODO? maybe detect blank strings to help with user error?
         if name is None:
             name = random.choice(list(self.quotes.keys()))
-
-        # TODO if name is "", pick any old random quote
 
         if name in self.quotes:
             selected_quote = random.choice(self.quotes[name])
