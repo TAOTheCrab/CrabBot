@@ -48,8 +48,8 @@ class Quotes:
                                           "WHERE author IS ? "
                                           "ORDER BY RANDOM()"
                                           "LIMIT 1", (name,))
-            # Escape a list of 1-tuples now
-            selected_quote = self.quotes_db_cursor.fetchall()[0][0]
+            # Just escape one 1-tuple. We already have the name, so meh.
+            selected_quote = self.quotes_db_cursor.fetchone()[0]
             await self.bot.say("{quote} \n  —{name}".format(quote=selected_quote,
                                                             name=name))
         else:
