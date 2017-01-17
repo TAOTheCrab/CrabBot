@@ -100,7 +100,7 @@ class Quotes:
 
         # TODO error handling.
         self.quotes_db_cursor.execute("INSERT INTO quotes VALUES "
-                                      "(?, ?)", (name, quote))
+                                      "(?,?)", (name, quote))
 
         # For safety (CrabBot has no graceful shutdown), just write the changes now
         self.quotes_db_connection.commit()
