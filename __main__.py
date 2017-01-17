@@ -34,7 +34,7 @@ parser.add_argument('--assets-path', default="assets/",
 parser.add_argument('--memes-path', default="assets/memes",
                     help="Path for memes audio clips (and its filelist.txt)")
 parser.add_argument('--quotes-path', default="../",  # NOTE we write to this location, be careful where you put it
-                    help="Path containing the quotes database (quotes.json. Do not include filename.)")
+                    help="Path containing the quotes database. Will create quotes.sqlite3 if it does not exist.")
 parser.add_argument('--use-libav', action='store_true',
                     help="Make Voice use Libav instead of FFmpeg")
 parser.add_argument('--disable-voice', action='store_true',
@@ -92,7 +92,7 @@ input_thread = Thread(target=poll_terminal, daemon=True)
 input_thread.start()
 
 bot.add_cog(crabbot.cogs.messages.Messages(bot, args.assets_path + "/messages"))
-bot.add_cog(crabbot.cogs.quotes.Quotes(bot, args.quotes_path + "/quotes.json"))
+bot.add_cog(crabbot.cogs.quotes.Quotes(bot, args.quotes_path))
 # Comment out import of voice to disable voice commands
 if "crabbot.cogs.voice" in sys.modules and args.disable_voice is False:
     bot.add_cog(crabbot.cogs.voice.Voice(bot, args.memes_path, args.use_libav))
