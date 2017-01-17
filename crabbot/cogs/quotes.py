@@ -57,7 +57,8 @@ class Quotes:
 
     @quote.command(help='List all authors of recorded quotes')
     async def authors(self):
-        self.quotes_db_cursor.execute("SELECT DISTINCT author FROM quotes")
+        self.quotes_db_cursor.execute("SELECT DISTINCT author FROM quotes "
+                                      "ORDER BY author COLLATE NOCASE")
         # DB query result is a list of 1-tuples, so we extract the contained strs
         authors = [x[0] for x in self.quotes_db_cursor.fetchall()]
 
