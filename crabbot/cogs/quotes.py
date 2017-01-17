@@ -57,7 +57,10 @@ class Quotes:
 
     @quote.command(help='List all authors of recorded quotes')
     async def authors(self):
-        authors = sorted(self.quotes.keys(), key=str.lower)
+        self.quotes_db_cursor.execute("SELECT DISTINCT author FROM quotes")
+        # DB query result is a list of 1-tuples, so we extract the contained strs
+        authors = [x[0] for x in self.quotes_db_cursor.fetchall()]
+
         await self.bot.say(";  ".join(authors))
 
     @quote.command(help='Search for a random quote with the given string in it.\n'
