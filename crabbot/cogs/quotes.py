@@ -75,7 +75,7 @@ class Quotes:
                          'eg. quote add Steve "Steve said this thing"\n'
                          '\n'
                          'You can also put quotation marks around the author to add a name with spaces'))
-    async def add(self, name, quote):
+    async def add(self, name, *, quote: str):
         # Testing code
         # await self.bot.say('Sorry {name}, we cannot add the quote "{quote}" due to oppressive overlords.'.format(name=name, quote=quote))
 
