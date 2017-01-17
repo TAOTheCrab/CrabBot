@@ -62,13 +62,13 @@ Put in `/etc/systemd/system`
 ```
 [Unit]
 Description=Start CrabBot at startup.
-After=network-online.target  # might be too early?
+After=network-online.target
 
 [Service]
 Type=forking
 User=*USERNAME*
 ExecStart=*CrabBotDir*/start-crabbot.sh
-ExecStop=screen -X -S CrabBotRun quit  # KillSignal=SIGINT instead? Phantom login bug currently
+ExecStop=screen -X -S CrabBotRun quit
 WorkingDirectory=*CrabBotDir*
 # Restart=always
 
