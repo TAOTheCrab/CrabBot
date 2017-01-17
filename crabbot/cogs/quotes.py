@@ -50,6 +50,7 @@ class Quotes:
 
         # TODO consider using name.lower() to standardize input. Or some kind of fuzzy matching.
 
+        # TODO do something different to get names, currently spaces are ignored
         name = ctx.subcommand_passed  # attempt to get the rest of the message
 
         if name is None:
@@ -62,6 +63,11 @@ class Quotes:
             await self.bot.say("{quote} \n  —{name}".format(quote=selected_quote, name=name))
         else:
             await self.bot.say("No quotes from {name}".format(name=name))
+
+    @quote.command(help='List all authors of recorded quotes')
+    async def authors(self):
+        authors = self.quotes.keys()
+        await self.bot.say(";  ".join(authors))
 
     @quote.command(help=('Add a quote.\n'
                          'Say the name of the person being quoted, then '
