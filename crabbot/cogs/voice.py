@@ -176,8 +176,9 @@ class Voice(crabbot.common.CrabBotCog):
         await voice_connection.audio_queue.put(new_entry)
 
     @commands.command(pass_context=True,
-                      help="Plays most things supported by youtube-dl")
-    async def stream(self, ctx, video=None):
+                      help="Plays most things supported by youtube-dl\n"
+                           "Accepts a start time in the format [HH:MM]:SS (feature may be buggy)")
+    async def stream(self, ctx, video=None, start_time='00:00:00'):
         # TODO check if video is a valid streamable (YoutubeDL.py simulate?)
         if video is None:
             self.bot.reply("Nothing to stream")
@@ -204,10 +205,12 @@ class Voice(crabbot.common.CrabBotCog):
             # "ignoreerrors": True  # Mostly so it won't stop on bad playlist entries
             "noplaylist": True  # Too many things broke on playlists, so...
         }
+        ffmpeg_before_options="-ss " + start_time
         player = await voice_connection.voice.create_ytdl_player(
             video,
             use_avconv=self.use_libav,
             ytdl_options=ytdl_opts,
+            before_options=ffmpeg_before_options,
             after=voice_connection.toggle_next)
         new_entry = VoiceEntry(
             player, player.title,
