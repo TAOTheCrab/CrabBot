@@ -6,6 +6,8 @@
     - requires using client.start() instead of run()
     - Could try code after bot.run() as a hacky start
     - LRRBot, with a similar arch for startup, uses try except (KeyBoardInterrupt, SystemExit) finally
+    - INTERMEDIATE SOLUTION: look into cog unloading code.
+        - At least is relevant to unloading the cog live too
 - [ ] Full command logging
     - Logging.INFO level
     - Timestamp
@@ -58,6 +60,7 @@
     - List contents of eg. the_memes (ex. check if --memes-path was correct without voice command)
 - [ ] Better console (eg. not clobbered by log)
     - Could be solved with server/client for management
+    - Currently worked around using iffy file logging (logs from youtube-dl leak)
 - [ ] Server/client for commands
     - Need some kind of shared key for auth
         - `--key` launch arg? Don't launch server without it?
@@ -95,6 +98,7 @@
 - [ ] catch discord.ext.commands.errors.CommandInvokeError for eg. invalid stream URLs
     - Disconnect from voice on error
         - (would like to do the error-prone task before connecting, but we're not there yet)
+    - Note: YouTube-DL cannot validate URLs, so it can only throw errors in that case
 - [ ] Livestreamer integration
     - Bonus alt YouTube streamer? (claims only Live tho)
         - Could hopefully start playing sooner than a full youtube-dl for longer videos
@@ -107,11 +111,17 @@
         - Big problem when the connection is persistent for volume controls
         - Might be that it crashes, continues, then somehow doesn't None the voice so it doesn't reconnect
     - Cancel or end the audio_player task when finished, then restart it when playing more?
-- [ ] Some kind of stream target link validation/error handling
-    - Whole thing just crashes if you give it eg. "stream <blah>"
 - [ ] The queue seems to only work without problem with a short queue (~1 queue entry). Investigate
     - Might be related to host's low amount of memory
     - FFmpeg gets killed after a while? Usually the queued entry cuts out soon after starting.
+- [ ] Move audio processing/create_player() to audio player loop, instead of preprocessing.
+    - The preprocessing might be the reason for the above issues with longer queues
+    - Preprocessing causes noticeable quality issues with currently playing stream
+        - Also processing when the queue pops would put processing delay where it might be useful
+    - Figure out how to reduce differences between "memes" and "stream" for audio player
+        - End result is the same, but until processed the function calls are different
+        - Pass in pre-filled create_player() functions?
+            - ffmpeg_player doesn't need to be await-ed, but youtube_player does...
 
 ### Nice to have
 - [ ] Voice volume convert from ex. 100% to 1.0 notation
@@ -143,18 +153,16 @@
     - Would be difficult with current data structure if quotes db gets too big
         - Could use some sort of quote id
 - [ ] Figure out quotes data structure
-    - Name
-    - Quote
     - ID?
         - Per-name id number?
         - Could be difficult to determine non-colliding id
-- [ ] Could use some way to reload quotes.json file while live
-    - Currently it is always overridden while CrabBot is running, when the add command is used
-- [ ] Quotes queries
-    - List recorded authors
-    - Advanced: search
-- [ ] User names with spaces
-    - Mostly for lookup, currently cannot look up quote authors with spaces
+- [ ] Cog unload: close db connection as cleanup
+    - Not high priority or really necessary (changes are committed immediately)
+- [ ] Per-server quotes
+    - Would need:
+        - Table initialization in "add" for a new server
+        - General check in query functions
+            - Notify user if no quotes have been added for the server
 
 
 # Assorted notes (AKA thought this while busy with another thing)
@@ -178,6 +186,6 @@
     - Need/use concurrent.futures?
 - [ ] Might have to move assets into crabbot for distribution
     - Alt. could somehow split out messages.py, since it's the thing that needs the assets badly
-- [ ] Rename run.py to __main__.py?
+- [x] Rename run.py to __main__.py?
     - Allows automatic execution by calling the module name
     - for, ex., [zipapp](https://docs.python.org/3/library/zipapp.html)
