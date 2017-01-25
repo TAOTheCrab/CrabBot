@@ -85,10 +85,10 @@ class Quotes:
 
     @quote.command(help=('Add a quote.\n'
                          'Say the name of the person being quoted, then '
-                         'write the quote in quotation marks.\n'
+                         'write the quote (quotation marks are optional).\n'
                          'eg. quote add Steve "Steve said this thing"\n'
                          '\n'
-                         'You can also put quotation marks around the author to add a name with spaces'))
+                         'To add a name with spaces in it, you must put the name in quotation marks.'))
     async def add(self, name: str, *, quote: str):
         # TODO? Would kind of like to number quote for reference purposes.
         # TODO? allow use of @User id numbers instead of hardcoded names
