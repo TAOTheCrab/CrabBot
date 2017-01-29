@@ -16,6 +16,8 @@ class Messages(crabbot.common.CrabBotCog):
     def __init__(self, bot, assets_path):
         super().__init__(bot)
 
+        self.spam_limit = 100  # Limit for repetitive emotes commands
+
         self.assets_path = Path(assets_path)
         # Initialize the lists
         self.update_lists()
@@ -75,6 +77,8 @@ class Messages(crabbot.common.CrabBotCog):
         if num not in ('nope', '0'):
             try:
                 number = int(num)
+                if number > spam_limit:
+                    number = spam_limit
             except ValueError:
                 number = 1
             await self.bot.reply("👍" * number)
@@ -83,6 +87,12 @@ class Messages(crabbot.common.CrabBotCog):
 
     @commands.command()
     async def cake(self, num='1'):
+        try:
+            number = int(num)
+            if number > spam_limit:
+                number = spam_limit
+        except ValueError:
+            number = 1
         reply = [random.choice(self.cakes) for _ in range(abs(int(num)))]
         await self.bot.say(''.join(reply))
 
