@@ -93,13 +93,14 @@ class Quotes:
                          '\n'
                          'To add a name with spaces in it, you must put the name in quotation marks.'))
     async def add(self, name: str, *, quote: str):
-        # TODO? Would kind of like to number quote for reference purposes.
+        # TODO Would kind of like to number quote for reference purposes.
         # TODO? allow use of @User id numbers instead of hardcoded names
         #       problem: using @User notifies user of the message
         #       Try to match string name with in-server user and store their ID for later matching?
 
-        # TODO consider using name.lower() to standardize input.
-        #       Would like to preserve capitalization for display though.
+        # NOTE: For capitalization sanitation, there's 'author COLLATE NOCASE'
+        #       either in CREATE TABLE or 'SELECT DISTINCT author COLLATE NOCASE'
+        #       Both ways, 'quote name' will probably need a couple tolower()s
 
         # TODO error handling.
         self.quotes_db_cursor.execute("INSERT INTO quotes VALUES "
