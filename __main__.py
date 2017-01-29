@@ -7,8 +7,10 @@
 import argparse
 import datetime
 import logging
+import os
 import readline  # Only for better terminal input support, eg. history
 import sys
+from tempfile import gettempdir  # for PID file (for easier service management)
 from threading import Thread
 
 import crabbot.common
@@ -16,6 +18,10 @@ import crabbot.cogs.messages
 import crabbot.cogs.quotes
 import crabbot.cogs.voice  # comment out to disable voice commands entirely
 
+pid = str(os.getpid())
+pidfile = gettempdir() + '/CrabBot.pid'  # eg. so systemd's PIDFile can find a /tmp/CrabBot.pid
+with open(pidfile, 'w') as temppidfile:
+    temppidfile.write(pid)
 
 logging.basicConfig(filename='crabbot.log', level=logging.INFO)  # Grr, ytdl doesn't log
 logging.info("Starting crabbot at " + str(datetime.datetime.now()))
@@ -105,3 +111,9 @@ bot.run(login)
 # (CrabBot doesn't log out if it's straight terminated)
 logging.info("CrabBot has recieved a SIGINT and has now exited as intended")
 print("CrabBot says goodbye")
+
+# Cleanup pidfile
+try:
+    os.remove(pidfile)
+except:
+    pass  # Don't try too hard to clean up
