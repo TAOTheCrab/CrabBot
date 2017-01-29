@@ -87,6 +87,7 @@ def poll_terminal():
         elif term_input.startswith("update_lists"):
             bot.update_all_lists()
 
+
 # Start polling thread as a daemon so the program exits without waiting if ex. the bot crashes
 input_thread = Thread(target=poll_terminal, daemon=True)
 input_thread.start()

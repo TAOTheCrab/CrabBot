@@ -77,7 +77,7 @@ class Quotes:
         self.quotes_db_cursor.execute("SELECT * FROM quotes "
                                       "WHERE quote LIKE ? "
                                       "ORDER BY RANDOM() "
-                                      "LIMIT 1", ('%'+query+'%',))
+                                      "LIMIT 1", ('%' + query + '%',))
         quote = self.quotes_db_cursor.fetchone()
 
         if quote is None:
