@@ -29,6 +29,12 @@ class Quotes:
         self.quotes_db_cursor.execute("CREATE TABLE IF NOT EXISTS quotes "
                                       "(author text NOT NULL, quote text NOT NULL)")
 
+    def __unload(self):
+        # This is mostly just to express that we definitely want everything cleaned up on unload
+        # and a reminder that unload exists if we want to, say, commit beforehand.
+        self.quotes_db_connection.close()
+        self.quotes_db_cursor.close()
+
     @commands.group(pass_context=True, invoke_without_command=True,
                     help=('Read or add quotes! See "help quote" for details\n'
                           '\n'
