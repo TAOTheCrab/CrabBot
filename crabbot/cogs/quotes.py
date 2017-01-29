@@ -32,8 +32,8 @@ class Quotes:
     def __unload(self):
         # This is mostly just to express that we definitely want everything cleaned up on unload
         # and a reminder that unload exists if we want to, say, commit beforehand.
-        self.quotes_db_connection.close()
         self.quotes_db_cursor.close()
+        self.quotes_db_connection.close()
 
     @commands.group(pass_context=True, invoke_without_command=True,
                     help=('Read or add quotes! See "help quote" for details\n'
