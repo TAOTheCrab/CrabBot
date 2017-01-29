@@ -99,3 +99,8 @@ if "crabbot.cogs.voice" in sys.modules and args.disable_voice is False:
 
 # Blocking, must be last. See discord.py Client for more info.
 bot.run(login)
+
+# If it reaches here, CrabBot's probably logged out of Discord now
+# (CrabBot doesn't log out if it's straight terminated)
+logging.info("CrabBot has recieved a SIGINT and has now exited as intended")
+print("CrabBot says goodbye")
