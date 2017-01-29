@@ -80,8 +80,11 @@ class Quotes:
                                       "LIMIT 1", ('%'+query+'%',))
         quote = self.quotes_db_cursor.fetchone()
 
-        await self.bot.say("{quote} \n  —{name}".format(quote=quote[1],
-                                                        name=quote[0]))
+        if quote is None:
+            await self.bot.say("No quotes found.")
+        else:
+            await self.bot.say("{quote} \n  —{name}".format(quote=quote[1],
+                                                            name=quote[0]))
 
     @quote.command(help=('Add a quote.\n'
                          'Say the name of the person being quoted, then '
