@@ -66,9 +66,10 @@ After=network-online.target
 
 [Service]
 Type=forking
+PIDFile=/tmp/CrabBot.pid
 User=*USERNAME*
 ExecStart=*CrabBotDir*/start-crabbot.sh
-ExecStop=screen -X -S CrabBotRun quit
+KillSignal=SIGINT
 WorkingDirectory=*CrabBotDir*
 # Restart=always
 
