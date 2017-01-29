@@ -2,12 +2,8 @@
 
 
 # General
-- [ ] Look into an exit more graceful than Interrupt
-    - requires using client.start() instead of run()
-    - Could try code after bot.run() as a hacky start
-    - LRRBot, with a similar arch for startup, uses try except (KeyBoardInterrupt, SystemExit) finally
-    - INTERMEDIATE SOLUTION: look into cog unloading code.
-        - At least is relevant to unloading the cog live too
+- [x] Look into an exit more graceful than Interrupt
+    - Now that I know how to reliably send SIGINTs, discord.py basically does this for us with cog unloads
 - [ ] Full command logging
     - Logging.INFO level
     - Timestamp
@@ -23,12 +19,12 @@
         - Reminder: 0x1=b0001, 0x2=b0010, 0x4=b0100, 0x8=b1000
         - For link, convert to permissions hex/binary to int
     - [Add to server link docs](https://discordapp.com/developers/docs/topics/oauth2#adding-bots-to-guilds)
-- [ ] Need logging for exit/many other exceptions (see todo for clean exit)
 - [ ] Add println for some logged messages for user feedback (mostly for eg. disable_voice command)
 - [ ] Add logging for on_ready (currently only println)
+    - Kind of satisfied by the discord.gateway logs, but...
 
 ### Nice to have
-- [ ] Would like to make a custom help formatter
+- [ ] Might like to make a custom help formatter
     - see default discord.py commands.formatter.py and "formatter" commands.Bot arg
 - [x] setup.py
     - Needs a main script
@@ -42,6 +38,9 @@
 - [ ] Translation strings (mostly as an excuse to shorten the help= sections)
     - Idea: crabbot.load_help(), used by cogs to populate their help
     - Look into existing libraries for localization loading eg. managing translation txt files
+        - gettext
+            - tried, seems heavyweight for just populating text fields
+    - Look into dynamic command aliases to translate them
 - [ ] Module docstrings
 - [ ] Function docstrings
 - [ ] Add type hints to functions (see [typing](https://docs.python.org/3/library/typing.html))
@@ -152,12 +151,7 @@
 - [ ] Add command to remove a quote
     - Would be difficult with current data structure if quotes db gets too big
         - Could use some sort of quote id
-- [ ] Figure out quotes data structure
-    - ID?
-        - Per-name id number?
-        - Could be difficult to determine non-colliding id
-- [ ] Cog unload: close db connection as cleanup
-    - Not high priority or really necessary (changes are committed immediately)
+- [ ] Quotes ID for easy reference, a la LRRBot?
 - [ ] Per-server quotes
     - Would need:
         - Table initialization in "add" for a new server
@@ -167,8 +161,6 @@
 
 # Assorted notes (AKA thought this while busy with another thing)
 - [ ] cmd module for/instead of poll_terminal?
-- [ ] Call loop.stop() to exit bot.run()?
-    - discord.py does useful things in 'except KeyBoardInterrupt' though
 - [ ] Figure out multi-server stuff (currently untested, but might work as-is)
 - [ ] Case-insensitive commands (not that important, just interesting)
     - Could override bot.on_message() and do str.lower() before bot.process_commands()
