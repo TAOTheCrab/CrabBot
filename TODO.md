@@ -121,6 +121,7 @@
         - End result is the same, but until processed the function calls are different
         - Pass in pre-filled create_player() functions?
             - ffmpeg_player doesn't need to be await-ed, but youtube_player does...
+- [ ] Might want to only let users in CrabBot's current voice channel use commands
 
 ### Nice to have
 - [ ] Voice volume convert from ex. 100% to 1.0 notation
