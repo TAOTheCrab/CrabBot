@@ -75,7 +75,7 @@ class Voice(crabbot.common.CrabBotCog):
 
         if target_voice_channel is None:
             logging.info("User not in a voice channel")
-            self.bot.loop.create_task(self.bot.reply("Try being in a voice channel first"))
+            self.bot.loop.create_task(self.bot.reply("You must be in a voice channel to use voice commands"))
             return None, None
 
         voice_connection = self.get_voice_connection(ctx)
