@@ -2,9 +2,6 @@
 # Simple Discord chatbot for fun
 # Main bot management plus some functions common between command cogs.
 #
-# Contains class CrabBotCog, which defines an optional interface
-# used by CrabBot to interact with cogs.
-#
 # Requires a bot user token.
 
 import asyncio
@@ -72,7 +69,7 @@ class CrabBot(commands.Bot):
     def add_cog(self, cog):
         super(CrabBot, self).add_cog(cog)
         logging.info("Added cog {}".format(cog.__class__.__name__))
-        if isinstance(cog, CrabBotCog) and cog.has_lists is True:
+        if hasattr(cog, "update_lists"):
             self.cogs_update_lists[cog.__class__.__name__] = cog.update_lists
 
     def remove_cog(self, cog_name):
@@ -80,17 +77,6 @@ class CrabBot(commands.Bot):
         logging.info("Removed cog {}".format(cog_name))
         if cog_name in self.cogs_update_lists:
             del self.cogs_update_lists[cog_name]
-
-
-class CrabBotCog:
-    has_lists = False  # Set to true in your subclass if you implement update_lists()
-
-    # Superclass defining the interface for CrabBot cogs
-    def __init__(self, bot):
-        self.bot = bot
-
-    def update_lists():
-        raise NotImplementedError("Either implement update_lists or initialize cog with has_list=False")
 
 
 def read_list_file(filepath):

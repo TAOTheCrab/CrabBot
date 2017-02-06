@@ -17,11 +17,9 @@ from discord.ext import commands
 import crabbot.common
 
 
-class Voice(crabbot.common.CrabBotCog):
-    has_lists = True
-
+class Voice:
     def __init__(self, bot, memes_path, use_libav=False):
-        super().__init__(bot)
+        self.bot = bot
         self.use_libav = use_libav
 
         self.memes_path = Path(memes_path)

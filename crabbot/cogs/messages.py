@@ -10,11 +10,9 @@ from discord.ext import commands
 import crabbot.common
 
 
-class Messages(crabbot.common.CrabBotCog):
-    has_lists = True
-
+class Messages:
     def __init__(self, bot, assets_path):
-        super().__init__(bot)
+        self.bot = bot
 
         self.spam_limit = 100  # Limit for repetitive emotes commands
 
