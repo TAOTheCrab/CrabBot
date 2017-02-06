@@ -38,7 +38,7 @@ class Messages:
         self.bandplaces = crabbot.common.read_list_file(self.assets_path / "band-places.txt")
         # !band style
         self.bandstyles = crabbot.common.read_list_file(self.assets_path / "band-styles.txt")
-        # !new world
+        # !world
         self.worldwords = crabbot.common.read_list_file(self.assets_path / "world-words.txt")
 
     @commands.command(help='The bots have something to say')
@@ -120,8 +120,8 @@ class Messages:
         style = random.choice(self.bandstyles)
         await self.bot.say("    which is a {} cover band.".format(style))
 
-    @commands.command(name="world", help="Name a new Land! Thanks, Homestuck!")
-    async def new_world(self):
+    @commands.command(help="Name a new Land! Thanks, Homestuck!")
+    async def world(self):
         # Repeat words are OK
         word1 = random.choice(self.worldwords)
         word2 = random.choice(self.worldwords)
