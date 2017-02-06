@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 
+# WARNING! WIP, doesn't work correctly.
+# Still needs to understand the assets folder and make an executable out of __main__
+
 from setuptools import setup, find_packages
 
 # We want to restrict newer versions while we deal with upstream breaking changes.
