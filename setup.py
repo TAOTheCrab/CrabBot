@@ -5,9 +5,6 @@
 
 from setuptools import setup, find_packages
 
-# We want to restrict newer versions while we deal with upstream breaking changes.
-discordpy_version = '==0.11.0'
-
 # TODO read README(.rst? .md looks bad on pypi) for long_description.
 #      Could use pandoc, but the end user shouldn't need to do this in setup.
 #      Alt. could have package-specific description. More error-prone though.
@@ -35,7 +32,7 @@ setup(
     ],
     extras_require={
         'voice': [
-            'discord.py[voice]{}'.format(discordpy_version),
+            'discord.py[voice]',
             'youtube_dl'
         ]
     }
