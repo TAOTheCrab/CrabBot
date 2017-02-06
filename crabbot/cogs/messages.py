@@ -115,8 +115,8 @@ class Messages:
         place = random.choice(self.bandplaces)
         await self.bot.say("Your new band name is {} {} {}".format(adjective, noun, place))
 
-    @band.command(name="style")
-    async def _style(self):
+    @band.command()
+    async def style(self):
         style = random.choice(self.bandstyles)
         await self.bot.say("    which is a {} cover band.".format(style))
 
