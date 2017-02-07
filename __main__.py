@@ -24,7 +24,10 @@ with open(pidfile, 'w') as temppidfile:
     temppidfile.write(pid)
 
 logging.basicConfig(filename='crabbot.log', level=logging.INFO)  # Grr, ytdl doesn't log
-logging.info("Starting crabbot at " + str(datetime.datetime.now()))
+logging.info("________\n" +
+             "Starting CrabBot at " + str(datetime.datetime.now()) + "\n"
+             "--------")  # Make it clear in the log when a new run starts
+                          # TODO? Might want a delimiter that is easier to write, eg. for a log parsing script
 
 # Do argparse first so that -h can print and exit before anything else happens
 parser = argparse.ArgumentParser(description='A silly Discord bot')
@@ -109,7 +112,8 @@ bot.run(login)
 
 # If it reaches here, CrabBot's probably logged out of Discord now
 # (CrabBot doesn't log out if it's straight terminated)
-logging.info("CrabBot has recieved a SIGINT and has now exited as intended")
+logging.info("CrabBot has recieved a SIGINT and has now exited as intended\n" +
+             "————— CrabBot exited at " + str(datetime.datetime.now()))
 print("CrabBot says goodbye")
 
 # Cleanup pidfile
