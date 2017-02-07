@@ -30,10 +30,11 @@ class CrabBot(commands.Bot):
         self.cogs_update_lists = {}
 
     async def on_ready(self):
-        print('Logged in as')
-        print(self.user.name)
-        print(self.user.id)
-        print('------')
+        login_msg = ('Logged in as {} ({})\n'.format(self.user.name, self.user.id) +
+                     '------')
+
+        print(login_msg)
+        logging.info(login_msg)
 
     async def update_profile(self, username=None, avatar=None):
         logging.info("Updating profile")
