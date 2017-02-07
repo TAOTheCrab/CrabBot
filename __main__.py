@@ -9,6 +9,7 @@ import datetime
 import logging
 import os
 import readline  # Only for better terminal input support, eg. history
+import signal  # So we can send SIGINT to ourselves
 import sys
 from tempfile import gettempdir  # for PID file (for easier service management)
 from threading import Thread
@@ -62,25 +63,17 @@ bot = crabbot.common.CrabBot(prefix=args.prefix)
 
 
 def poll_terminal():
-    running = True
-    # TODO function dict
-    # TODO handle KeyboardInterrupt exception (cleans up console output)
+    # TODO function dict instead of if/elif.
 
-    while running:
+    while True:  # Run thread as daemon, so Python will exit despite this loop
         term_input = input()
         if term_input == "help":
-            # TODO print terminal command help
+            # TODO write help for the terminal commands
             print("Uh, no. I'm gonna be annoying instead.")
             # NOTE could use function.__doc__ and docstrings for function help
         elif term_input == "quit":
-            # TODO figure out if it's possible to end discord.Client without KeyboardInterrupt
-            #   Probably need to reimplement run() using start() with a different quit condition
-            #   Could also use run() and just throw a KeyboardInterrupt or two.
-            #   Ew...
-
-            # For now, tell user how to quit so we don't leave them in the dark
-            print("Disabling command input. Use ctrl+c to quit the bot.")
-            running = False
+            os.kill(int(pid), signal.SIGINT)  # discord.Client.run() quits on KeyboardInterrupt, so...
+            # This might not work on Windows? It has a special signal.CTRL_C_EVENT.
         elif term_input.startswith("update_profile"):
             profile_args = term_input.split(' ')
             bot._update_profile(username=profile_args[1], avatar=profile_args[2])
@@ -103,7 +96,7 @@ input_thread.start()
 
 bot.add_cog(crabbot.cogs.messages.Messages(bot, args.assets_path + "/messages"))
 bot.add_cog(crabbot.cogs.quotes.Quotes(bot, args.quotes_path))
-# Comment out import of voice to disable voice commands
+# Comment out import of voice to completely disable voice commands
 if "crabbot.cogs.voice" in sys.modules and args.disable_voice is False:
     bot.add_cog(crabbot.cogs.voice.Voice(bot, args.memes_path, args.use_libav))
 
