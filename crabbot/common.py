@@ -13,6 +13,12 @@ import discord
 from discord.ext import commands
 
 
+def read_list_file(filepath):
+    with filepath.open() as file_list:
+        words = [x.rstrip() for x in file_list]
+    return words
+
+
 class CrabBot(commands.Bot):
     def __init__(self, prefix='!crab'):
         # Could just use command_prefix arg, but this allows for a default prefix
@@ -77,11 +83,3 @@ class CrabBot(commands.Bot):
         logging.info("Removed cog {}".format(cog_name))
         if cog_name in self.cogs_update_lists:
             del self.cogs_update_lists[cog_name]
-
-
-def read_list_file(filepath):
-    with filepath.open() as file_list:
-        words = [x.rstrip() for x in file_list]
-    # TODO check whether trailing newlines make it into the list as blank strings
-    #      Needs live check of the list. So far blank lines haven't shown up in commands, but...
-    return words
