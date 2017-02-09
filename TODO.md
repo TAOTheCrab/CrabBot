@@ -48,9 +48,6 @@
 
 
 # run.py
-- [ ] launch options in config file
-    - Look into argparse's fromfile_prefix_chars
-        - crabbot prefix? ex. crabbotargs.txt
 - [ ] Some kind of status check command(s)
     - List contents of eg. the_memes (ex. check if --memes-path was correct without voice command)
 - [ ] Better console (eg. not clobbered by log)
