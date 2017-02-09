@@ -31,7 +31,7 @@ logging.info("________\n" +
                           # TODO? Might want a delimiter that is easier to write, eg. for a log parsing script
 
 # Do argparse first so that -h can print and exit before anything else happens
-parser = argparse.ArgumentParser(description='A silly Discord bot')
+parser = argparse.ArgumentParser(fromfile_prefix_chars='@', description='A silly Discord bot')
 token_args = parser.add_mutually_exclusive_group(required=True)
 token_args.add_argument('-t', '--token',
                         help="The bot user's login token. Use this or -f.")
