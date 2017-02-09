@@ -32,6 +32,22 @@ or
 `python3 __main__.py -t UserToken`
 
 
+You can also make a text file with common arguments and refer to it with the arg "@*filename*",
+which you can mix with regular args.
+
+For instance, for a custom prefix with custom assets, use a file like this:
+
+```
+-p
+!banana
+--assets-path
+./banana-messages
+```
+
+Then launch CrabBot with:
+
+`python3 __main__.py -f TokenFile @bananas.txt`
+
 
 ## Similar projects
 
