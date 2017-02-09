@@ -203,7 +203,7 @@ class Voice:
             # "ignoreerrors": True  # Mostly so it won't stop on bad playlist entries
             "noplaylist": True  # Too many things broke on playlists, so...
         }
-        ffmpeg_before_options="-ss " + start_time
+        ffmpeg_before_options = "-ss " + start_time
         player = await voice_connection.voice.create_ytdl_player(
             video,
             use_avconv=self.use_libav,
