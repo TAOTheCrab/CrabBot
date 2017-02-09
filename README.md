@@ -29,7 +29,9 @@ Common usage is
 
 or
 
-`python3 __main_.py -t UserToken`
+`python3 __main__.py -t UserToken`
+
+
 
 ## Similar projects
 
