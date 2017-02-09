@@ -93,6 +93,8 @@
 ### Nice to have
 - [ ] Command for info about current song (eg. a link)
     - Only really important when the stream message is either deleted or heavily buried
+    - If possible, current playback time (eg. long stream you want timestamps for)
+        - Might need either a per-song timer or a start time to calculate from
 - [ ] Voice volume convert from ex. 100% to 1.0 notation
 - [ ] Use "playing"/Discord.game for stream name/link?
 - [ ] Memes number selector
