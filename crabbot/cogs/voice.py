@@ -139,9 +139,9 @@ class Voice:
             logging.info("No voice connection to end")
             await self.bot.say("No voice connection to {}".format(ctx.message.server))
 
-    @commands.command(aliases=['current_stop', 'skip'], pass_context=True,
+    @commands.command(pass_context=True,
                       help="Skip the currently playing audio for the next queued entry")
-    async def stop_current(self, ctx):
+    async def skip(self, ctx):
         logging.info("Stopping current audio entry for {}".format(ctx.message.server))
         existing_connection = self.voice_connections.get(ctx.message.server)
         if existing_connection is not None:
