@@ -94,8 +94,8 @@ class Quotes:
 
     @quote.command(help=('Add a quote.\n'
                          'Say the name of the person being quoted, then '
-                         'write the quote (quotation marks are optional).\n'
-                         'eg. quote add Steve "Steve said this thing"\n'
+                         'write the quote (only include quotation marks if you want the quote to have them).\n'
+                         'eg. quote add Steve Steve said this thing\n'
                          '\n'
                          'To add a name with spaces in it, you must put the name in quotation marks.'))
     async def add(self, name: str, *, quote: str):
