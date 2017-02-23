@@ -203,6 +203,8 @@ class Voice:
             # "ignoreerrors": True  # Mostly so it won't stop on bad playlist entries
             "noplaylist": True  # Too many things broke on playlists, so...
         }
+        # TODO: test with libav/avconv. Seems to not work on Raspbian, though -ss is valid for avconv too...
+        #       Might be more strict processing of time as hh:mm:ss?
         ffmpeg_before_options = "-ss " + start_time
         player = await voice_connection.voice.create_ytdl_player(
             video,
