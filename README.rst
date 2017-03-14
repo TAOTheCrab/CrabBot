@@ -15,14 +15,18 @@ By default, use !crabhelp or "@\*botname\* help" to see a list of visible comman
 Requires:
 
 - `discord.py <https://github.com/Rapptz/discord.py>`__ v0.10+ (AKA async branch)
-    - ``pip3 install discord.py[voice]`` for voice support
+
+  - ``pip3 install discord.py[voice]`` for voice support
+
 - Python 3.5+ (uses async syntax, can be edited to work with 3.4)
 
 For voice (module can be disabled):
 
 - libopus0/opus (for voice transmission. Package name depends on package manager)
 - ffmpeg (for voice file playback)
-    - Voice module can be configured to use avconv/libav instead (eg. for Debian)
+
+  - Voice module can be configured to use avconv/libav instead (eg. for Debian)
+
 - youtube-dl (for stream command)
 
 Needs a bot user token. See ``-h`` for details
