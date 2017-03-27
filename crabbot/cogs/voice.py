@@ -186,7 +186,7 @@ class Voice:
 
         if importlib.util.find_spec("youtube_dl") is None:
             # Preempt import error and silent failure with a more useful message and user feedback
-            logging.error("Memes command requires youtube-dl module. Install with pip.")
+            logging.error("Stream command requires youtube-dl module. Install with pip.")
             self.bot.reply("Bot is not configured to stream")
             return
 
