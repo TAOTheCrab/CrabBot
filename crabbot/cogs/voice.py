@@ -13,6 +13,7 @@ import tempfile
 
 import discord
 from discord.ext import commands
+from youtube_dl.utils import DownloadError
 
 import crabbot.common
 
@@ -206,22 +207,30 @@ class Voice:
         # TODO: test with libav/avconv. Seems to not work on Raspbian, though -ss is valid for avconv too...
         #       Might be more strict processing of time as hh:mm:ss?
         ffmpeg_before_options = "-ss " + start_time
-        player = await voice_connection.voice.create_ytdl_player(
-            video,
-            use_avconv=self.use_libav,
-            ytdl_options=ytdl_opts,
-            before_options=ffmpeg_before_options,
-            after=voice_connection.toggle_next)
-        new_entry = VoiceEntry(
-            player, player.title,
-            target_voice_channel, ctx.message)
+        try:
+            player = await voice_connection.voice.create_ytdl_player(
+                video,
+                use_avconv=self.use_libav,
+                ytdl_options=ytdl_opts,
+                before_options=ffmpeg_before_options,
+                after=voice_connection.toggle_next)
+            new_entry = VoiceEntry(
+                player, player.title,
+                target_voice_channel, ctx.message)
 
-        # Give user feedback when recieved
-        await self.bot.reply("Stream queued")
+            # Give user feedback when recieved
+            await self.bot.reply("Stream queued")
 
-        logging.info("Queueing new voice entry for {}".format(new_entry.name))
-        voice_connection.prepare_player()
-        await voice_connection.audio_queue.put(new_entry)
+            logging.info("Queueing new voice entry for {}".format(new_entry.name))
+            voice_connection.prepare_player()
+            await voice_connection.audio_queue.put(new_entry)
+        except DownloadError:
+            message = "{0}, Something went wrong. Make sure the URL is valid".format(ctx.message.author.mention)
+            await self.bot.send_message(ctx.message.channel, message)
+            # Don't leave the bot connected if it's not playing anything (otherwise it just sits there)
+            # TODO: check if we need more conditions where bot isn't going to be playing audio
+            if voice_connection.audio_queue.empty() and voice_connection.current_entry is None:
+                await voice_connection.disconnect()
 
 
 class VoiceEntry:
@@ -273,6 +282,13 @@ class VoiceConnection:
         else:
             logging.info("Moving existing voice connection to {}".format(channel.name))
             await self.voice.move_to(channel)
+
+    async def disconnect(self):
+        voice_channel_name = self.voice.channel
+        logging.info("Disconnecting from voice channel {}".format(voice_channel_name))
+        await self.voice.disconnect()
+        logging.info("Voice has been disconnected for channel {}".format(voice_channel_name))
+        self.voice = None
 
     def prepare_player(self):
         ''' Ensure audio player is in a usable state '''
@@ -335,10 +351,6 @@ class VoiceConnection:
         # BUG there's a small window where you can call a command while it's disconnecting
         #  So the command goes through, but the VoiceEntry disappears
 
-        voice_channel_name = self.voice.channel
-        logging.info("Disconnecting from voice channel {}".format(voice_channel_name))
-        await self.voice.disconnect()
-        logging.info("Voice has been disconnected for channel {}".format(voice_channel_name))
-        self.voice = None
+        await self.disconnect()
 
         # End of task, be sure to restart task if it is needed again
