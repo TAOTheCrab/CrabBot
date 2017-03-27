@@ -225,6 +225,7 @@ class Voice:
             voice_connection.prepare_player()
             await voice_connection.audio_queue.put(new_entry)
         except DownloadError:
+            logging.info("An error was caught while trying to stream '{0}'".format(video))
             message = "{0}, Something went wrong. Make sure the URL is valid.".format(ctx.message.author.mention)
             await self.bot.send_message(ctx.message.channel, message)
             # Don't leave the bot connected if it's not playing anything (otherwise it just sits there)
