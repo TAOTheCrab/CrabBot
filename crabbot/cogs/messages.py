@@ -75,8 +75,8 @@ class Messages:
         if num not in ('nope', '0'):
             try:
                 number = int(num)
-                if number > spam_limit:
-                    number = spam_limit
+                if number > self.spam_limit:
+                    number = self.spam_limit
             except ValueError:
                 number = 1
             await self.bot.reply("👍" * number)
@@ -87,8 +87,8 @@ class Messages:
     async def cake(self, num='1'):
         try:
             number = int(num)
-            if number > spam_limit:
-                number = spam_limit
+            if number > self.spam_limit:
+                number = self.spam_limit
         except ValueError:
             number = 1
         reply = [random.choice(self.cakes) for _ in range(abs(int(num)))]
