@@ -130,4 +130,4 @@ class Messages:
     @commands.command(aliases=['SUMMON THE BEAR'], help="SUMMON THE BEAR")
     async def BEAR(self):
         # SUMMON THE BEAR
-        await self.bot.upload("assets/SUMMONTHEBEAR.gif")
+        await self.bot.upload(self.assets_path / "SUMMONTHEBEAR.gif")
