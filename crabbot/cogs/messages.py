@@ -126,3 +126,8 @@ class Messages:
         word1 = random.choice(self.worldwords)
         word2 = random.choice(self.worldwords)
         await self.bot.say("The Land of {} and {}".format(word1, word2))
+
+    @commands.command(aliases=['SUMMON THE BEAR'], help="SUMMON THE BEAR")
+    async def BEAR(self):
+        # SUMMON THE BEAR
+        await self.bot.upload("assets/SUMMONTHEBEAR.gif")
