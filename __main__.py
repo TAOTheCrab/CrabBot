@@ -17,7 +17,8 @@ from threading import Thread
 import crabbot.common
 import crabbot.cogs.messages
 import crabbot.cogs.quotes
-import crabbot.cogs.voice  # comment out to disable voice commands entirely
+#NOTE: Disabling until ready to transition voice cog to 'rewrite'. Likely the biggest pain.
+#import crabbot.cogs.voice  # comment out to disable voice commands entirely
 
 pid = str(os.getpid())
 pidfile = gettempdir() + '/CrabBot.pid'  # eg. so systemd's PIDFile can find a /tmp/CrabBot.pid
