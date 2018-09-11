@@ -8,7 +8,7 @@ import argparse
 import datetime
 import logging
 import os
-import readline  # Only for better terminal input support, eg. history
+import readline  # Only for better terminal input support, eg. history. Does not work on Windows, but does work in WSL.
 import signal  # So we can send SIGINT to ourselves
 import sys
 from tempfile import gettempdir  # for PID file (for easier service management)
