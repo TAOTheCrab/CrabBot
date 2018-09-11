@@ -35,9 +35,9 @@ class Quotes:
         self.quotes_db_connection.close()
 
     @group(invoke_without_command=True,
-                    help=('Read or add quotes! See "help quote" for details\n'
-                          '\n'
-                          'If no command is given, a random quote is printed'))
+           help=('Read or add quotes! See "help quote" for details\n'
+                 '\n'
+                 'If no command is given, a random quote is printed'))
     async def quote(self, ctx, *, name=None):
         # TODO consider using name.lower() to standardize input. Or some kind of fuzzy matching.
 
