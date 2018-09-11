@@ -19,8 +19,7 @@ from discord.ext import commands
 
 class Quotes:
 
-    def __init__(self, bot, quotes_db_path):
-        self.bot = bot
+    def __init__(self, quotes_db_path):
         self.quotes_db_path = PurePath(quotes_db_path)
 
         # TODO SQL error handling (applies to most of this module)
