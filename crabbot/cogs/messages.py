@@ -59,8 +59,7 @@ class Messages:
         # Yes, possibly having repeats is intentional, more fun that way
         place_one = random.choice(self.sirplaces)
         place_two = random.choice(self.sirplaces)
-        reply = f"Sir, this is {place_one}, not {place_two}."
-        await ctx.send(reply)
+        await ctx.send(f"Sir, this is {place_one}, not {place_two}.")
 
     @command()
     async def assist(self, ctx):
