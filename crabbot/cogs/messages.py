@@ -121,8 +121,8 @@ class Messages:
         style = random.choice(self.bandstyles)
         await ctx.send(f"which is a {style} cover band.")
 
-    @command(help="Name a new Land! Thanks, Homestuck!")
-    async def world(self, ctx):
+    @command(aliases=['world'], help="Name a new Land! Thanks, Homestuck!")
+    async def land(self, ctx):
         # Repeat words are OK
         word1 = random.choice(self.worldwords)
         word2 = random.choice(self.worldwords)
