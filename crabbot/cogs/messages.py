@@ -80,8 +80,7 @@ class Messages:
                     number = self.spam_limit
             except ValueError:
                 number = 1
-            thumbs = "👍" * number
-            await ctx.send(f"{ctx.author.mention} {thumbs}")
+            await ctx.send(f"{ctx.author.mention} {'👍' * number}")
         else:
             await ctx.send("Awww")
 
