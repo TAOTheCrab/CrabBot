@@ -56,10 +56,9 @@ class Quotes:
                                           "LIMIT 1", (name,))
             # Just escape one 1-tuple. We already have the name, so meh.
             selected_quote = self.quotes_db_cursor.fetchone()[0]
-            await ctx.send("{quote} \n  —{name}".format(quote=selected_quote,
-                                                            name=name))
+            await ctx.send(f"{selected_quote} \n  —{name}")
         else:
-            await ctx.send("No quotes from {name}.".format(name=name))
+            await ctx.send(f"No quotes from {name}.")
 
     @quote.command(help='List all authors of recorded quotes')
     async def authors(self):
