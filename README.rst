@@ -1,6 +1,8 @@
 CrabBot
 =======
 
+**NOTE: This library-rewrite-prep branch uses the version of Discord.py from the `rewrite/1.0 branch <https://github.com/Rapptz/discord.py/tree/rewrite>` **
+
 Silly Discord bot for funsies
 
 Mostly prints funny messages in reply to commands, with some additional voice functionality
@@ -14,11 +16,14 @@ By default, use !crabhelp or "@\*botname\* help" to see a list of visible comman
 
 Requires:
 
-- `discord.py <https://github.com/Rapptz/discord.py>`__ v0.10+ (AKA async branch)
+- `discord.py <https://github.com/Rapptz/discord.py>`__ v1.0+ (AKA **rewrite** branch)
 
   - ``pip3 install discord.py[voice]`` for voice support
+    
+    - **TEMP UNTIL PYPI RELEASE OF REWRITE BRANCH** ``pip3 install git+https://github.com/Rapptz/discord.py.git@rewrite#egg=discord.py[voice]``
 
-- Python 3.5+ (uses async syntax, can be edited to work with 3.4)
+
+- Python 3.6+ (uses `f-strings <https://docs.python.org/3/reference/lexical_analysis.html#f-strings>`, can be edited for 3.5)
 
 For voice (module can be disabled):
 
