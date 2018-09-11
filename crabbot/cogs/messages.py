@@ -98,16 +98,16 @@ class Messages:
     @command(help="Go on a quest!")
     async def adventure(self, ctx):
         await ctx.send("Simulating adventure...")
-        await self.bot.type() # TODO find replacment
-        await asyncio.sleep(3)  # suspense!
-        if random.randint(1, 10) == 5:  # 10% chance to win
-            reward = random.choice(self.rewards)
-            await ctx.send("You win! You got {}!".format(reward))
-        else:  # Ruin!
-            death = random.choice(self.deaths)
-            killer = random.choice(self.killers)
-            location = random.choice(self.locations)
-            await ctx.send("You were {} by {} in {}".format(death, killer, location))
+        async with ctx.typing():
+            await asyncio.sleep(3)  # suspense!
+            if random.randint(1, 10) == 5:  # 10% chance to win
+                reward = random.choice(self.rewards)
+                await ctx.send("You win! You got {}!".format(reward))
+            else:  # Ruin!
+                death = random.choice(self.deaths)
+                killer = random.choice(self.killers)
+                location = random.choice(self.locations)
+                await ctx.send("You were {} by {} in {}".format(death, killer, location))
 
     @group(help="Need a band name?")
     async def band(self, ctx):
