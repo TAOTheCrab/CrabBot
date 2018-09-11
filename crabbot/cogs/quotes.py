@@ -87,8 +87,7 @@ class Quotes:
         if quote is None:
             await ctx.send("No quotes found.")
         else:
-            await ctx.send("{quote} \n  —{name}".format(quote=quote[1],
-                                                            name=quote[0]))
+            await ctx.send(f"{quote[1]} \n  —{quote[0]}")
 
     @quote.command(help=('Add a quote.\n'
                          'Say the name of the person being quoted, then '
