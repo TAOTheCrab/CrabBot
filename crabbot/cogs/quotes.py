@@ -61,19 +61,19 @@ class Quotes:
             await ctx.send(f"No quotes from {name}.")
 
     @quote.command(help='List all authors of recorded quotes')
-    async def authors(self):
+    async def authors(self, ctx):
         self.quotes_db_cursor.execute("SELECT DISTINCT author FROM quotes "
                                       "ORDER BY author COLLATE NOCASE")
         # DB query result is a list of 1-tuples, so we extract the contained strs
         authors = [x[0] for x in self.quotes_db_cursor.fetchall()]
 
-        await self.bot.say(";  ".join(authors))
+        await ctx.send(";  ".join(authors))
 
     @quote.command(help='Search for a random quote with the given string in it.\n'
                         '\n'
                         'Only searches quote contents and returns word-for-word matches.\n'
                         'Not case sensitive.')
-    async def search(self, *, query: str):
+    async def search(self, ctx, *, query: str):
         ''' Get a random quote containing the word-for-word query in it'''
         # LIKE is case-insensitive for ASCII-range letters only.
         #   Also, it is claimed LIKE is slow for searches starting with %,
@@ -86,9 +86,9 @@ class Quotes:
         quote = self.quotes_db_cursor.fetchone()
 
         if quote is None:
-            await self.bot.say("No quotes found.")
+            await ctx.send("No quotes found.")
         else:
-            await self.bot.say("{quote} \n  —{name}".format(quote=quote[1],
+            await ctx.send("{quote} \n  —{name}".format(quote=quote[1],
                                                             name=quote[0]))
 
     @quote.command(help=('Add a quote.\n'
@@ -97,7 +97,7 @@ class Quotes:
                          'eg. quote add Steve Steve said this thing\n'
                          '\n'
                          'To add a name with spaces in it, you must put the name in quotation marks.'))
-    async def add(self, name: str, *, quote: str):
+    async def add(self, ctx, name: str, *, quote: str):
         # TODO Would kind of like to number quote for reference purposes.
         # TODO? allow use of @User id numbers instead of hardcoded names
         #       problem: using @User notifies user of the message
@@ -114,6 +114,6 @@ class Quotes:
         # For safety (CrabBot has no graceful shutdown), just write the changes now
         self.quotes_db_connection.commit()
 
-        await self.bot.say("Quote added.")
+        await ctx.send("Quote added.")
 
     # TODO 'remove' command
