@@ -74,7 +74,7 @@ class Voice:
 
         if target_voice_channel is None:
             logging.info("User not in a voice channel")
-            self.bot.loop.create_task(self.bot.reply("You must be in a voice channel to use voice commands"))
+            self.bot.loop.create_task(ctx.send(f"{ctx.author.mention} You must be in a voice channel to use voice commands"))
             return None, None
 
         voice_connection = self.get_voice_connection(ctx)
@@ -92,7 +92,7 @@ class Voice:
     async def volume(self, ctx, new_volume=None):
         voice_connection = self.get_voice_connection(ctx)
         if new_volume is None:
-            await self.bot.say("The current volume is {}".format(voice_connection.volume))
+            await ctx.send("The current volume is {}".format(voice_connection.volume))
             return
 
         logging.info("Setting volume for {} to {}".format(ctx.message.server, new_volume))
@@ -103,7 +103,7 @@ class Voice:
     async def maxvolume(self, ctx, new_volume=None):
         voice_connection = self.get_voice_connection(ctx)
         if new_volume is None:
-            await self.bot.say("The current max volume is {}".format(voice_connection.maxvolume))
+            await ctx.send("The current max volume is {}".format(voice_connection.maxvolume))
             return
 
         logging.info("Setting max volume for {} to {}".format(ctx.message.server, new_volume))
@@ -138,7 +138,7 @@ class Voice:
 
         else:
             logging.info("No voice connection to end")
-            await self.bot.say("No voice connection to {}".format(ctx.message.server))
+            await ctx.send("No voice connection to {}".format(ctx.message.server))
 
     @command(help="Skip the currently playing audio for the next queued entry")
     async def skip(self, ctx):
@@ -178,7 +178,7 @@ class Voice:
     async def stream(self, ctx, video=None, start_time='00:00:00'):
         # TODO check if video is a valid streamable (YoutubeDL.py simulate?)
         if video is None:
-            self.bot.reply("Nothing to stream")
+            ctx.send(f"{ctx.author.mention} Nothing to stream")
             return
 
         logging.info("Streaming")
@@ -186,7 +186,7 @@ class Voice:
         if importlib.util.find_spec("youtube_dl") is None:
             # Preempt import error and silent failure with a more useful message and user feedback
             logging.error("Stream command requires youtube-dl module. Install with pip.")
-            self.bot.reply("Bot is not configured to stream")
+            ctx.send(f"{ctx.author.mention} Bot is not configured to stream")
             return
 
         target_voice_channel, voice_connection = await self.setup_voice_connection(ctx)
@@ -217,7 +217,7 @@ class Voice:
                 target_voice_channel, ctx.message)
 
             # Give user feedback when recieved
-            await self.bot.reply("Stream queued")
+            await ctx.send(f"{ctx.author.mention} Stream queued")
 
             logging.info("Queueing new voice entry for {}".format(new_entry.name))
             voice_connection.prepare_player()
@@ -225,7 +225,7 @@ class Voice:
         except DownloadError:
             logging.info("An error was caught while trying to stream '{0}'".format(video))
             message = "{0}, Something went wrong. Make sure the URL is valid.".format(ctx.message.author.mention)
-            await self.bot.send_message(ctx.message.channel, message)
+            await ctx.message.channel.send_message(message)
             # Don't leave the bot connected if it's not playing anything (otherwise it just sits there)
             # TODO: check if we need more conditions where bot isn't going to be playing audio
             if voice_connection.audio_queue.empty() and voice_connection.current_entry is None:
@@ -269,7 +269,7 @@ class VoiceConnection:
     def toggle_next(self):
         self.bot.loop.call_soon_threadsafe(self.play_next_in_queue.set)
 
-    async def connect(self, channel):
+    async def connect(self, ctx, channel):
         if self.voice is None:
             logging.info("Attempting voice connection to {}".format(channel.name))
             try:
@@ -277,7 +277,7 @@ class VoiceConnection:
                 logging.info("Voice connected to {}".format(channel.name))
             except discord.ClientException as e:
                 logging.info(e)
-                await self.bot.say("Sorry, something went wrong with voice")
+                await ctx.send("Sorry, something went wrong with voice")
         else:
             logging.info("Moving existing voice connection to {}".format(channel.name))
             await self.voice.move_to(channel)
@@ -310,7 +310,7 @@ class VoiceConnection:
 
             # Connect to a voice channel. None means the command did it already.
             if self.current_entry.voice_channel is not None:
-                await self.connect(self.current_entry.voice_channel)
+                await self.connect(ctx, self.current_entry.voice_channel)
 
             logging.info("Playing {} on {}".format(
                 self.current_entry.name, self.voice.channel))
@@ -326,7 +326,7 @@ class VoiceConnection:
                 logging.info("Requested by {}".format(self.current_entry.requester))
                 msg = "{0.mention}, Playing your stream: {1}".format(
                     self.current_entry.requester, self.current_entry.name)
-                await self.bot.send_message(self.current_entry.text_channel, msg)
+                await self.current_entry.text_channel.send_message(msg)
 
             self.current_entry.player.volume = self.volume
             self.current_entry.player.start()
