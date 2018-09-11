@@ -88,7 +88,7 @@ class Voice:
 
         return target_voice_channel, voice_connection  # Caller generally needs both
 
-    @command(pass_context=True)
+    @command()
     async def volume(self, ctx, new_volume=None):
         voice_connection = self.get_voice_connection(ctx)
         if new_volume is None:
@@ -99,7 +99,7 @@ class Voice:
         # Barring Exceptions, we should always get back something we can set_volume for
         voice_connection.set_volume(new_volume)
 
-    @command(pass_context=True)
+    @command()
     async def maxvolume(self, ctx, new_volume=None):
         voice_connection = self.get_voice_connection(ctx)
         if new_volume is None:
@@ -110,8 +110,8 @@ class Voice:
         # Barring Exceptions, we should always get back something we can set_maxvolume for
         voice_connection.set_maxvolume(new_volume)
 
-    @command(aliases=['voice_stop', 'shutup'], pass_context=True,
-                      help="Stop all playback and empty the play queue")
+    @command(aliases=['voice_stop', 'shutup'], 
+             help="Stop all playback and empty the play queue")
     async def stop_voice(self, ctx):
         logging.info("Ending voice connection to {}".format(ctx.message.server))
         existing_connection = self.voice_connections.get(ctx.message.server)
@@ -140,8 +140,7 @@ class Voice:
             logging.info("No voice connection to end")
             await self.bot.say("No voice connection to {}".format(ctx.message.server))
 
-    @command(pass_context=True,
-                      help="Skip the currently playing audio for the next queued entry")
+    @command(help="Skip the currently playing audio for the next queued entry")
     async def skip(self, ctx):
         logging.info("Stopping current audio entry for {}".format(ctx.message.server))
         existing_connection = self.voice_connections.get(ctx.message.server)
@@ -151,7 +150,7 @@ class Voice:
                 existing_connection.current_entry.player.stop()
             # Audio player task should now continue
 
-    @command(pass_context=True, help="Lost?")
+    @command(help="Lost?")
     async def memes(self, ctx):
         logging.info("Memeing it up")
 
@@ -174,9 +173,8 @@ class Voice:
         voice_connection.prepare_player()
         await voice_connection.audio_queue.put(new_entry)
 
-    @command(pass_context=True,
-                      help="Plays most things supported by youtube-dl\n"
-                           "Accepts a start time in the format [HH:MM]:SS (feature may be buggy)")
+    @command(help="Plays most things supported by youtube-dl\n"
+                  "Accepts a start time in the format [HH:MM]:SS (feature may be buggy)")
     async def stream(self, ctx, video=None, start_time='00:00:00'):
         # TODO check if video is a valid streamable (YoutubeDL.py simulate?)
         if video is None:
