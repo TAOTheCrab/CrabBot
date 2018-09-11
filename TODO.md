@@ -18,6 +18,7 @@
         - For link, convert to permissions hex/binary to int
     - [Add to server link docs](https://discordapp.com/developers/docs/topics/oauth2#adding-bots-to-guilds)
 - [ ] Add print() for some logged messages for user feedback (mostly for eg. disable_voice command)
+    - Alternately add a StreamHandler to logging. See [this](https://stackoverflow.com/a/9321890/1693387).
 
 ### Nice to have
 - [ ] Might like to make a custom help formatter
