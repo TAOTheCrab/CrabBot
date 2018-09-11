@@ -14,7 +14,7 @@ from pathlib import PurePath
 import random
 import sqlite3
 
-from discord.ext import commands
+from discord.ext.commands import group
 
 
 class Quotes:
@@ -34,7 +34,7 @@ class Quotes:
         self.quotes_db_cursor.close()
         self.quotes_db_connection.close()
 
-    @commands.group(invoke_without_command=True,
+    @group(invoke_without_command=True,
                     help=('Read or add quotes! See "help quote" for details\n'
                           '\n'
                           'If no command is given, a random quote is printed'))
