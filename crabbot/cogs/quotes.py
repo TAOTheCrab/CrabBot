@@ -35,7 +35,7 @@ class Quotes:
         self.quotes_db_cursor.close()
         self.quotes_db_connection.close()
 
-    @commands.group(pass_context=True, invoke_without_command=True,
+    @commands.group(invoke_without_command=True,
                     help=('Read or add quotes! See "help quote" for details\n'
                           '\n'
                           'If no command is given, a random quote is printed'))
@@ -56,10 +56,10 @@ class Quotes:
                                           "LIMIT 1", (name,))
             # Just escape one 1-tuple. We already have the name, so meh.
             selected_quote = self.quotes_db_cursor.fetchone()[0]
-            await self.bot.say("{quote} \n  —{name}".format(quote=selected_quote,
+            await ctx.send("{quote} \n  —{name}".format(quote=selected_quote,
                                                             name=name))
         else:
-            await self.bot.say("No quotes from {name}.".format(name=name))
+            await ctx.send("No quotes from {name}.".format(name=name))
 
     @quote.command(help='List all authors of recorded quotes')
     async def authors(self):
