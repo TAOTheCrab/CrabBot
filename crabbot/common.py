@@ -9,8 +9,7 @@ import logging
 from pathlib import Path
 import random
 
-import discord
-from discord.ext import commands
+from discord.ext.commands import Bot as DiscordBot, when_mentioned_or
 
 
 def read_list_file(filepath):
@@ -19,10 +18,10 @@ def read_list_file(filepath):
     return words
 
 
-class CrabBot(commands.Bot):
+class CrabBot(DiscordBot):
     def __init__(self, prefix='!crab'):
         # Could just use command_prefix arg, but this allows for a default prefix
-        super().__init__(command_prefix=commands.when_mentioned_or(prefix),
+        super().__init__(command_prefix=when_mentioned_or(prefix),
                          description="Huh, another bot")
         # loop.set_debug(True)  # Set asyncio loop to output more info for debugging
         # self.add_listener(self.on_ready)  # TIL on_ready in a Bot subclass is already registered
