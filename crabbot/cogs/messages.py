@@ -128,6 +128,6 @@ class Messages:
 
     # TODO figure out how to make commands with spaces. Probably have to just do SUMMON @group() somehow tho.
     @command(aliases=['SUMMON THE BEAR'], help="SUMMON THE BEAR")
-    async def BEAR(self,ctx):
+    async def BEAR(self, ctx):
         # SUMMON THE BEAR
         await ctx.send(file=discordFile(str(self.assets_path / "SUMMONTHEBEAR.gif")))
