@@ -46,7 +46,7 @@ class Messages:
     async def takeover(self, ctx):
         await ctx.send("Something something robots")
 
-    @command(help='Well, what is this Lords Management then?', aliases=['lol'])
+    @command(aliases=['lol'], help='Well, what is this Lords Management then?')
     async def dota(self, ctx):
         moba = random.choice(self.mobas)
         await ctx.send(f"This is a strange {moba} mod")
@@ -128,6 +128,7 @@ class Messages:
         word2 = random.choice(self.worldwords)
         await ctx.send(f"The Land of {word1} and {word2}")
 
+    # TODO figure out how to make commands with spaces. Probably have to just do SUMMON @group() somehow tho.
     @command(aliases=['SUMMON THE BEAR'], help="SUMMON THE BEAR")
     async def BEAR(self,ctx):
         # SUMMON THE BEAR
