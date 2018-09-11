@@ -4,6 +4,9 @@
 # Parts taken from discord.py/examples/playlist.py
 # https://github.com/Rapptz/discord.py/blob/async/examples/playlist.py
 
+# TODO Go over the rewrite's voice changes and determine if a full redo is needed
+#      https://discordpy.readthedocs.io/en/rewrite/migrating.html#voice-changes
+
 import asyncio
 import importlib.util
 import logging
