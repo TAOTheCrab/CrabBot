@@ -80,7 +80,8 @@ class Messages:
                     number = self.spam_limit
             except ValueError:
                 number = 1
-            await ctx.reply("👍" * number) #TODO find replacement
+            thumbs = "👍" * number
+            await ctx.send(f"{ctx.author.mention} {thumbs}")
         else:
             await ctx.send("Awww")
 
