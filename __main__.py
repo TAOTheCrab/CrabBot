@@ -95,7 +95,7 @@ def poll_terminal():
 input_thread = Thread(target=poll_terminal, daemon=True)
 input_thread.start()
 
-bot.add_cog(crabbot.cogs.messages.Messages(bot, args.assets_path + "/messages"))
+bot.add_cog(crabbot.cogs.messages.Messages(args.assets_path + "/messages"))
 bot.add_cog(crabbot.cogs.quotes.Quotes(bot, args.quotes_path))
 # Comment out import of voice to completely disable voice commands
 if "crabbot.cogs.voice" in sys.modules and args.disable_voice is False:

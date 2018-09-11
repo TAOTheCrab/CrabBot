@@ -12,9 +12,7 @@ import crabbot.common
 
 
 class Messages:
-    def __init__(self, bot, assets_path):
-        self.bot = bot
-
+    def __init__(self, assets_path):
         self.spam_limit = 100  # Limit for repetitive emotes commands
 
         self.assets_path = Path(assets_path)
