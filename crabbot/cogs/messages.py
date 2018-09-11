@@ -42,8 +42,8 @@ class Messages:
         self.worldwords = crabbot.common.read_list_file(self.assets_path / "world-words.txt")
 
     @commands.command(help='The bots have something to say')
-    async def takeover(self):
-        await self.bot.say("Something something robots")
+    async def takeover(self, ctx):
+        await ctx.send("Something something robots")
 
     @commands.command(help='Well, what is this Lords Management then?', aliases=['lol'])
     async def dota(self):
