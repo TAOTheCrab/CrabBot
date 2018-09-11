@@ -12,10 +12,10 @@ import random
 import tempfile
 
 import discord
-from discord.ext import commands
+from discord.ext.commands import command
 from youtube_dl.utils import DownloadError
 
-import crabbot.common
+from crabbot.common import read_list_file
 
 
 class Voice:
@@ -45,7 +45,7 @@ class Voice:
 
     def update_lists(self):
         # !memes
-        self.the_memes = crabbot.common.read_list_file(self.memes_path / "filelist.txt")
+        self.the_memes = read_list_file(self.memes_path / "filelist.txt")
 
     def remove_voice_connection(self, server):
         logging.info("Removing connection to voice {}".format(server))
@@ -88,7 +88,7 @@ class Voice:
 
         return target_voice_channel, voice_connection  # Caller generally needs both
 
-    @commands.command(pass_context=True)
+    @command(pass_context=True)
     async def volume(self, ctx, new_volume=None):
         voice_connection = self.get_voice_connection(ctx)
         if new_volume is None:
@@ -99,7 +99,7 @@ class Voice:
         # Barring Exceptions, we should always get back something we can set_volume for
         voice_connection.set_volume(new_volume)
 
-    @commands.command(pass_context=True)
+    @command(pass_context=True)
     async def maxvolume(self, ctx, new_volume=None):
         voice_connection = self.get_voice_connection(ctx)
         if new_volume is None:
@@ -110,7 +110,7 @@ class Voice:
         # Barring Exceptions, we should always get back something we can set_maxvolume for
         voice_connection.set_maxvolume(new_volume)
 
-    @commands.command(aliases=['voice_stop', 'shutup'], pass_context=True,
+    @command(aliases=['voice_stop', 'shutup'], pass_context=True,
                       help="Stop all playback and empty the play queue")
     async def stop_voice(self, ctx):
         logging.info("Ending voice connection to {}".format(ctx.message.server))
@@ -140,7 +140,7 @@ class Voice:
             logging.info("No voice connection to end")
             await self.bot.say("No voice connection to {}".format(ctx.message.server))
 
-    @commands.command(pass_context=True,
+    @command(pass_context=True,
                       help="Skip the currently playing audio for the next queued entry")
     async def skip(self, ctx):
         logging.info("Stopping current audio entry for {}".format(ctx.message.server))
@@ -151,7 +151,7 @@ class Voice:
                 existing_connection.current_entry.player.stop()
             # Audio player task should now continue
 
-    @commands.command(pass_context=True, help="Lost?")
+    @command(pass_context=True, help="Lost?")
     async def memes(self, ctx):
         logging.info("Memeing it up")
 
@@ -174,7 +174,7 @@ class Voice:
         voice_connection.prepare_player()
         await voice_connection.audio_queue.put(new_entry)
 
-    @commands.command(pass_context=True,
+    @command(pass_context=True,
                       help="Plays most things supported by youtube-dl\n"
                            "Accepts a start time in the format [HH:MM]:SS (feature may be buggy)")
     async def stream(self, ctx, video=None, start_time='00:00:00'):
