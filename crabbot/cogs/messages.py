@@ -49,7 +49,7 @@ class Messages:
     @command(help='Well, what is this Lords Management then?', aliases=['lol'])
     async def dota(self, ctx):
         moba = random.choice(self.mobas)
-        await ctx.send("This is a strange {} mod".format(moba))
+        await ctx.send(f"This is a strange {moba} mod")
 
     @command(enabled=True, hidden=True)
     async def annoy(self, ctx):
@@ -61,7 +61,7 @@ class Messages:
         # Yes, possibly having repeats is intentional, more fun that way
         place_one = random.choice(self.sirplaces)
         place_two = random.choice(self.sirplaces)
-        reply = "Sir, this is {}, not {}.".format(place_one, place_two)
+        reply = f"Sir, this is {place_one}, not {place_two}."
         await ctx.send(reply)
 
     @command()
@@ -102,31 +102,31 @@ class Messages:
             await asyncio.sleep(3)  # suspense!
             if random.randint(1, 10) == 5:  # 10% chance to win
                 reward = random.choice(self.rewards)
-                await ctx.send("You win! You got {}!".format(reward))
+                await ctx.send(f"You win! You got {reward}!")
             else:  # Ruin!
                 death = random.choice(self.deaths)
                 killer = random.choice(self.killers)
                 location = random.choice(self.locations)
-                await ctx.send("You were {} by {} in {}".format(death, killer, location))
+                await ctx.send(f"You were {death} by {killer} in {location}")
 
     @group(help="Need a band name?")
     async def band(self, ctx):
         adjective = random.choice(self.bandadjectives)
         noun = random.choice(self.bandnouns)
         place = random.choice(self.bandplaces)
-        await ctx.send("Your new band name is {} {} {}".format(adjective, noun, place))
+        await ctx.send(f"Your new band name is {adjective} {noun} {place}")
 
     @band.command()
     async def style(self, ctx):
         style = random.choice(self.bandstyles)
-        await ctx.send("    which is a {} cover band.".format(style))
+        await ctx.send(f"which is a {style} cover band.")
 
     @command(help="Name a new Land! Thanks, Homestuck!")
     async def world(self, ctx):
         # Repeat words are OK
         word1 = random.choice(self.worldwords)
         word2 = random.choice(self.worldwords)
-        await ctx.send("The Land of {} and {}".format(word1, word2))
+        await ctx.send(f"The Land of {word1} and {word2}")
 
     @command(aliases=['SUMMON THE BEAR'], help="SUMMON THE BEAR")
     async def BEAR(self,ctx):
