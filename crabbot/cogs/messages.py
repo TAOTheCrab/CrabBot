@@ -46,32 +46,32 @@ class Messages:
         await ctx.send("Something something robots")
 
     @command(help='Well, what is this Lords Management then?', aliases=['lol'])
-    async def dota(self):
+    async def dota(self, ctx):
         moba = random.choice(self.mobas)
-        await self.bot.say("This is a strange {} mod".format(moba))
+        await ctx.send("This is a strange {} mod".format(moba))
 
     @command(enabled=True, hidden=True)
-    async def annoy(self):
+    async def annoy(self, ctx):
         # TODO anti-spam cooldown (probably a good idea for most commands)
-        await self.bot.say("Ho ho ha ha!", tts=True)
+        await ctx.send("Ho ho ha ha!", tts=True)
 
     @command(help='For the unruly patron')
-    async def sir(self):
+    async def sir(self, ctx):
         # Yes, possibly having repeats is intentional, more fun that way
         place_one = random.choice(self.sirplaces)
         place_two = random.choice(self.sirplaces)
         reply = "Sir, this is {}, not {}.".format(place_one, place_two)
-        await self.bot.say(reply)
+        await ctx.send(reply)
 
     @command()
-    async def assist(self):
+    async def assist(self, ctx):
         if random.randint(1, 10) == 5:  # 10%
-            await self.bot.say("Ok")
+            await ctx.send("Ok")
         else:
-            await self.bot.say("Help is transient, and for some reason is not provided here.")
+            await ctx.send("Help is transient, and for some reason is not provided here.")
 
     @command(help="👍")
-    async def thumbsup(self, num='1'):
+    async def thumbsup(self, ctx, num='1'):
         if num not in ('nope', '0'):
             try:
                 number = int(num)
@@ -79,12 +79,12 @@ class Messages:
                     number = self.spam_limit
             except ValueError:
                 number = 1
-            await self.bot.reply("👍" * number)
+            await ctx.reply("👍" * number) #TODO find replacement
         else:
-            await self.bot.say("Awww")
+            await ctx.send("Awww")
 
     @command()
-    async def cake(self, num='1'):
+    async def cake(self, ctx, num='1'):
         try:
             number = int(num)
             if number > self.spam_limit:
@@ -92,40 +92,40 @@ class Messages:
         except ValueError:
             number = 1
         reply = [random.choice(self.cakes) for _ in range(abs(int(num)))]
-        await self.bot.say(''.join(reply))
+        await ctx.send(''.join(reply))
 
     @command(help="Go on a quest!")
-    async def adventure(self):
-        await self.bot.say("Simulating adventure...")
-        await self.bot.type()
+    async def adventure(self, ctx):
+        await ctx.send("Simulating adventure...")
+        await self.bot.type() # TODO find replacment
         await asyncio.sleep(3)  # suspense!
         if random.randint(1, 10) == 5:  # 10% chance to win
             reward = random.choice(self.rewards)
-            await self.bot.say("You win! You got {}!".format(reward))
+            await ctx.send("You win! You got {}!".format(reward))
         else:  # Ruin!
             death = random.choice(self.deaths)
             killer = random.choice(self.killers)
             location = random.choice(self.locations)
-            await self.bot.say("You were {} by {} in {}".format(death, killer, location))
+            await ctx.send("You were {} by {} in {}".format(death, killer, location))
 
     @group(help="Need a band name?")
-    async def band(self):
+    async def band(self, ctx):
         adjective = random.choice(self.bandadjectives)
         noun = random.choice(self.bandnouns)
         place = random.choice(self.bandplaces)
-        await self.bot.say("Your new band name is {} {} {}".format(adjective, noun, place))
+        await ctx.send("Your new band name is {} {} {}".format(adjective, noun, place))
 
     @band.command()
-    async def style(self):
+    async def style(self, ctx):
         style = random.choice(self.bandstyles)
-        await self.bot.say("    which is a {} cover band.".format(style))
+        await ctx.send("    which is a {} cover band.".format(style))
 
     @command(help="Name a new Land! Thanks, Homestuck!")
-    async def world(self):
+    async def world(self, ctx):
         # Repeat words are OK
         word1 = random.choice(self.worldwords)
         word2 = random.choice(self.worldwords)
-        await self.bot.say("The Land of {} and {}".format(word1, word2))
+        await ctx.send("The Land of {} and {}".format(word1, word2))
 
     @command(aliases=['SUMMON THE BEAR'], help="SUMMON THE BEAR")
     async def BEAR(self):
