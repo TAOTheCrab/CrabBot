@@ -5,6 +5,7 @@ import asyncio
 from pathlib import Path
 import random
 
+from discord import File as discordFile
 from discord.ext.commands import command, group
 
 import crabbot.common
@@ -128,6 +129,6 @@ class Messages:
         await ctx.send("The Land of {} and {}".format(word1, word2))
 
     @command(aliases=['SUMMON THE BEAR'], help="SUMMON THE BEAR")
-    async def BEAR(self):
+    async def BEAR(self,ctx):
         # SUMMON THE BEAR
-        await self.bot.upload(self.assets_path / "SUMMONTHEBEAR.gif")
+        await ctx.send(file=discordFile(str(self.assets_path / "SUMMONTHEBEAR.gif")))
