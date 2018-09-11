@@ -1,7 +1,7 @@
 CrabBot
 =======
 
-**NOTE: This library-rewrite-prep branch uses the version of Discord.py from the `rewrite/1.0 branch <https://github.com/Rapptz/discord.py/tree/rewrite>` **
+**NOTE: This library-rewrite-prep branch uses the version of Discord.py from the `rewrite/1.0 branch <https://github.com/Rapptz/discord.py/tree/rewrite>`__ **
 
 Silly Discord bot for funsies
 
@@ -23,7 +23,7 @@ Requires:
     - **TEMP UNTIL PYPI RELEASE OF REWRITE BRANCH** ``pip3 install git+https://github.com/Rapptz/discord.py.git@rewrite#egg=discord.py[voice]``
 
 
-- Python 3.6+ (uses `f-strings <https://docs.python.org/3/reference/lexical_analysis.html#f-strings>`, can be edited for 3.5)
+- Python 3.6+ (uses `f-strings <https://docs.python.org/3/reference/lexical_analysis.html#f-strings>`__, can be edited for 3.5)
 
 For voice (module can be disabled):
 
