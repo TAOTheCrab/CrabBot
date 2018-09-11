@@ -63,3 +63,8 @@ target/
 .ipynb_checkpoints
 
 ## End Python template
+
+## VSCode workspace config
+# I'm up for changing it later, but for now my workspace settings are not useful to others
+.vscode/*
+## End VSCode 
