@@ -17,8 +17,8 @@ from threading import Thread
 import crabbot.common
 import crabbot.cogs.messages
 import crabbot.cogs.quotes
-#NOTE: Disabling until ready to transition voice cog to 'rewrite'. Likely the biggest pain.
-#import crabbot.cogs.voice  # comment out to disable voice commands entirely
+#NOTE: Incomplete and buggy, rewrite transition not finished. Recommend commenting out.
+import crabbot.cogs.voice  # comment out to disable voice commands entirely
 
 pid = str(os.getpid())
 pidfile = gettempdir() + '/CrabBot.pid'  # eg. so systemd's PIDFile can find a /tmp/CrabBot.pid
@@ -99,7 +99,7 @@ bot.add_cog(crabbot.cogs.messages.Messages(args.assets_path + "/messages"))
 bot.add_cog(crabbot.cogs.quotes.Quotes(args.quotes_path))
 # Comment out import of voice to completely disable voice commands
 if "crabbot.cogs.voice" in sys.modules and args.disable_voice is False:
-    bot.add_cog(crabbot.cogs.voice.Voice(bot, args.memes_path, args.use_libav))
+    bot.add_cog(crabbot.cogs.voice.Voice(bot.loop , args.memes_path, args.use_libav))
 
 # Blocking, must be last. See discord.py Client for more info.
 bot.run(login)

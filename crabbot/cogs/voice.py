@@ -1,0 +1,71 @@
+#!/usr/bin/env python3
+# CrabBot general voice commands, for Discord v1.0
+#
+# Reference:
+# https://github.com/Rapptz/discord.py/blob/rewrite/examples/basic_voice.py
+
+import asyncio
+import logging  # I want to keep track of command usage and voice state for troubleshooting
+from pathlib import Path
+import random
+
+from discord import FFmpegPCMAudio, PCMVolumeTransformer
+from discord.ext.commands import command, CommandError
+
+from crabbot.common import read_list_file
+
+
+class Voice:
+    def __init__(self, bot_loop, memes_path, use_libav=False):
+        self.bot_loop = bot_loop
+        self.decoder_executable = 'ffmpeg' if use_libav is False else 'avconv'
+
+        self.memes_path = Path(memes_path)
+        # Initialize lists
+        self.update_lists()
+
+        self.voice_client = None  # For handling state of the player. Possibly unwise.
+
+    def update_lists(self):
+        # !memes
+        self.the_memes = read_list_file(self.memes_path / "filelist.txt")
+
+    def disconnect_after_playback(self, error):
+        if error:
+            logging.info(f"Error with voice: {error}")
+        #TODO Figure out if it's possible to disconnect when playback is exausted without await
+        # asyncio.ensure_future(self.voice_client.disconnect, loop=self.bot_loop)
+        
+
+    @command(help="Lost?")
+    async def memes(self, ctx):
+        logging.info("Playing voice memes")
+
+        async with ctx.typing():  # Give some server-visible feedback
+            chosen_meme = random.choice(self.the_memes)
+
+            source = FFmpegPCMAudio(str(self.memes_path / chosen_meme))
+            ctx.voice_client.play(source, after=self.disconnect_after_playback)
+            # BUG possibly in discord.py? in player.py/cleanup(), it tries to kill ffmpeg, which appears to have terminated on its own (EOF?)
+            #     cleanup() never gets past attempting to kill its subprocess, never performs `after`. (NOTE only tested on WSL Ubuntu)
+            #     commenting out line 180's `proc.kill()` seems to have no ill effects in this particular use case, and discord.py thinks it's terminated.
+            self.voice_client = ctx.voice_client  # Possibly ill-fated attempt to disconnect after playback is exausted.
+        
+        # voice_client.play() will go on its own from here, command ends
+
+    @memes.before_invoke
+    async def ensure_voice_with_interrupt(self, ctx):
+        """ Taken from discord.py's examples/basic_voice.py 
+        
+        Will interrupt the currently playing audio in favor of the next command.
+        """
+        if ctx.voice_client is None:
+            if ctx.author.voice is not None:
+                await ctx.author.voice.channel.connect()
+                logging.info(f"Connected to {ctx.author.voice.channel.name} on server {ctx.guild.name}")
+            else:
+                await ctx.send(f"{ctx.author.mention} You must be in a voice channel to use voice commands")
+                raise CommandError("Author is not connected to a voice channel")
+                logging.info("Author is not connected to a voice channel, voice command stopped.")
+        elif ctx.voice_client.is_playing():
+            ctx.voice_client.stop()
