@@ -338,7 +338,7 @@ class VoiceConnection:
             logging.info("Audio finished")
 
             # Small pause between entries
-            asyncio.sleep(1)
+            await asyncio.sleep(1)
 
             if self.audio_queue.empty():
                 break
