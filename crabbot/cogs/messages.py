@@ -5,7 +5,7 @@ import asyncio
 from pathlib import Path
 import random
 
-from discord import File as discordFile, utils as discordUtils
+import discord
 from discord.ext.commands import command, group
 
 from crabbot.common import read_list_file
@@ -131,9 +131,9 @@ class Messages:
         ''' SUMMON THE BEAR '''
 
         # Alt. upload version. Bad for slow upload speeds. Also maybe don't fill Discord with 100s of bear gif files?
-        # await ctx.send(file=discordFile(str(self.assets_path / "SUMMONTHEBEAR.gif")))
+        # await ctx.send(file=discord.File(str(self.assets_path / "SUMMONTHEBEAR.gif")))
 
-        emoji_bear = discordUtils.get(ctx.message.guild.emojis, name="bearmoji")
+        emoji_bear = discord.utils.get(ctx.message.guild.emojis, name="bearmoji")
         # print(f"{type(emoji_bear)} : {emoji_bear}")
         if emoji_bear is None:
             # Fallback unicode bear
