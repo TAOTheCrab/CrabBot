@@ -25,12 +25,6 @@ pidfile = gettempdir() + '/CrabBot.pid'  # eg. so systemd's PIDFile can find a /
 with open(pidfile, 'w') as temppidfile:
     temppidfile.write(pid)
 
-logging.basicConfig(filename='crabbot.log', level=logging.INFO)  # Grr, ytdl doesn't log
-logging.info("________\n" +
-             "Starting CrabBot at " + str(datetime.datetime.now()) + "\n"
-             "--------")  # Make it clear in the log when a new run starts
-                          # TODO? Might want a delimiter that is easier to write, eg. for a log parsing script
-
 # Do argparse first so that -h can print and exit before anything else happens
 parser = argparse.ArgumentParser(fromfile_prefix_chars='@', description='A silly Discord bot')
 token_args = parser.add_mutually_exclusive_group(required=True)
@@ -50,8 +44,16 @@ parser.add_argument('--use-libav', action='store_true',
                     help="Make Voice use Libav instead of FFmpeg")
 parser.add_argument('--disable-voice', action='store_true',
                     help="Disable Voice commands (can be enabled later)")
+parser.add_argument('-l', '--logfile', default="./CrabBot.log", 
+                    help="Path, with filename, to write the log to")
 
 args = parser.parse_args()
+
+logging.basicConfig(filename=args.logfile, level=logging.INFO)  # Grr, ytdl doesn't log
+logging.info("________\n" +
+             "Starting CrabBot at " + str(datetime.datetime.now()) + "\n"
+             "--------")  # Make it clear in the log when a new run starts
+                          # TODO? Might want a delimiter that is easier to write, eg. for a log parsing script
 
 if args.file is not None:
     login = args.file.readline().rstrip()
