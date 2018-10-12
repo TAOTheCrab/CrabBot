@@ -5,7 +5,7 @@ import asyncio
 from pathlib import Path
 import random
 
-from discord import File as discordFile
+from discord import File as discordFile, utils as discordUtils
 from discord.ext.commands import command, group
 
 from crabbot.common import read_list_file
@@ -128,5 +128,15 @@ class Messages:
     # TODO figure out how to make commands with spaces. Probably have to just do SUMMON @group() somehow tho.
     @command(aliases=['SUMMON THE BEAR'], help="SUMMON THE BEAR")
     async def BEAR(self, ctx):
-        # SUMMON THE BEAR
-        await ctx.send(file=discordFile(str(self.assets_path / "SUMMONTHEBEAR.gif")))
+        ''' SUMMON THE BEAR '''
+
+        # Alt. upload version. Bad for slow upload speeds. Also maybe don't fill Discord with 100s of bear gif files?
+        # await ctx.send(file=discordFile(str(self.assets_path / "SUMMONTHEBEAR.gif")))
+
+        emoji_bear = discordUtils.get(ctx.message.guild.emojis, name="bearmoji")
+        # print(f"{type(emoji_bear)} : {emoji_bear}")
+        if emoji_bear is None:
+            # Fallback unicode bear
+            emoji_bear = "🐻"
+        
+        await ctx.send(emoji_bear)
