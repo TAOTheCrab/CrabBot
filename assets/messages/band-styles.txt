@@ -7,9 +7,12 @@ clownstep
 Cotton-Eye Joe
 elevator music
 folk polka
+glitchcore
 gypsy jazz
 hair metal
 Hatsune Miku
+jank-core
+Jet Set Radio
 math rock
 motown
 nature sounds
@@ -23,4 +26,5 @@ punk blues
 Rick Astley
 Skillet Lickers
 time lord rock
+vaporwave
 VeggieTales
