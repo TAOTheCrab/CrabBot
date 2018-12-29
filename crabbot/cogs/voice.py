@@ -347,7 +347,7 @@ class VoiceConnection:
 
         logging.info("Audio queue finished")
         # The disconnect sound doesn't make a good sudden end
-        asyncio.sleep(1)
+        await asyncio.sleep(1)
 
         # BUG there's a small window where you can call a command while it's disconnecting
         #  So the command goes through, but the VoiceEntry disappears
