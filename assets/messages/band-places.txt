@@ -2,12 +2,16 @@ Apocalypse
 Arena
 Boardroom
 Box
+Boudoir
+Cabin
+Cabinet
 Closet
 Computer Lab
 Cornfield
 Country
 Dictatorship
 Diner
+Duchy
 Dungeon
 Empire
 Farm
@@ -16,10 +20,14 @@ Heck
 Hell
 Internet-land
 Loveshack
+Mesa
 Office
 Ranch
+Ravine
 Sauna
 Sewer
 Starship
 Station
+Study
 Trench
+Zone
