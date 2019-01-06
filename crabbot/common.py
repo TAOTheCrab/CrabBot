@@ -48,15 +48,15 @@ class CrabBot(DiscordBot):
         # TODO convert to try: fields['avatar'] except KeyError, so we can use None for 'no avatar'
         #      to signal edit_profile() to use the existing profile fields instead
         if avatar is not None:
-            # As far as I can tell, Discord's official API only supports JPEG
+            # Discord.py documents JPEG and PNG as supported.
             new_avatar = open(avatar, 'rb')
             picture_bytes = new_avatar.read()
             new_avatar.close()
-            await self.edit_profile(username=username, avatar=picture_bytes)
+            await self.user.edit(username=username, avatar=picture_bytes)
         else:
             # edit_profile only skips bytes processing if avatar doesn't exist at all
             # BUG server returns BAD REQUEST
-            await self.edit_profile(username=new_username)
+            await self.user.edit(username=new_username)
 
         logging.info("Profile updated")
 
