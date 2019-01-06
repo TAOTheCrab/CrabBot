@@ -12,7 +12,7 @@ import random
 from discord.ext.commands import Bot as DiscordBot, when_mentioned_or
 
 
-def read_list_file(filepath):
+def read_list_file(filepath: Path):
     with filepath.open() as file_list:
         words = [x.rstrip() for x in file_list]
     return words
