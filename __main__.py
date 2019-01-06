@@ -8,6 +8,7 @@ import argparse
 import datetime
 import logging
 import os
+from pathlib import Path
 import readline  # Only for better terminal input support, eg. history. Does not work on Windows, but does work in WSL.
 import signal  # So we can send SIGINT to ourselves
 import sys
@@ -21,7 +22,7 @@ import crabbot.cogs.quotes
 import crabbot.cogs.voice  # comment out to disable voice commands entirely
 
 pid = str(os.getpid())
-pidfile = gettempdir() + '/CrabBot.pid'  # eg. so systemd's PIDFile can find a /tmp/CrabBot.pid
+pidfile = Path(gettempdir() + '/CrabBot.pid')  # eg. so systemd's PIDFile can find a /tmp/CrabBot.pid
 with open(pidfile, 'w') as temppidfile:
     temppidfile.write(pid)
 
@@ -34,17 +35,17 @@ token_args.add_argument('-f', '--file', type=argparse.FileType('r'),
                         help="A file with the bot user's login token as the first line. Use this or -t")
 parser.add_argument('-p', '--prefix', default="!crab",
                     help="Command prefix the bot responds to")
-parser.add_argument('--assets-path', default="assets/",
+parser.add_argument('--assets-path', type=Path, default=Path('assets'),
                     help="Path for general assets (ex. sir-places.txt)")
-parser.add_argument('--memes-path', default="assets/memes",
+parser.add_argument('--memes-path', type=Path, default=Path('assets/memes'),
                     help="Path for memes audio clips (and its filelist.txt)")
-parser.add_argument('--quotes-path', default="../",  # NOTE we write to this location, be careful where you put it
+parser.add_argument('--quotes-path', type=Path, default=Path('..'),  # NOTE we write to this location, be careful where you put it
                     help="Path containing the quotes database. Will create quotes.sqlite3 if it does not exist.")
 parser.add_argument('--use-libav', action='store_true',
                     help="Make Voice use Libav instead of FFmpeg")
 parser.add_argument('--disable-voice', action='store_true',
                     help="Disable Voice commands (can be enabled later)")
-parser.add_argument('-l', '--logfile', default="./CrabBot.log", 
+parser.add_argument('-l', '--logfile', type=Path, default=Path('CrabBot.log'), 
                     help="Path, with filename, to write the log to")
 
 args = parser.parse_args()
@@ -97,7 +98,7 @@ def poll_terminal():
 input_thread = Thread(target=poll_terminal, daemon=True)
 input_thread.start()
 
-bot.add_cog(crabbot.cogs.messages.Messages(args.assets_path + "/messages"))
+bot.add_cog(crabbot.cogs.messages.Messages(args.assets_path / "messages"))
 bot.add_cog(crabbot.cogs.quotes.Quotes(args.quotes_path))
 # Comment out import of voice to completely disable voice commands
 if "crabbot.cogs.voice" in sys.modules and args.disable_voice is False:
