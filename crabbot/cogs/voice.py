@@ -34,7 +34,7 @@ class Voice:
         if error:
             logging.info(f"Error with voice: {error}")
         #TODO Figure out if it's possible to disconnect when playback is exausted without await
-        # asyncio.ensure_future(self.voice_client.disconnect, loop=self.bot_loop)
+        # OLD CODE: asyncio.ensure_future(self.voice_client.disconnect, loop=self.bot_loop)
         
 
     @command(help="Lost?")
@@ -65,7 +65,7 @@ class Voice:
                 logging.info(f"Connected to {ctx.author.voice.channel.name} on server {ctx.guild.name}")
             else:
                 await ctx.send(f"{ctx.author.mention} You must be in a voice channel to use voice commands")
-                raise CommandError("Author is not connected to a voice channel")
                 logging.info("Author is not connected to a voice channel, voice command stopped.")
+                raise CommandError("Author is not connected to a voice channel")
         elif ctx.voice_client.is_playing():
             ctx.voice_client.stop()
