@@ -41,16 +41,15 @@ class Voice(Cog):
     async def memes(self, ctx):
         logging.info("Playing voice memes")
 
-        async with ctx.typing():  # Give some server-visible feedback
-            chosen_meme = random.choice(self.the_memes)
+        chosen_meme = random.choice(self.the_memes)
 
-            source = FFmpegPCMAudio(str(self.memes_path / chosen_meme))
-            ctx.voice_client.play(source, after=None)  # NOTE removing `after=disconnect_after_playback` until that works correctly
-            # BUG possibly in discord.py? in player.py/cleanup(), it tries to kill ffmpeg, which appears to have terminated on its own (EOF?)
-            #     cleanup() never gets past attempting to kill its subprocess, never performs `after`. (NOTE only tested on WSL Ubuntu)
-            #     commenting out line 180's `proc.kill()` seems to have no ill effects in this particular use case, and discord.py thinks it's terminated.
-            self.voice_client = ctx.voice_client  # Possibly ill-fated attempt to disconnect after playback is exausted.
-        
+        source = FFmpegPCMAudio(str(self.memes_path / chosen_meme))
+        ctx.voice_client.play(source, after=None)  # NOTE removing `after=disconnect_after_playback` until that works correctly
+        # BUG possibly in discord.py? in player.py/cleanup(), it tries to kill ffmpeg, which appears to have terminated on its own (EOF?)
+        #     cleanup() never gets past attempting to kill its subprocess, never performs `after`. (NOTE only tested on WSL Ubuntu)
+        #     commenting out line 180's `proc.kill()` seems to have no ill effects in this particular use case, and discord.py thinks it's terminated.
+        self.voice_client = ctx.voice_client  # Possibly ill-fated attempt to disconnect after playback is exausted.
+
         # Now voice_client.play() will go on its own, command ends
 
     @memes.before_invoke
