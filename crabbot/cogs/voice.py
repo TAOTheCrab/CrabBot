@@ -11,8 +11,52 @@ import random
 
 from discord import FFmpegPCMAudio, PCMVolumeTransformer
 from discord.ext.commands import Cog, command, CommandError
+import youtube_dl
 
 from crabbot.common import read_list_file
+
+
+""" This block mostly taken straight from discord.py's examples/basic_voice.py """
+ytdl_format_options = {
+    'format': 'bestaudio/best',
+    'outtmpl': '%(extractor)s-%(id)s-%(title)s.%(ext)s',
+    'restrictfilenames': True,
+    'noplaylist': True,
+    'nocheckcertificate': True,
+    'ignoreerrors': False,
+    'logtostderr': False,
+    'quiet': True,
+    'no_warnings': True,
+    'default_search': 'auto',
+}
+
+ffmpeg_options = {
+    'options': '-vn'
+}
+
+ytdl = youtube_dl.YoutubeDL(ytdl_format_options)
+
+class YTDLSource(PCMVolumeTransformer):
+    def __init__(self, source, *, data, volume=0.5):
+        super().__init__(source, volume)
+
+        self.data = data
+
+        self.title = data.get('title')
+        self.url = data.get('url')
+
+    @classmethod
+    async def from_url(cls, url, *, loop=None, stream=False):
+        loop = loop or asyncio.get_event_loop()
+        data = await loop.run_in_executor(None, lambda: ytdl.extract_info(url, download=not stream))
+
+        if 'entries' in data:
+            # take first item from a playlist
+            data = data['entries'][0]
+
+        filename = data['url'] if stream else ytdl.prepare_filename(data)
+        return cls(FFmpegPCMAudio(filename, **ffmpeg_options), data=data)
+""" End discord.py examples/basic_voice.py copied code block """
 
 
 class Voice(Cog):
@@ -31,6 +75,7 @@ class Voice(Cog):
         self.the_memes = read_list_file(self.memes_path / "filelist.txt")
 
     def disconnect_after_playback(self, error):
+        # NOTE ESSENTIALLY NOT IMPLEMENTED YET
         if error:
             logging.info(f"Error with voice: {error}")
         #TODO Figure out if it's possible to disconnect when playback is exausted without await
@@ -52,7 +97,21 @@ class Voice(Cog):
 
         # Now voice_client.play() will go on its own, command ends
 
+    @command(help="Stream anything YouTube-DL supports (no queue yet)")
+    async def stream(self, ctx, *, url):
+        """ Taken from discord.py's examples/basic_voice.py """
+
+        logging.info(f'Streaming "{url}" from "{ctx.message.channel}" on "{ctx.message.guild}"')
+
+        async with ctx.typing():
+            player = await YTDLSource.from_url(url, loop=self.bot_loop, stream=True) # NOTE If voice has problems, try setting stream=False first
+            ctx.voice_client.play(player, after=lambda e: print(f'Player error: {e}') if e else None)
+
+        logging.info(f'Stream setup successfull. Now playing "{player.title}" in "{ctx.author.voice.channel.name}"')
+        await ctx.send(f'Now playing: {player.title}')
+
     @memes.before_invoke
+    @stream.before_invoke
     async def ensure_voice_with_interrupt(self, ctx):
         """ Taken from discord.py's examples/basic_voice.py 
         
