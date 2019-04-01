@@ -69,3 +69,13 @@ class Voice(Cog):
                 raise CommandError("Author is not connected to a voice channel")
         elif ctx.voice_client.is_playing():
             ctx.voice_client.stop()
+
+    @command(help="Disconnect from voice", aliases=["shutup"])
+    async def disconnect(self, ctx):
+        if ctx.voice_client is not None:
+            logging.info(f'Ending voice connection to "{ctx.voice_client.channel.name}" on server "{ctx.voice_client.guild}"')
+
+            await ctx.voice_client.disconnect()
+        else:
+            # We could just not do anything, but I like when there's feedback, debugging or not
+            await ctx.send(f"The bot is not currently connected to a voice channel in {ctx.message.guild}")
