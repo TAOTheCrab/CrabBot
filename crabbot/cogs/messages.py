@@ -6,12 +6,12 @@ from pathlib import Path
 import random
 
 import discord
-from discord.ext.commands import command, group
+from discord.ext.commands import Cog, command, group
 
 from crabbot.common import read_list_file
 
 
-class Messages:
+class Messages(Cog):
     def __init__(self, assets_path):
         self.spam_limit = 100  # Limit for repetitive emotes commands
 

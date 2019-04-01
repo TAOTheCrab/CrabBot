@@ -14,10 +14,10 @@ from pathlib import PurePath
 import random
 import sqlite3
 
-from discord.ext.commands import group
+from discord.ext.commands import Cog, group
 
 
-class Quotes:
+class Quotes(Cog):
 
     def __init__(self, quotes_db_path):
         self.quotes_db_path = PurePath(quotes_db_path)

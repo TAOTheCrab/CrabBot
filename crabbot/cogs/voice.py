@@ -10,12 +10,12 @@ from pathlib import Path
 import random
 
 from discord import FFmpegPCMAudio, PCMVolumeTransformer
-from discord.ext.commands import command, CommandError
+from discord.ext.commands import Cog, command, CommandError
 
 from crabbot.common import read_list_file
 
 
-class Voice:
+class Voice(Cog):
     def __init__(self, bot_loop, memes_path, use_libav=False):
         self.bot_loop = bot_loop
         self.decoder_executable = 'ffmpeg' if use_libav is False else 'avconv'
