@@ -120,7 +120,7 @@ class Voice(Cog):
         if ctx.voice_client is None:
             if ctx.author.voice is not None:
                 await ctx.author.voice.channel.connect()
-                logging.info(f"Connected to {ctx.author.voice.channel.name} on server {ctx.guild.name}")
+                logging.info(f'Connected to "{ctx.author.voice.channel.name}" on server "{ctx.guild.name}"')
             else:
                 await ctx.send(f"{ctx.author.mention} You must be in a voice channel to use voice commands")
                 logging.info("Author is not connected to a voice channel, voice command stopped.")
