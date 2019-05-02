@@ -19,8 +19,6 @@ Requires:
 - `discord.py <https://github.com/Rapptz/discord.py>`__ v1.0+ (AKA **rewrite** branch)
 
   - ``pip3 install discord.py[voice]`` for voice support
-    
-    - **TEMP UNTIL PYPI RELEASE OF REWRITE BRANCH** ``pip3 install git+https://github.com/Rapptz/discord.py.git@rewrite#egg=discord.py[voice]``
 
 
 - Python 3.6+ (uses `f-strings <https://docs.python.org/3/reference/lexical_analysis.html#f-strings>`__, can be edited for 3.5)
