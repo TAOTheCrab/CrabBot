@@ -9,20 +9,19 @@ import logging
 from pathlib import Path
 import random
 
-import discord
-from discord.ext import commands
+from discord.ext.commands import Bot as DiscordBot, when_mentioned_or
 
 
-def read_list_file(filepath):
+def read_list_file(filepath: Path):
     with filepath.open() as file_list:
         words = [x.rstrip() for x in file_list]
     return words
 
 
-class CrabBot(commands.Bot):
+class CrabBot(DiscordBot):
     def __init__(self, prefix='!crab'):
         # Could just use command_prefix arg, but this allows for a default prefix
-        super().__init__(command_prefix=commands.when_mentioned_or(prefix),
+        super().__init__(command_prefix=when_mentioned_or(prefix),
                          description="Huh, another bot")
         # loop.set_debug(True)  # Set asyncio loop to output more info for debugging
         # self.add_listener(self.on_ready)  # TIL on_ready in a Bot subclass is already registered
@@ -49,15 +48,15 @@ class CrabBot(commands.Bot):
         # TODO convert to try: fields['avatar'] except KeyError, so we can use None for 'no avatar'
         #      to signal edit_profile() to use the existing profile fields instead
         if avatar is not None:
-            # As far as I can tell, Discord's official API only supports JPEG
+            # Discord.py documents JPEG and PNG as supported.
             new_avatar = open(avatar, 'rb')
             picture_bytes = new_avatar.read()
             new_avatar.close()
-            await self.edit_profile(username=username, avatar=picture_bytes)
+            await self.user.edit(username=username, avatar=picture_bytes)
         else:
             # edit_profile only skips bytes processing if avatar doesn't exist at all
             # BUG server returns BAD REQUEST
-            await self.edit_profile(username=new_username)
+            await self.user.edit(username=new_username)
 
         logging.info("Profile updated")
 

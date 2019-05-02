@@ -5,15 +5,14 @@ import asyncio
 from pathlib import Path
 import random
 
-from discord.ext import commands
+import discord
+from discord.ext.commands import Cog, command, group
 
-import crabbot.common
+from crabbot.common import read_list_file
 
 
-class Messages:
-    def __init__(self, bot, assets_path):
-        self.bot = bot
-
+class Messages(Cog):
+    def __init__(self, assets_path):
         self.spam_limit = 100  # Limit for repetitive emotes commands
 
         self.assets_path = Path(assets_path)
@@ -22,56 +21,55 @@ class Messages:
 
     def update_lists(self):
         # !dota
-        self.mobas = crabbot.common.read_list_file(self.assets_path / "mobas.txt")
+        self.mobas = read_list_file(self.assets_path / "mobas.txt")
         # !sir
-        self.sirplaces = crabbot.common.read_list_file(self.assets_path / "sir-places.txt")
+        self.sirplaces = read_list_file(self.assets_path / "sir-places.txt")
         # !adventure
-        self.deaths = crabbot.common.read_list_file(self.assets_path / "adventure-deaths.txt")
-        self.killers = crabbot.common.read_list_file(self.assets_path / "adventure-killers.txt")
-        self.locations = crabbot.common.read_list_file(self.assets_path / "adventure-locations.txt")
-        self.rewards = crabbot.common.read_list_file(self.assets_path / "adventure-rewards.txt")
+        self.deaths = read_list_file(self.assets_path / "adventure-deaths.txt")
+        self.killers = read_list_file(self.assets_path / "adventure-killers.txt")
+        self.locations = read_list_file(self.assets_path / "adventure-locations.txt")
+        self.rewards = read_list_file(self.assets_path / "adventure-rewards.txt")
         # !cake
-        self.cakes = crabbot.common.read_list_file(self.assets_path / "cakes.txt")
+        self.cakes = read_list_file(self.assets_path / "cakes.txt")
         # !band
-        self.bandadjectives = crabbot.common.read_list_file(self.assets_path / "band-adjectives.txt")
-        self.bandnouns = crabbot.common.read_list_file(self.assets_path / "band-nouns.txt")
-        self.bandplaces = crabbot.common.read_list_file(self.assets_path / "band-places.txt")
+        self.bandadjectives = read_list_file(self.assets_path / "band-adjectives.txt")
+        self.bandnouns = read_list_file(self.assets_path / "band-nouns.txt")
+        self.bandplaces = read_list_file(self.assets_path / "band-places.txt")
         # !band style
-        self.bandstyles = crabbot.common.read_list_file(self.assets_path / "band-styles.txt")
+        self.bandstyles = read_list_file(self.assets_path / "band-styles.txt")
         # !world
-        self.worldwords = crabbot.common.read_list_file(self.assets_path / "world-words.txt")
+        self.worldwords = read_list_file(self.assets_path / "world-words.txt")
 
-    @commands.command(help='The bots have something to say')
-    async def takeover(self):
-        await self.bot.say("Something something robots")
+    @command(help='The bots have something to say')
+    async def takeover(self, ctx):
+        await ctx.send("Something something robots")
 
-    @commands.command(help='Well, what is this Lords Management then?', aliases=['lol'])
-    async def dota(self):
+    @command(aliases=['lol'], help='Well, what is this Lords Management then?')
+    async def dota(self, ctx):
         moba = random.choice(self.mobas)
-        await self.bot.say("This is a strange {} mod".format(moba))
+        await ctx.send(f"This is a strange {moba} mod")
 
-    @commands.command(enabled=True, hidden=True)
-    async def annoy(self):
+    @command(enabled=True, hidden=True)
+    async def annoy(self, ctx):
         # TODO anti-spam cooldown (probably a good idea for most commands)
-        await self.bot.say("Ho ho ha ha!", tts=True)
+        await ctx.send("Ho ho ha ha!", tts=True)
 
-    @commands.command(help='For the unruly patron')
-    async def sir(self):
+    @command(help='For the unruly patron')
+    async def sir(self, ctx):
         # Yes, possibly having repeats is intentional, more fun that way
         place_one = random.choice(self.sirplaces)
         place_two = random.choice(self.sirplaces)
-        reply = "Sir, this is {}, not {}.".format(place_one, place_two)
-        await self.bot.say(reply)
+        await ctx.send(f"Sir, this is {place_one}, not {place_two}.")
 
-    @commands.command()
-    async def assist(self):
+    @command()
+    async def assist(self, ctx):
         if random.randint(1, 10) == 5:  # 10%
-            await self.bot.say("Ok")
+            await ctx.send("Ok")
         else:
-            await self.bot.say("Help is transient, and for some reason is not provided here.")
+            await ctx.send("Help is transient, and for some reason is not provided here.")
 
-    @commands.command(help="👍")
-    async def thumbsup(self, num='1'):
+    @command(help="👍")
+    async def thumbsup(self, ctx, num='1'):
         if num not in ('nope', '0'):
             try:
                 number = int(num)
@@ -79,12 +77,12 @@ class Messages:
                     number = self.spam_limit
             except ValueError:
                 number = 1
-            await self.bot.reply("👍" * number)
+            await ctx.send(f"{ctx.author.mention} {'👍' * number}")
         else:
-            await self.bot.say("Awww")
+            await ctx.send("Awww")
 
-    @commands.command()
-    async def cake(self, num='1'):
+    @command()
+    async def cake(self, ctx, num='1'):
         try:
             number = int(num)
             if number > self.spam_limit:
@@ -92,42 +90,53 @@ class Messages:
         except ValueError:
             number = 1
         reply = [random.choice(self.cakes) for _ in range(abs(int(num)))]
-        await self.bot.say(''.join(reply))
+        await ctx.send(''.join(reply))
 
-    @commands.command(help="Go on a quest!")
-    async def adventure(self):
-        await self.bot.say("Simulating adventure...")
-        await self.bot.type()
-        await asyncio.sleep(3)  # suspense!
-        if random.randint(1, 10) == 5:  # 10% chance to win
-            reward = random.choice(self.rewards)
-            await self.bot.say("You win! You got {}!".format(reward))
-        else:  # Ruin!
-            death = random.choice(self.deaths)
-            killer = random.choice(self.killers)
-            location = random.choice(self.locations)
-            await self.bot.say("You were {} by {} in {}".format(death, killer, location))
+    @command(help="Go on a quest!")
+    async def adventure(self, ctx):
+        await ctx.send("Simulating adventure...")
+        async with ctx.typing():
+            await asyncio.sleep(3)  # suspense!
+            if random.randint(1, 10) == 5:  # 10% chance to win
+                reward = random.choice(self.rewards)
+                await ctx.send(f"You win! You got {reward}!")
+            else:  # Ruin!
+                death = random.choice(self.deaths)
+                killer = random.choice(self.killers)
+                location = random.choice(self.locations)
+                await ctx.send(f"You were {death} by {killer} in {location}")
 
-    @commands.group(help="Need a band name?")
-    async def band(self):
+    @group(help="Need a band name?")
+    async def band(self, ctx):
         adjective = random.choice(self.bandadjectives)
         noun = random.choice(self.bandnouns)
         place = random.choice(self.bandplaces)
-        await self.bot.say("Your new band name is {} {} {}".format(adjective, noun, place))
+        await ctx.send(f"Your new band name is {adjective} {noun} {place}")
 
     @band.command()
-    async def style(self):
+    async def style(self, ctx):
         style = random.choice(self.bandstyles)
-        await self.bot.say("    which is a {} cover band.".format(style))
+        await ctx.send(f"which is a {style} cover band.")
 
-    @commands.command(help="Name a new Land! Thanks, Homestuck!")
-    async def world(self):
+    @command(aliases=['world'], help="Name a new Land! Thanks, Homestuck!")
+    async def land(self, ctx):
         # Repeat words are OK
         word1 = random.choice(self.worldwords)
         word2 = random.choice(self.worldwords)
-        await self.bot.say("The Land of {} and {}".format(word1, word2))
+        await ctx.send(f"The Land of {word1} and {word2}")
 
-    @commands.command(aliases=['SUMMON THE BEAR'], help="SUMMON THE BEAR")
-    async def BEAR(self):
-        # SUMMON THE BEAR
-        await self.bot.upload(self.assets_path / "SUMMONTHEBEAR.gif")
+    # TODO figure out how to make commands with spaces. Probably have to just do SUMMON @group() somehow tho.
+    @command(aliases=['SUMMON THE BEAR'], help="SUMMON THE BEAR")
+    async def BEAR(self, ctx):
+        ''' SUMMON THE BEAR '''
+
+        # Alt. upload version. Bad for slow upload speeds. Also maybe don't fill Discord with 100s of bear gif files?
+        # await ctx.send(file=discord.File(str(self.assets_path / "SUMMONTHEBEAR.gif")))
+
+        emoji_bear = discord.utils.get(ctx.message.guild.emojis, name="bearmoji")
+        # print(f"{type(emoji_bear)} : {emoji_bear}")
+        if emoji_bear is None:
+            # Fallback unicode bear
+            emoji_bear = "🐻"
+        
+        await ctx.send(emoji_bear)

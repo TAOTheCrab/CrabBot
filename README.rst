@@ -14,11 +14,12 @@ By default, use !crabhelp or "@\*botname\* help" to see a list of visible comman
 
 Requires:
 
-- `discord.py <https://github.com/Rapptz/discord.py>`__ v0.10+ (AKA async branch)
+- `discord.py <https://github.com/Rapptz/discord.py>`__ v1.0+ (AKA **rewrite** branch)
 
   - ``pip3 install discord.py[voice]`` for voice support
 
-- Python 3.5+ (uses async syntax, can be edited to work with 3.4)
+
+- Python 3.6+ (uses `f-strings <https://docs.python.org/3/reference/lexical_analysis.html#f-strings>`__, can be edited for 3.5)
 
 For voice (module can be disabled):
 

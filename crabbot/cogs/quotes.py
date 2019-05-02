@@ -14,13 +14,12 @@ from pathlib import PurePath
 import random
 import sqlite3
 
-from discord.ext import commands
+from discord.ext.commands import Cog, group
 
 
-class Quotes:
+class Quotes(Cog):
 
-    def __init__(self, bot, quotes_db_path):
-        self.bot = bot
+    def __init__(self, quotes_db_path):
         self.quotes_db_path = PurePath(quotes_db_path)
 
         # TODO SQL error handling (applies to most of this module)
@@ -35,10 +34,10 @@ class Quotes:
         self.quotes_db_cursor.close()
         self.quotes_db_connection.close()
 
-    @commands.group(pass_context=True, invoke_without_command=True,
-                    help=('Read or add quotes! See "help quote" for details\n'
-                          '\n'
-                          'If no command is given, a random quote is printed'))
+    @group(invoke_without_command=True,
+           help=('Read or add quotes! See "help quote" for details\n'
+                 '\n'
+                 'If no command is given, a random quote is printed'))
     async def quote(self, ctx, *, name=None):
         # TODO consider using name.lower() to standardize input. Or some kind of fuzzy matching.
 
@@ -56,25 +55,24 @@ class Quotes:
                                           "LIMIT 1", (name,))
             # Just escape one 1-tuple. We already have the name, so meh.
             selected_quote = self.quotes_db_cursor.fetchone()[0]
-            await self.bot.say("{quote} \n  —{name}".format(quote=selected_quote,
-                                                            name=name))
+            await ctx.send(f"{selected_quote} \n  —{name}")
         else:
-            await self.bot.say("No quotes from {name}.".format(name=name))
+            await ctx.send(f"No quotes from {name}.")
 
     @quote.command(help='List all authors of recorded quotes')
-    async def authors(self):
+    async def authors(self, ctx):
         self.quotes_db_cursor.execute("SELECT DISTINCT author FROM quotes "
                                       "ORDER BY author COLLATE NOCASE")
         # DB query result is a list of 1-tuples, so we extract the contained strs
         authors = [x[0] for x in self.quotes_db_cursor.fetchall()]
 
-        await self.bot.say(";  ".join(authors))
+        await ctx.send(";  ".join(authors))
 
     @quote.command(help='Search for a random quote with the given string in it.\n'
                         '\n'
                         'Only searches quote contents and returns word-for-word matches.\n'
                         'Not case sensitive.')
-    async def search(self, *, query: str):
+    async def search(self, ctx, *, query: str):
         ''' Get a random quote containing the word-for-word query in it'''
         # LIKE is case-insensitive for ASCII-range letters only.
         #   Also, it is claimed LIKE is slow for searches starting with %,
@@ -87,10 +85,9 @@ class Quotes:
         quote = self.quotes_db_cursor.fetchone()
 
         if quote is None:
-            await self.bot.say("No quotes found.")
+            await ctx.send("No quotes found.")
         else:
-            await self.bot.say("{quote} \n  —{name}".format(quote=quote[1],
-                                                            name=quote[0]))
+            await ctx.send(f"{quote[1]} \n  —{quote[0]}")
 
     @quote.command(help=('Add a quote.\n'
                          'Say the name of the person being quoted, then '
@@ -98,7 +95,7 @@ class Quotes:
                          'eg. quote add Steve Steve said this thing\n'
                          '\n'
                          'To add a name with spaces in it, you must put the name in quotation marks.'))
-    async def add(self, name: str, *, quote: str):
+    async def add(self, ctx, name: str, *, quote: str):
         # TODO Would kind of like to number quote for reference purposes.
         # TODO? allow use of @User id numbers instead of hardcoded names
         #       problem: using @User notifies user of the message
@@ -115,6 +112,6 @@ class Quotes:
         # For safety (CrabBot has no graceful shutdown), just write the changes now
         self.quotes_db_connection.commit()
 
-        await self.bot.say("Quote added.")
+        await ctx.send("Quote added.")
 
     # TODO 'remove' command
