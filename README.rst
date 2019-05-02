@@ -1,8 +1,6 @@
 CrabBot
 =======
 
-**NOTE: This library-rewrite-prep branch uses the version of Discord.py from the `rewrite/1.0 branch <https://github.com/Rapptz/discord.py/tree/rewrite>`__ **
-
 Silly Discord bot for funsies
 
 Mostly prints funny messages in reply to commands, with some additional voice functionality
