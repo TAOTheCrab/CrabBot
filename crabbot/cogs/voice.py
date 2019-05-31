@@ -101,6 +101,8 @@ class Voice(Cog):
     async def stream(self, ctx, *, url):
         """ Taken from discord.py's examples/basic_voice.py """
 
+        # TODO queue by reference counting and then decrementing with after?
+
         logging.info(f'Streaming "{url}" from "{ctx.message.channel}" on "{ctx.message.guild}"')
 
         async with ctx.typing():
