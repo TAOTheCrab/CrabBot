@@ -140,3 +140,10 @@ class Messages(Cog):
             emoji_bear = "🐻"
         
         await ctx.send(emoji_bear)
+
+    @command(help=("(Sauce by Captain_Siix (Twitter/Twitch))"))
+    async def arc(self, ctx):
+        ''' Server in-joke memes. The source file is being kept separately. '''
+
+        # Well, screw it, this meme'll work until this link dies, lol. Don't want to upload it every time.
+        await ctx.send("https://cdn.discordapp.com/attachments/452175328148979713/583852441519390740/arc_warden.mp4")
