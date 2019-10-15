@@ -15,6 +15,7 @@ import youtube_dl
 
 from crabbot.common import read_list_file
 
+log = logging.getLogger(__name__)
 
 """ This block mostly taken straight from discord.py's examples/basic_voice.py """
 ytdl_format_options = {
@@ -66,7 +67,7 @@ class Voice(Cog):
         #      This code has essentially been ported over from an earlier version of CrabBot that did use it sometimes.
         self.decoder_executable = 'ffmpeg' if use_libav is False else 'avconv'
 
-        logging.info(f"Voice: Using {self.decoder_executable} for playback")
+        log.info(f"Voice: Using {self.decoder_executable} for playback")
 
         self.memes_path = Path(memes_path)
         # Initialize lists
@@ -81,14 +82,14 @@ class Voice(Cog):
     def disconnect_after_playback(self, error):
         # NOTE ESSENTIALLY NOT IMPLEMENTED YET
         if error:
-            logging.info(f"Error with voice: {error}")
+            log.info(f"Error with voice: {error}")
         #TODO Figure out if it's possible to disconnect when playback is exausted without await
         # OLD CODE: asyncio.ensure_future(self.voice_client.disconnect, loop=self.bot_loop)
         
 
     @command(help="Lost?")
     async def memes(self, ctx):
-        logging.info("Playing voice memes")
+        log.info("Playing voice memes")
 
         chosen_meme = random.choice(self.the_memes)
 
@@ -107,14 +108,14 @@ class Voice(Cog):
 
         # TODO queue by reference counting and then decrementing with after?
 
-        logging.info(f'Streaming "{url}" from "{ctx.message.channel}" on "{ctx.message.guild}"')
+        log.info(f'Streaming "{url}" from "{ctx.message.channel}" on "{ctx.message.guild}"')
 
         async with ctx.typing():
             # NOTE If voice has problems, try setting stream=False first
             player = await YTDLSource.from_url(url, loop=self.bot_loop, stream=True, executable=self.decoder_executable)
             ctx.voice_client.play(player, after=lambda e: print(f'Player error: {e}') if e else None)
 
-        logging.info(f'Stream setup successfull. Now playing "{player.title}" in "{ctx.author.voice.channel.name}"')
+        log.info(f'Stream setup successfull. Now playing "{player.title}" in "{ctx.author.voice.channel.name}"')
         await ctx.send(f'Now playing: {player.title}')
 
     @memes.before_invoke
@@ -124,7 +125,7 @@ class Voice(Cog):
         
         Will interrupt the currently playing audio in favor of the next command.
         """
-        logging.info(f'Ensuring a voice connection on server "{ctx.guild.name}"')
+        log.info(f'Ensuring a voice connection on server "{ctx.guild.name}"')
         if ctx.voice_client is None:
             if ctx.author.voice is not None:
                 await ctx.author.voice.channel.connect()
@@ -139,26 +140,26 @@ class Voice(Cog):
                 #     Discord server problem? Network problem? Soft ban on the bot? Sleepiness? Commiting notes and then trying again much later.
                 #
                 #     When this occurs, a voice_client is created, but is_connected() is False.
-                logging.info(f'Connected to "{ctx.author.voice.channel.name}" on server "{ctx.guild.name}"')
+                log.info(f'Connected to "{ctx.author.voice.channel.name}" on server "{ctx.guild.name}"')
             else:
                 await ctx.send(f"{ctx.author.mention} You must be in a voice channel to use voice commands")
-                logging.info("Author is not connected to a voice channel, voice command stopped.")
+                log.info("Author is not connected to a voice channel, voice command stopped.")
                 raise CommandError("Author is not connected to a voice channel")
         elif ctx.voice_client.is_playing():
-            logging.info("Voice client is playing, stopping playback.")
+            log.info("Voice client is playing, stopping playback.")
             ctx.voice_client.stop()
         elif ctx.voice_client.is_connected() is False:
-            logging.info(f'Problem with voice connection to "{ctx.voice_client.channel.name}" on server "{ctx.voice_client.guild.name}" with endpoint "{ctx.voice_client.endpoint}"')
+            log.info(f'Problem with voice connection to "{ctx.voice_client.channel.name}" on server "{ctx.voice_client.guild.name}" with endpoint "{ctx.voice_client.endpoint}"')
             await ctx.send(f"Something went wrong with fully establishing a voice connection. Did a previous voice command not play any audio?")
             # Prevent before_invoke'd command from running
             raise CommandError("Bot has a voice client, but is not connected to voice. Either a previous connect() has stalled, or unfortunate timing has occurred.")
         else:  # Hopefully there aren't any more error states to check for
-            logging.info(f'Using existing voice connection to "{ctx.voice_client.channel.name}" on server "{ctx.voice_client.guild.name}"')
+            log.info(f'Using existing voice connection to "{ctx.voice_client.channel.name}" on server "{ctx.voice_client.guild.name}"')
 
     @command(help="Disconnect from voice", aliases=["shutup"])
     async def disconnect(self, ctx):
         if ctx.voice_client is not None:
-            logging.info(f'Ending voice connection to "{ctx.voice_client.channel.name}" on server "{ctx.voice_client.guild}"')
+            log.info(f'Ending voice connection to "{ctx.voice_client.channel.name}" on server "{ctx.voice_client.guild}"')
 
             await ctx.voice_client.disconnect()
         else:

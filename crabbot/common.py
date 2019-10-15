@@ -11,6 +11,7 @@ import random
 
 from discord.ext.commands import Bot as DiscordBot, when_mentioned_or
 
+log = logging.getLogger(__name__)
 
 def read_list_file(filepath: Path):
     # Force utf-8, to be explicit/get Windows in line
@@ -34,10 +35,10 @@ class CrabBot(DiscordBot):
                      '------')
 
         print(login_msg)
-        logging.info(login_msg)
+        log.info(login_msg)
 
     async def update_profile(self, username=None, avatar=None):
-        logging.info("Updating profile")
+        log.info("Updating profile")
 
         # TODO probably just convert this to require both args, since single arg seems too buggy
         # BUG using new_username seems to always return BAD REQUEST, disabled for now
@@ -59,28 +60,28 @@ class CrabBot(DiscordBot):
             # BUG server returns BAD REQUEST
             await self.user.edit(username=new_username)
 
-        logging.info("Profile updated")
+        log.info("Profile updated")
 
     def _update_profile(self, username=None, avatar=None):
         # Mostly for threads, to allow them to call the update_profile coroutine
-        logging.info("Calling update_profile")
+        log.info("Calling update_profile")
         up_function = self.update_profile(username, avatar)
         future = asyncio.run_coroutine_threadsafe(up_function, self.loop)
-        logging.info("update_profile completed with: " + str(future.exception()))
+        log.info("update_profile completed with: " + str(future.exception()))
 
     def update_all_lists(self):
         for cog_name, cog_function in self.cogs_update_lists.items():
             cog_function()
-            logging.info("Updated lists for {}".format(cog_name))
+            log.info("Updated lists for {}".format(cog_name))
 
     def add_cog(self, cog):
         super(CrabBot, self).add_cog(cog)
-        logging.info("Added cog {}".format(cog.__class__.__name__))
+        log.info("Added cog {}".format(cog.__class__.__name__))
         if hasattr(cog, "update_lists"):
             self.cogs_update_lists[cog.__class__.__name__] = cog.update_lists
 
     def remove_cog(self, cog_name):
         super(CrabBot, self).remove_cog(cog_name)
-        logging.info("Removed cog {}".format(cog_name))
+        log.info("Removed cog {}".format(cog_name))
         if cog_name in self.cogs_update_lists:
             del self.cogs_update_lists[cog_name]
