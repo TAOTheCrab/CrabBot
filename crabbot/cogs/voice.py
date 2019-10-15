@@ -66,6 +66,8 @@ class Voice(Cog):
         #      This code has essentially been ported over from an earlier version of CrabBot that did use it sometimes.
         self.decoder_executable = 'ffmpeg' if use_libav is False else 'avconv'
 
+        logging.info(f"Voice: Using {self.decoder_executable} for playback")
+
         self.memes_path = Path(memes_path)
         # Initialize lists
         self.update_lists()
@@ -122,16 +124,36 @@ class Voice(Cog):
         
         Will interrupt the currently playing audio in favor of the next command.
         """
+        logging.info(f'Ensuring a voice connection on server "{ctx.guild.name}"')
         if ctx.voice_client is None:
             if ctx.author.voice is not None:
                 await ctx.author.voice.channel.connect()
+                # BUG somewhere. Sometimes connect gets stuck right after logging a "Voice handshake complete".
+                #     Codewise it worked after the "minor Windows changes" commit, selecting a voice protocol right after.
+                #     Logwise when it worked it got a `discord.gg` endpoint for the handshake,
+                #     but now it hangs on a `discord.media` endpoint with an entirely different IP address.
+                #     Setting logging.DEBUG, discord.py seemed to get a response with a voice protocol and then did nothing?
+                #     AFAIK all I changed is logging and exposing the executable arg discord.py already had, now it doesn't work on Windows or Linux.
+                #     Windows environment AFAIK has not changed from when voice worked earlier in the day, just the libav changes it doesn't appear to reach anyway.
+                #     Separate Linux environment on same network has up to libav commit, same hang on `discord.media`, unsure if was working before.
+                #     Discord server problem? Network problem? Soft ban on the bot? Sleepiness? Commiting notes and then trying again much later.
+                #
+                #     When this occurs, a voice_client is created, but is_connected() is False.
                 logging.info(f'Connected to "{ctx.author.voice.channel.name}" on server "{ctx.guild.name}"')
             else:
                 await ctx.send(f"{ctx.author.mention} You must be in a voice channel to use voice commands")
                 logging.info("Author is not connected to a voice channel, voice command stopped.")
                 raise CommandError("Author is not connected to a voice channel")
         elif ctx.voice_client.is_playing():
+            logging.info("Voice client is playing, stopping playback.")
             ctx.voice_client.stop()
+        elif ctx.voice_client.is_connected() is False:
+            logging.info(f'Problem with voice connection to "{ctx.voice_client.channel.name}" on server "{ctx.voice_client.guild.name}" with endpoint "{ctx.voice_client.endpoint}"')
+            await ctx.send(f"Something went wrong with fully establishing a voice connection. Did a previous voice command not play any audio?")
+            # Prevent before_invoke'd command from running
+            raise CommandError("Bot has a voice client, but is not connected to voice. Either a previous connect() has stalled, or unfortunate timing has occurred.")
+        else:  # Hopefully there aren't any more error states to check for
+            logging.info(f'Using existing voice connection to "{ctx.voice_client.channel.name}" on server "{ctx.voice_client.guild.name}"')
 
     @command(help="Disconnect from voice", aliases=["shutup"])
     async def disconnect(self, ctx):
