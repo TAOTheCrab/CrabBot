@@ -8,6 +8,11 @@ Mostly prints funny messages in reply to commands, with some additional voice fu
 **This should be considered alpha-quality software.** There are some
 glaring bugs, missing features, and most of it is undocumented
 
+This bot's primary dev/working environment is Linux / MSYS2. 
+Native Windows compatibility is not guaranteed, 
+but is occassionally tested and fixed up as a curiosity.
+(ex. issues with the difference in preferred file encoding, only lightly tested as fixed)
+
 **Do not use the setup.py, it is WIP**
 
 By default, use !crabhelp or "@\*botname\* help" to see a list of visible commands
@@ -60,4 +65,4 @@ Similar projects
 ----------------
 
 - `Red <https://github.com/Twentysix26/Red-DiscordBot>`__ - Another
-discord.py bot, similarly uses cogs for most commands
+    discord.py bot, similarly uses cogs for most commands
