@@ -13,7 +13,8 @@ from discord.ext.commands import Bot as DiscordBot, when_mentioned_or
 
 
 def read_list_file(filepath: Path):
-    with filepath.open() as file_list:
+    # Force utf-8, to be explicit/get Windows in line
+    with filepath.open(encoding="utf-8") as file_list:
         words = [x.rstrip() for x in file_list]
     return words
 
