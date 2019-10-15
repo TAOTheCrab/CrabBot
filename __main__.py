@@ -53,7 +53,13 @@ parser.add_argument('-l', '--logfile', type=Path, default=Path('CrabBot.log'),
 
 args = parser.parse_args()
 
-logging.basicConfig(filename=args.logfile, level=logging.INFO)  # Grr, ytdl doesn't log
+# BUG WINDOWS: If encoding is not specified as utf-8, logging tends to choke on newer emojis and not write anything.
+# Waiting on change in Python 3.9 to add encoding arg to basicConfig.
+#logging.basicConfig(filename=args.logfile, level=logging.INFO, encoding="utf-8")  # Grr, ytdl doesn't log
+# In the meantime, create a working handler and continue
+file_log = logging.FileHandler(args.logfile, encoding='utf-8')
+logging.basicConfig(handlers=[file_log], level=logging.INFO)
+
 logging.info("________\n" +
              "Starting CrabBot at " + str(datetime.datetime.now()) + "\n"
              "--------")  # Make it clear in the log when a new run starts
