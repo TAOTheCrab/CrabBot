@@ -58,7 +58,8 @@ args = parser.parse_args()
 #logging.basicConfig(filename=args.logfile, level=logging.INFO, encoding="utf-8")  # Grr, ytdl doesn't log
 # In the meantime, create a working handler and continue
 file_log = logging.FileHandler(args.logfile, encoding='utf-8')
-logging.basicConfig(handlers=[file_log], level=logging.INFO)
+logging.basicConfig(handlers=[file_log], level=logging.INFO,
+                    format="{asctime}:{levelname}:{name}:{message}", style="{")
 
 logging.info("________\n" +
              "Starting CrabBot at " + str(datetime.datetime.now()) + "\n"
