@@ -46,7 +46,7 @@ class YTDLSource(PCMVolumeTransformer):
         self.url = data.get('url')
 
     @classmethod
-    async def from_url(cls, url, *, loop=None, stream=False):
+    async def from_url(cls, url, *, loop=None, stream=False, executable='ffmpeg'):
         loop = loop or asyncio.get_event_loop()
         data = await loop.run_in_executor(None, lambda: ytdl.extract_info(url, download=not stream))
 
@@ -55,13 +55,15 @@ class YTDLSource(PCMVolumeTransformer):
             data = data['entries'][0]
 
         filename = data['url'] if stream else ytdl.prepare_filename(data)
-        return cls(FFmpegPCMAudio(filename, **ffmpeg_options), data=data)
+        return cls(FFmpegPCMAudio(filename, executable=executable, **ffmpeg_options), data=data)
 """ End discord.py examples/basic_voice.py copied code block """
 
 
 class Voice(Cog):
     def __init__(self, bot_loop, memes_path, use_libav=False):
         self.bot_loop = bot_loop
+        # NOTE avconv has not been tested, so this might be the first variable to look for if there are issues.
+        #      This code has essentially been ported over from an earlier version of CrabBot that did use it sometimes.
         self.decoder_executable = 'ffmpeg' if use_libav is False else 'avconv'
 
         self.memes_path = Path(memes_path)
@@ -88,7 +90,7 @@ class Voice(Cog):
 
         chosen_meme = random.choice(self.the_memes)
 
-        source = FFmpegPCMAudio(str(self.memes_path / chosen_meme))
+        source = FFmpegPCMAudio(str(self.memes_path / chosen_meme), executable=self.decoder_executable)
         ctx.voice_client.play(source, after=None)  # NOTE removing `after=disconnect_after_playback` until that works correctly
         # BUG possibly in discord.py? in player.py/cleanup(), it tries to kill ffmpeg, which appears to have terminated on its own (EOF?)
         #     cleanup() never gets past attempting to kill its subprocess, never performs `after`. (NOTE only tested on WSL Ubuntu)
@@ -106,7 +108,8 @@ class Voice(Cog):
         logging.info(f'Streaming "{url}" from "{ctx.message.channel}" on "{ctx.message.guild}"')
 
         async with ctx.typing():
-            player = await YTDLSource.from_url(url, loop=self.bot_loop, stream=True) # NOTE If voice has problems, try setting stream=False first
+            # NOTE If voice has problems, try setting stream=False first
+            player = await YTDLSource.from_url(url, loop=self.bot_loop, stream=True, executable=self.decoder_executable)
             ctx.voice_client.play(player, after=lambda e: print(f'Player error: {e}') if e else None)
 
         logging.info(f'Stream setup successfull. Now playing "{player.title}" in "{ctx.author.voice.channel.name}"')
