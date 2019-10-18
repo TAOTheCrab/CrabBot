@@ -129,28 +129,6 @@ class Voice(Cog):
         if ctx.voice_client is None:
             if ctx.author.voice is not None:
                 await ctx.author.voice.channel.connect()
-                # BUG somewhere. Sometimes connect gets stuck right after logging a "Voice handshake complete".
-                #     Codewise it worked after the "minor Windows changes" commit, selecting a voice protocol right after.
-                #     Logwise when it worked it got a `discord.gg` endpoint for the handshake,
-                #     but now it hangs on a `discord.media` endpoint with an entirely different IP address.
-                #     Setting logging.DEBUG, discord.py seemed to get a response with a voice protocol and then did nothing?
-                #     AFAIK all I changed is logging and exposing the executable arg discord.py already had, now it doesn't work on Windows or Linux.
-                #     Windows environment AFAIK has not changed from when voice worked earlier in the day, just the libav changes it doesn't appear to reach anyway.
-                #     Separate Linux environment on same network has up to libav commit, same hang on `discord.media`, unsure if was working before.
-                #     Discord server problem? Network problem? Soft ban on the bot? Sleepiness? Commiting notes and then trying again much later.
-                #
-                #     When this occurs, a voice_client is created, but is_connected() is False.
-                #       Where the timeout is defined as 60s, and where VoiceClient is created.
-                #     https://github.com/Rapptz/discord.py/blob/master/discord/abc.py#L1007
-                #       Seems to get stuck somewhere after the handshake, last log is the "Voice handshake complete" at the end of start_handshake().
-                #       Also seems to be configured to time out in 60s, but waiting multiple minutes produced no retry logs/errors.
-                #     https://github.com/Rapptz/discord.py/blob/master/discord/voice_client.py#L208
-                #       The module that usually logs a voice protocol right after the handshake.
-                #       DEBUG logs imply this gets stuck at "Voice websocket frame received", but the log is very noisy with guild status changes.
-                #       Seems to keep the voice websocket alive without actually getting anywhere?
-                #       After handshake, receives OP codes 8 (HELLO) and 2 (READY), but there is no debug log from DiscordVoiceWebSocket.initial_connection() for 2.
-                #       Sends and receives heartbeats though.
-                #     https://github.com/Rapptz/discord.py/blob/master/discord/gateway.py#L636
                 log.info(f'Connected to "{ctx.author.voice.channel.name}" on server "{ctx.guild.name}"')
             else:
                 await ctx.send(f"{ctx.author.mention} You must be in a voice channel to use voice commands")
