@@ -118,12 +118,14 @@ class Messages(Cog):
         style = random.choice(self.bandstyles)
         await ctx.send(f"which is a {style} cover band.")
 
-    @command(aliases=['world'], help="Name a new Land! Thanks, Homestuck!")
+    @command(aliases=['world', 'planet'], help="Name a new Land! Thanks, Homestuck!")
     async def land(self, ctx):
         # Repeat words are OK
         word1 = random.choice(self.worldwords)
         word2 = random.choice(self.worldwords)
-        await ctx.send(f"The Land of {word1} and {word2}")
+        # Might have to watch this one for iffy combos
+        abbreviation = f"LO{word1[0]}A{word2[0]}"
+        await ctx.send(f"Land of {word1} and {word2}   ({abbreviation})")
 
     # TODO figure out how to make commands with spaces. Probably have to just do SUMMON @group() somehow tho.
     @command(aliases=['SUMMON THE BEAR'], help="SUMMON THE BEAR")
