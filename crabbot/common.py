@@ -20,8 +20,19 @@ def read_list_file(filepath: Path):
     return words
 
 
+# We're treating these as default CrabBot cogs (though honestly it's just to show/test how to add cogs in init)
+# TODO might want to only add messages by default, it's the most used and the least likely to be busted.
+from .cogs import messages, quotes
+
 class CrabBot(DiscordBot):
-    def __init__(self, prefix='!crab'):
+    ''' The heart of CrabBot. 
+
+    Default paths assume the bot is being run at project root (eg. as crabbot.common.CrabBot()).
+    '''
+
+    def __init__(self, prefix='!crab', 
+                       assets_path: Path = Path("assets"), 
+                       quotes_path: Path = Path("..")):
         # Could just use command_prefix arg, but this allows for a default prefix
         super().__init__(command_prefix=when_mentioned_or(prefix),
                          description="Huh, another bot")
@@ -29,6 +40,13 @@ class CrabBot(DiscordBot):
         # self.add_listener(self.on_ready)  # TIL on_ready in a Bot subclass is already registered
 
         self.cogs_update_lists = {}
+
+        # Add default cogs
+        self.assets_path = assets_path
+        self.add_cog(messages.Messages(assets_path / "messages"))
+
+        self.quotes_path = quotes_path
+        self.add_cog(quotes.Quotes(quotes_path))
 
     async def on_ready(self):
         login_msg = ('Logged in as {} ({})\n'.format(self.user.name, self.user.id) +

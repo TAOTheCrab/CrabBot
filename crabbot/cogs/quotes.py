@@ -46,6 +46,7 @@ class Quotes(Cog):
         authors = [x[0] for x in self.quotes_db_cursor.fetchall()]
 
         if name is None:  # User wants any random quote, so we pick an author
+            # BUG if quotes db is empty, this errors out silently. Need to inform user.
             name = random.choice(authors)
 
         if name in authors:

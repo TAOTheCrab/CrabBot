@@ -19,10 +19,12 @@ from tempfile import gettempdir  # for PID file (for easier service management)
 from threading import Thread
 
 import crabbot.common
-import crabbot.cogs.messages
-import crabbot.cogs.quotes
-#NOTE: Incomplete and buggy, rewrite transition not finished. Recommend commenting out.
-import crabbot.cogs.voice  # comment out to disable voice commands entirely
+try:
+    # This module has extra dependencies (youtube-dl), and is considered optional.
+    import crabbot.cogs.voice  # comment out to disable voice commands entirely
+except ImportError as e:
+    # Notify CLI, but otherwise don't block the run.
+    print(f"Voice cog not loaded, missing dependency: {e.name}")
 
 pid = str(os.getpid())
 pidfile = Path(gettempdir() + '/CrabBot.pid')  # eg. so systemd's PIDFile can find a /tmp/CrabBot.pid
@@ -73,7 +75,10 @@ else:
     login = args.token
 
 
-bot = crabbot.common.CrabBot(prefix=args.prefix)
+# Initializing early so poll_terminal can refer to it. Otherwise it is kind of a poor grouping of control flow.
+bot = crabbot.common.CrabBot(prefix=args.prefix, 
+                             assets_path=args.assets_path,
+                             quotes_path=args.quotes_path)
 
 
 def poll_terminal():
@@ -97,25 +102,25 @@ def poll_terminal():
         elif term_input.startswith("enable_voice"):
             if "crabbot.cogs.voice" in sys.modules:
                 logging.info("Enabling voice commands")
-                bot.add_cog(crabbot.cogs.voice.Voice(bot, args.memes_path, args.use_libav))
+                bot.add_cog(crabbot.cogs.voice.Voice(bot.loop, args.memes_path, args.use_libav))
             else:
                 logging.info("Voice disabled in source. Add/uncomment import for crabbot.voice and relaunch.")
         elif term_input.startswith("update_lists"):
             bot.update_all_lists()
 
-
 # Start polling thread as a daemon so the program exits without waiting if ex. the bot crashes
 input_thread = Thread(target=poll_terminal, daemon=True)
 input_thread.start()
 
-bot.add_cog(crabbot.cogs.messages.Messages(args.assets_path / "messages"))
-bot.add_cog(crabbot.cogs.quotes.Quotes(args.quotes_path))
+
+# Example of adding a cog to CrabBot outside of CrabBot's init (...also voice is the iffiest module)
 # Comment out import of voice to completely disable voice commands
 if "crabbot.cogs.voice" in sys.modules and args.disable_voice is False:
-    bot.add_cog(crabbot.cogs.voice.Voice(bot.loop , args.memes_path, args.use_libav))
+    bot.add_cog(crabbot.cogs.voice.Voice(bot.loop, args.memes_path, args.use_libav))
 
 # Blocking, must be last. See discord.py Client for more info.
 bot.run(login)
+
 
 # If it reaches here, CrabBot's probably logged out of Discord now
 # (CrabBot doesn't log out if it's straight terminated)
