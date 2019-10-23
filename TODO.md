@@ -2,23 +2,8 @@
 
 
 # General
-- [ ] Full command logging
-    - Logging.INFO level
-    - Timestamp
-    - Usage stats?
-    - logging.Formatter() (see Python docs entry "Logging HOWTO")
-    - [ ] Configurable logging to file
-- [ ] Admin permissions checks (ex. for maxvolume command)
-    - Bot manages its own permissions? (eg. internal list of allowed users)
-    - Check for (configurable?) Discord server role?
-        - alt. check user permissions (ex. Manage Server, Voice Move Member)
-- [ ] Discord permissions link generator
-    - [Permissions docs](https://discordapp.com/developers/docs/topics/permissions)
-        - Reminder: 0x1=b0001, 0x2=b0010, 0x4=b0100, 0x8=b1000
-        - For link, convert to permissions hex/binary to int
-    - [Add to server link docs](https://discordapp.com/developers/docs/topics/oauth2#adding-bots-to-guilds)
+- [ ] Add logging (/exception handling mostly) for Quotes cog.
 - [ ] Add print() for some logged messages for user feedback (mostly for eg. disable_voice command)
-    - Alternately add a StreamHandler to logging. See [this](https://stackoverflow.com/a/9321890/1693387).
 
 ### Nice to have
 - [ ] Might like to make a custom help formatter
@@ -46,6 +31,16 @@
         - (reading discord.py reminded me that duck typing is confusing with custom classes)
 - [ ] Hidden !uptime command for CrabBot uptime
     - Candidate for admin check
+- [ ] Admin permissions checks (not currently useful, but nice to have)
+    - Bot manages its own permissions? (eg. internal list of allowed users)
+    - Check for (configurable?) Discord server role?
+        - alt. check user permissions (ex. Manage Server, Voice Move Member)
+- [ ] Discord permissions link generator
+    - Discord Developer Portal has a "permissions integer" generator on an app's Bot page in My Applications.
+    - [Permissions docs](https://discordapp.com/developers/docs/topics/permissions)
+        - Reminder: 0x1=b0001, 0x2=b0010, 0x4=b0100, 0x8=b1000
+        - For link, convert to permissions hex/binary to int
+    - [Add to server link docs](https://discordapp.com/developers/docs/topics/oauth2#adding-bots-to-guilds)
 
 
 # run.py
@@ -64,29 +59,12 @@
 
 
 # Voice
-- [ ] Look over voice commands and put shared code in a function
-    - eg. target_voice_channel check
 - [ ] catch discord.ext.commands.errors.CommandInvokeError for eg. invalid stream URLs
     - Disconnect from voice on error
         - (would like to do the error-prone task before connecting, but we're not there yet)
     - Note: YouTube-DL cannot validate URLs, so it can only throw errors in that case
-- [ ] Add a way to restart the VoiceConnection from Discord
-    - Seems like the audio_player_task loop fails sometimes and doesn't recover
-        - Big problem when the connection is persistent for volume controls
-        - Might be that it crashes, continues, then somehow doesn't None the voice so it doesn't reconnect
-    - Cancel or end the audio_player task when finished, then restart it when playing more?
-- [ ] The queue seems to only work without problem with a short queue (~1 queue entry). Investigate
-    - Might be related to host's low amount of memory, though it's happened on higher memory systems
-    - FFmpeg gets killed after a while? Usually the queued entry cuts out soon after starting but still sometimes plays for a bit.
-- [ ] Move audio processing/create_player() to audio player loop, instead of preprocessing.
-    - The preprocessing might be the reason for the above issues with longer queues
-    - Preprocessing causes noticeable quality issues with currently playing stream
-        - Also processing when the queue pops would put processing delay where it might be useful
-    - Figure out how to reduce differences between "memes" and "stream" for audio player
-        - End result is the same, but until processed the function calls are different
-        - Pass in pre-filled create_player() functions?
-            - ffmpeg_player doesn't need to be await-ed, but youtube_player does...
 - [ ] Might want to only let users in CrabBot's current voice channel use commands
+- [ ] Reimplement volume commands
 
 ### Nice to have
 - [ ] Command for info about current song (eg. a link)
@@ -94,7 +72,6 @@
     - If possible, current playback time (eg. long stream you want timestamps for)
         - Might need either a per-song timer or a start time to calculate from
 - [ ] Voice volume convert from ex. 100% to 1.0 notation
-- [ ] Use "playing"/Discord.game for stream name/link?
 - [ ] Memes number selector
 - [ ] Iterate over or choose from the contents of memes_path, instead of filelist.txt
     - Would make dynamic list easier, but maybe more abusable?
@@ -111,36 +88,11 @@
 - [ ] No-notify stream arg to disable @mention on playback
 - [ ] Voice pre-encoded for opus (see AirhornBot's use of DCA)
     - FFmpeg and Libav have libopus support
-    - Make our own FFmpeg wrapper for StreamPlayer
-        - youtube-dl --audio-format opus
-        - Need Encoder class
-            - encoder.frame_size
-            - encoder.frame_length
-        - Might be able to do these StreamPlayer args:
-            - encoder=VoiceClientInstance.encoder
-            - player=(lambda data:VoiceClientInstance.play_audio(data, encode=False))
-    - Airhornbot's [load function](https://github.com/hammerandchisel/airhornbot/blob/master/cmd/bot/bot.go#L233):
-        - Basically follows this part of the [spec](https://github.com/bwmarrin/dca/wiki/DCA1-specification#audio-data)
-        - Reads the 16-bit signed little endian int header for the audio length in bytes
-        - Uses that length to put the rest of the file into a bytes array
-        - Simply appends the bytes array onto another bytes array as a buffer/queue
-            - That buffer gets fed straight into an OpusSend of a Discord VoiceConnection
-    - discord.py's opus.Encoder.encode() passes all audio through libopus's opus_encode
-        - VoiceClient.play_audio(encode=False) skips encode()
-            - For create_ffmpeg_player(), StreamPlayer(player=play_audio)
-                - could do Streamplayer(player=(lambda data: play_audio(data, encode=False)))
-- [ ] Livestreamer integration
-    - Bonus alt YouTube streamer? (claims only Live tho)
-        - Could hopefully start playing sooner than a full youtube-dl for longer videos
-        - Would lose possibility of caching videos
-    - At least look at [example code](http://docs.livestreamer.io/api_guide.html#simple-player) for audio buffer usage (they used GStreamer for ex.)
-        - (... yes, CrabBot's audio handling is bad enough that it needs random buffer examples)
 
 ### Notes
 - [x] Process voice audio before connecting to channel (reduce delay between joining and playing)
     - discord.py needs a voice connection before audio processing can start, so not possible
         - Obviously could break out of using discord.py to process audio
-    - Probably solved by pre-encoding TODO (at least, would have do to our own processing)
 
 
 # Quotes
@@ -168,11 +120,6 @@
 - [ ] Some kind of live cog reload/reimport
     - Cogs are the most modified code, would be nice to not wait for re-login
     - importlib.reload()?
-- [ ] Use multiprocessing for Voice/individual voice connections?
-    - Mostly just because a lot of Voice tasks seem to hold up the main loop, and crash the bot
-    - Make per-connection asyncio loop
-    - Call bot loop with threadsafe(?)
-    - Need/use concurrent.futures?
 - [ ] Might have to move assets into crabbot for distribution
     - Alt. could somehow split out messages.py, since it's the thing that needs the assets badly
 - [x] Rename run.py to __main__.py?
