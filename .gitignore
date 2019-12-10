@@ -68,3 +68,6 @@ target/
 # I'm up for changing it later, but for now my workspace settings are not useful to others
 .vscode/*
 ## End VSCode 
+
+## VS workspace config
+.vs/*
