@@ -1,6 +1,7 @@
 Apocalypse
 Arena
 Boardroom
+Boss
 Box
 Boudoir
 Bread
@@ -31,5 +32,6 @@ Sewer
 Starship
 Station
 Study
+Summoner
 Trench
 Zone
