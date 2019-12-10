@@ -1,22 +1,25 @@
-# Soon
+# TODO
 
+## Soon
 
-# General
+## General
+
 - [ ] Add logging (/exception handling mostly) for Quotes cog.
 - [ ] Add print() for some logged messages for user feedback (mostly for eg. disable_voice command)
 
 ### Nice to have
+
 - [ ] Might like to make a custom help formatter
-    - see default discord.py commands.formatter.py and "formatter" commands.Bot arg
+  - see default discord.py commands.formatter.py and "formatter" commands.Bot arg
 - [ ] setup.py
-    - Needs a main script
-    - Needs more testing
-    - Probably needs additional metadata
-    - Needs assets installed as extra data for setup()
-        - crabbot.\_\_file\_\_ will give module path
-    - use import+execfile script on a __main__.py?
+  - Needs a main script
+  - Needs more testing
+  - Probably needs additional metadata
+  - Needs assets installed as extra data for setup()
+    - crabbot.\_\_file\_\_ will give module path
+  - use import+execfile script on a __main__.py?
 - [ ] Data storage for persistent data (for ex. user permissions if those get implemented)
-    - sqlite?
+  - sqlite?
 - [ ] Translation strings (mostly as an excuse to shorten the help= sections)
     - Idea: crabbot.load_help(), used by cogs to populate their help
     - Look into existing libraries for localization loading eg. managing translation txt files
