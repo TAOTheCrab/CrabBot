@@ -112,7 +112,7 @@ class Voice(Cog):
 
         async with ctx.typing():
             # NOTE If voice has problems, try setting stream=False first
-            player = await YTDLSource.from_url(url, loop=self.bot_loop, stream=True, executable=self.decoder_executable)
+            player = await YTDLSource.from_url(url, loop=self.bot_loop, stream=False, executable=self.decoder_executable)
             ctx.voice_client.play(player, after=lambda e: print(f'Player error: {e}') if e else None)
 
         log.info(f'Stream setup successfull. Now playing "{player.title}" in "{ctx.author.voice.channel.name}"')
