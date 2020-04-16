@@ -13,27 +13,31 @@ Native Windows compatibility is not guaranteed,
 but is occassionally tested and fixed up as a curiosity.
 (ex. issues with the difference in preferred file encoding, only lightly tested as fixed)
 
-**Do not use the setup.py, it is WIP**
+**Support for packaging is WIP, please only use Poetry to manage dependencies in order to run from source**
+
+Quickstart using `Poetry <https://python-poetry.org>`__: 
+
+- ``poetry install``
+- ``poetry run python __main__.py -f FileWithUserTokenAsFirstLine``
 
 By default, use !crabhelp or "@\*botname\* help" to see a list of visible commands
 
 Requires:
 
-- `discord.py <https://github.com/Rapptz/discord.py>`__ v1.0+ (AKA **rewrite** branch)
-
-  - ``pip3 install discord.py[voice]`` for voice support
-
+- `discord.py <https://github.com/Rapptz/discord.py>`__ v1.0+
 
 - Python 3.6+ (uses `f-strings <https://docs.python.org/3/reference/lexical_analysis.html#f-strings>`__, can be edited for 3.5)
 
-For voice (module can be disabled):
+For voice (module will automatically be disabled if dependencies are missing):
 
-- libopus0/opus (for voice transmission. Package name depends on package manager)
-- ffmpeg (for voice file playback)
+- ``discord.py[voice]``
+- ``youtube-dl`` (for stream command)
+- Native packages
 
-  - Voice module can be configured to use avconv/libav instead (eg. for Debian)
+  - ``opus`` / ``libopus0`` (for voice transmission)
+  - ``ffmpeg`` (for voice file playback)
 
-- youtube-dl (for stream command)
+    - Can be configured to use ``avconv`` / ``libav`` instead (eg. for Debian)
 
 Needs a bot user token. See ``-h`` for details
 
