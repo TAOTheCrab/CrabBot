@@ -1,0 +1,36 @@
+[tool.poetry]
+name = "crabbot"
+version = "0.1.0"
+description = "Silly Discord bot for funsies"
+authors = ["TAOTheCrab <taothecrab@gmail.com>"]
+license = "MIT"
+# Still trying to sort out includes, but I never really intended to package CrabBot anyway...
+include = ["assets"]
+
+[tool.poetry.dependencies]
+# NOTE: Waiting on 3.9 for logging.basicConfig(encoding=)
+# The latest used feature should just be 3.6's f-strings, and discord.py requires >3.5.
+python = "^3.6"
+# I would like to optionally depend on discord.py[voice] since we have guards for voice,
+# but I can't figure out if optionally depending on a required dep's extras is possible.
+#   - discord.py[voice] depends on PyNaCL==1.3.0, and native libraries `libopus` and 'ffmpeg'/'avconv'
+#     although I would like to depend on their extras_require if I can help it.
+"discord.py" = { version = "^1.3", extras = ["voice"] }
+
+# There's probably a really old youtube-dl version that doesn't work,
+# but for the most part only the latest version works anyway due to website updates.
+"youtube-dl" = {version = "*", optional = true}
+
+# Duplicate discord.py's aiohttp requirement so we can enable speedups extra
+"aiohttp" = {version = "~3.6", extras = ["speedups"], optional = true}
+
+[tool.poetry.extras]
+# Semi-incomplete due to extras issue.
+voice = ["discord.py[voice]", "youtube-dl"]
+aiohttpspeedups = ["aiohttp"]
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"
