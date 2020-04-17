@@ -4,8 +4,12 @@ version = "0.1.0"
 description = "Silly Discord bot for funsies"
 authors = ["TAOTheCrab <taothecrab@gmail.com>"]
 license = "MIT"
-# Still trying to sort out includes, but I never really intended to package CrabBot anyway...
-include = ["assets"]
+include = [
+    "assets/*", # Nice-to-have icons, but probably useless
+    "assets/messages/*",  # messages.py 
+    "assets/memes/*",  # voice.py
+    "README.rst"  # Nice-to-have basic usage docs
+]
 
 [tool.poetry.dependencies]
 # NOTE: Waiting on 3.9 for logging.basicConfig(encoding=)
