@@ -13,7 +13,7 @@ Native Windows compatibility is not guaranteed,
 but is occassionally tested and fixed up as a curiosity.
 (ex. issues with the difference in preferred file encoding, only lightly tested as fixed)
 
-**Support for packaging is WIP, please only use Poetry to manage dependencies in order to run from source**
+**Please report any issues with running as an installed package. Recommended method is still running from source, though basic testing of `poetry build` + `pip` showed no issues.**
 
 Quickstart using `Poetry <https://python-poetry.org>`__: 
 
