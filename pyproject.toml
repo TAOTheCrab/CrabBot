@@ -4,12 +4,7 @@ version = "0.1.0"
 description = "Silly Discord bot for funsies"
 authors = ["TAOTheCrab <taothecrab@gmail.com>"]
 license = "MIT"
-include = [
-    "assets/*", # Nice-to-have icons, but probably useless
-    "assets/messages/*",  # messages.py 
-    "assets/memes/*",  # voice.py
-    "README.rst"  # Nice-to-have basic usage docs
-]
+homepage = "https://github.com/TAOTheCrab/CrabBot"
 
 [tool.poetry.dependencies]
 # NOTE: Waiting on 3.9 for logging.basicConfig(encoding=)
