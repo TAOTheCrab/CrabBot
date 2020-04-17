@@ -18,6 +18,8 @@ import sys
 from tempfile import gettempdir  # for PID file (for easier service management)
 from threading import Thread
 
+import pkg_resources # Allows us to access assets from a package as a default
+
 import crabbot.common
 try:
     # This module has extra dependencies (youtube-dl), and is considered optional.
@@ -40,11 +42,12 @@ token_args.add_argument('-f', '--file', type=argparse.FileType('r'),
                         help="A file with the bot user's login token as the first line. Use this or -t")
 parser.add_argument('-p', '--prefix', default="!crab",
                     help="Command prefix the bot responds to")
-parser.add_argument('--assets-path', type=Path, default=Path('assets'),
+# The default is to grab the assets from its own distribution
+parser.add_argument('--assets-path', type=Path, default=Path(pkg_resources.resource_filename(__name__, 'assets')),
                     help="Path for general assets (ex. sir-places.txt)")
-parser.add_argument('--memes-path', type=Path, default=Path('assets/memes'),
+parser.add_argument('--memes-path', type=Path, default=Path(pkg_resources.resource_filename(__name__, 'assets/memes')),
                     help="Path for memes audio clips (and its filelist.txt)")
-parser.add_argument('--quotes-path', type=Path, default=Path('..'),  # NOTE we write to this location, be careful where you put it
+parser.add_argument('--quotes-path', type=Path, default=Path('.'),  # NOTE we write to this location, be careful where you put it
                     help="Path containing the quotes database. Will create quotes.sqlite3 if it does not exist.")
 parser.add_argument('--use-libav', action='store_true',
                     help="Make Voice use Libav instead of FFmpeg")
@@ -127,6 +130,9 @@ bot.run(login)
 logging.info("CrabBot has recieved a SIGINT and has now exited as intended\n" +
              "————— CrabBot exited at " + str(datetime.datetime.now()))
 print("CrabBot says goodbye")
+
+# Remove ResourceManager caches
+pkg_resources.cleanup_resources()
 
 # Cleanup pidfile
 try:

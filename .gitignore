@@ -71,3 +71,7 @@ target/
 
 ## VS workspace config
 .vs/*
+
+## CrabBot default names
+quotes.sqlite3
+*.log
