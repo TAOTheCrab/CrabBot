@@ -45,6 +45,12 @@ class Quotes(Cog):
         # DB query result is a list of 1-tuples, so we extract the contained strs
         authors = [x[0] for x in self.quotes_db_cursor.fetchall()]
 
+        # Bail out if there are no entries at all
+        if not authors:
+            # BUG The implication of per-server quotes is a hopeful lie to get me to actually implement them.
+            await ctx.send(f"This server has no quotes. Add some with `quote add`.")
+            return
+
         if name is None:  # User wants any random quote, so we pick an author
             # BUG if quotes db is empty, this errors out silently. Need to inform user.
             name = random.choice(authors)
