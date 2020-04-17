@@ -18,7 +18,7 @@ but is occassionally tested and fixed up as a curiosity.
 Quickstart using `Poetry <https://python-poetry.org>`__: 
 
 - ``poetry install``
-- ``poetry run python __main__.py -f FileWithUserTokenAsFirstLine``
+- ``poetry run python -m crabbot -f FileWithUserTokenAsFirstLine``
 
 By default, use !crabhelp or "@\*botname\* help" to see a list of visible commands
 
@@ -43,11 +43,11 @@ Needs a bot user token. See ``-h`` for details
 
 Common usage is
 
-``python3 __main__.py -f FileWithUserTokenAsFirstLine``
+``python3 -m crabbot -f FileWithUserTokenAsFirstLine``
 
 or
 
-``python3 __main__.py -t UserToken``
+``python3 -m crabbot -t UserToken``
 
 You can also make a text file with common arguments and refer to it with
 the arg "@\*filename\*", which you can mix with regular args
