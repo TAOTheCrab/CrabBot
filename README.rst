@@ -68,5 +68,5 @@ Then launch CrabBot with:
 Similar projects
 ----------------
 
-- `Red <https://github.com/Twentysix26/Red-DiscordBot>`__ - Another
-    discord.py bot, similarly uses cogs for most commands
+- `Red <https://github.com/Twentysix26/Red-DiscordBot>`__ - 
+  Another discord.py bot, similarly uses cogs for most commands
