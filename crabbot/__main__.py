@@ -23,7 +23,9 @@ import pkg_resources # Allows us to access assets from a package as a default
 import crabbot.common
 try:
     # This module has extra dependencies (youtube-dl), and is considered optional.
-    import crabbot.cogs.voice  # comment out to disable voice commands entirely
+    # DISABLING UNTIL DISCORD.PY v2 MIGRATION IS COMPLETE
+    #import crabbot.cogs.voice  # comment out to disable voice commands entirely
+    pass
 except ImportError as e:
     # Notify CLI, but otherwise don't block the run.
     print(f"Voice cog not loaded, missing dependency: {e.name}")
@@ -115,11 +117,12 @@ def poll_terminal():
 input_thread = Thread(target=poll_terminal, daemon=True)
 input_thread.start()
 
-
+''' DISABLING TO FOCUS ON OTHER ASPECTS OF v2 MIGRATION. Need to add signaling to CrabBot to have it add the cog now that it has to be await-ed
 # Example of adding a cog to CrabBot outside of CrabBot's init (...also voice is the iffiest module)
 # Comment out import of voice to completely disable voice commands
 if "crabbot.cogs.voice" in sys.modules and args.disable_voice is False:
     bot.add_cog(crabbot.cogs.voice.Voice(bot.loop, args.memes_path, args.use_libav))
+'''
 
 # Blocking, must be last. See discord.py Client for more info.
 bot.run(login)
