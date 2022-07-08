@@ -24,7 +24,7 @@ python = "^3.6"
 "youtube-dl" = {version = "*", optional = true}
 
 # Duplicate discord.py's aiohttp requirement so we can enable speedups extra
-"aiohttp" = {version = "~3.7", extras = ["speedups"], optional = true}
+"aiohttp" = {version = "~3", extras = ["speedups"], optional = true}
 
 [tool.poetry.extras]
 # Semi-incomplete due to extras issue.
