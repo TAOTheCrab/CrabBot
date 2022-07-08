@@ -9,6 +9,7 @@ import logging
 from pathlib import Path
 import random
 
+import discord
 from discord.ext.commands import Bot as DiscordBot, when_mentioned_or
 
 log = logging.getLogger(__name__)
@@ -37,19 +38,24 @@ class CrabBot(DiscordBot):
         # TODO (new in Discord.py 1.5) determine what Intents we need https://discordpy.readthedocs.io/en/latest/intents.html
         #      CrabBot should be functional with the default Intents, but we might be able to opt out of some.
         #      THOUGHT: should we process cogs first, or acknowledge that cogs will require the host bot to subscribe to Intents on their behalf?
-        super().__init__(command_prefix=when_mentioned_or(prefix),
+        # For now just use the default intents, now that they're required to be explicit in discord.py v2
+        crabbot_intents = discord.Intents.default()
+        super().__init__(intents=crabbot_intents,
+                         command_prefix=when_mentioned_or(prefix),
                          description="Huh, another bot")
         # loop.set_debug(True)  # Set asyncio loop to output more info for debugging
         # self.add_listener(self.on_ready)  # TIL on_ready in a Bot subclass is already registered
 
         self.cogs_update_lists = {}
 
-        # Add default cogs
+        # TODO? Be able to reconfigure this live. Should probably add a function to the cogs too rather than reloading them.
         self.assets_path = assets_path
-        self.add_cog(messages.Messages(assets_path / "messages"))
-
         self.quotes_path = quotes_path
-        self.add_cog(quotes.Quotes(quotes_path))
+
+    async def setup_hook(self):
+        # Add default cogs
+        await self.add_cog(messages.Messages(self.assets_path / "messages"))
+        await self.add_cog(quotes.Quotes(self.quotes_path))
 
     async def on_ready(self):
         login_msg = ('Logged in as {} ({})\n'.format(self.user.name, self.user.id) +
@@ -95,14 +101,14 @@ class CrabBot(DiscordBot):
             cog_function()
             log.info("Updated lists for {}".format(cog_name))
 
-    def add_cog(self, cog):
-        super(CrabBot, self).add_cog(cog)
+    async def add_cog(self, cog):
+        await super(CrabBot, self).add_cog(cog)
         log.info("Added cog {}".format(cog.__class__.__name__))
         if hasattr(cog, "update_lists"):
             self.cogs_update_lists[cog.__class__.__name__] = cog.update_lists
 
-    def remove_cog(self, cog_name):
-        super(CrabBot, self).remove_cog(cog_name)
+    async def remove_cog(self, cog_name):
+        await super(CrabBot, self).remove_cog(cog_name)
         log.info("Removed cog {}".format(cog_name))
         if cog_name in self.cogs_update_lists:
             del self.cogs_update_lists[cog_name]
