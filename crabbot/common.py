@@ -58,6 +58,9 @@ class CrabBot(DiscordBot):
         await self.add_cog(quotes.Quotes(self.quotes_path))
 
     async def on_ready(self):
+        # Register the new cog commands with slash commands
+        await self.tree.sync()
+
         login_msg = ('Logged in as {} ({})\n'.format(self.user.name, self.user.id) +
                      '------')
 

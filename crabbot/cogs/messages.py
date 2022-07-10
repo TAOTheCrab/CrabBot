@@ -6,13 +6,14 @@ from pathlib import Path
 import random
 
 import discord
-from discord.ext.commands import Cog, command, group
+from discord.app_commands import command
+from discord.ext.commands import Cog
 
 from crabbot.common import read_list_file
 
 
 class Messages(Cog):
-    def __init__(self, assets_path):
+    def __init__(self, assets_path : Path):
         self.spam_limit = 100  # Limit for repetitive emotes commands
 
         self.assets_path = Path(assets_path)
@@ -40,112 +41,100 @@ class Messages(Cog):
         # !world
         self.worldwords = read_list_file(self.assets_path / "world-words.txt")
 
-    @command(help='The bots have something to say')
-    async def takeover(self, ctx):
-        await ctx.send("Something something robots")
+    @command(description='The bots have something to say')
+    async def takeover(self, interaction: discord.Interaction):
+        await interaction.response.send_message("Something something robots")
 
-    @command(aliases=['lol'], help='Well, what is this Lords Management then?')
-    async def dota(self, ctx):
+    @command(description='Well, what is this Lords Management then?')
+    async def dota(self, interaction: discord.Interaction):
         moba = random.choice(self.mobas)
-        await ctx.send(f"This is a strange {moba} mod")
+        await interaction.response.send_message(f"This is a strange {moba} mod")
 
-    @command(enabled=True, hidden=True)
-    async def annoy(self, ctx):
-        # TODO anti-spam cooldown (probably a good idea for most commands)
-        await ctx.send("Ho ho ha ha!", tts=True)
-
-    @command(help='For the unruly patron')
-    async def sir(self, ctx):
+    @command(description='For the unruly patron')
+    async def sir(self, interaction: discord.Interaction):
         # Yes, possibly having repeats is intentional, more fun that way
         place_one = random.choice(self.sirplaces)
         place_two = random.choice(self.sirplaces)
-        await ctx.send(f"Sir, this is {place_one}, not {place_two}.")
+        await interaction.response.send_message(f"Sir, this is {place_one}, not {place_two}.")
 
     @command()
-    async def assist(self, ctx):
+    async def assist(self, interaction: discord.Interaction):
         if random.randint(1, 10) == 5:  # 10%
-            await ctx.send("Ok")
+            await interaction.response.send_messagend("Ok")
         else:
-            await ctx.send("Help is transient, and for some reason is not provided here.")
+            await interaction.response.send_message("Help is transient, and for some reason is not provided here.")
 
-    @command(help="👍")
-    async def thumbsup(self, ctx, num='1'):
-        if num not in ('nope', '0'):
-            try:
-                number = int(num)
-                if number > self.spam_limit:
-                    number = self.spam_limit
-            except ValueError:
-                number = 1
-            await ctx.send(f"{ctx.author.mention} {'👍' * number}")
-        else:
-            await ctx.send("Awww")
-
-    @command()
-    async def cake(self, ctx, num='1'):
-        try:
-            number = int(num)
+    @command(description="👍")
+    async def thumbsup(self, interaction: discord.Interaction, number: int = 1):
+        if number > 0:
             if number > self.spam_limit:
                 number = self.spam_limit
-        except ValueError:
-            number = 1
-        reply = [random.choice(self.cakes) for _ in range(abs(int(num)))]
-        await ctx.send(''.join(reply))
 
-    @command(help="Go on a quest!")
-    async def adventure(self, ctx):
-        await ctx.send("Simulating adventure...")
-        async with ctx.typing():
-            await asyncio.sleep(3)  # suspense!
-            if random.randint(1, 10) == 5:  # 10% chance to win
-                reward = random.choice(self.rewards)
-                await ctx.send(f"You win! You got {reward}!")
-            else:  # Ruin!
-                death = random.choice(self.deaths)
-                killer = random.choice(self.killers)
-                location = random.choice(self.locations)
-                await ctx.send(f"You were {death} by {killer} in {location}")
+            await interaction.response.send_message(f"{interaction.user.mention} {'👍' * number}")
+        else:
+            await interaction.response.send_message("Awww")
 
-    @group(help="Need a band name?")
-    async def band(self, ctx):
+    @command()
+    async def cake(self, interaction: discord.Interaction, number: int = 1):
+        if number > self.spam_limit:
+            number = self.spam_limit
+
+        reply = [random.choice(self.cakes) for _ in range(abs(number))]
+        await interaction.response.send_message(''.join(reply))
+
+    @command(description="Go on a quest!")
+    async def adventure(self, interaction: discord.Interaction):
+        await interaction.response.defer(thinking = True)
+        await asyncio.sleep(3)  # suspense!
+        if random.randint(1, 10) == 5:  # 10% chance to win
+            reward = random.choice(self.rewards)
+            await interaction.followup.send(f"You win! You got {reward}!")
+        else:  # Ruin!
+            death = random.choice(self.deaths)
+            killer = random.choice(self.killers)
+            location = random.choice(self.locations)
+            await interaction.followup.send(f"You were {death} by {killer} in {location}")
+
+    # TODO make style optional (/make it a switch. Optional + autocomplete)
+    @command(description="Need a band name?")
+    async def band(self, interaction: discord.Interaction, style : bool = False):
         adjective = random.choice(self.bandadjectives)
         noun = random.choice(self.bandnouns)
         place = random.choice(self.bandplaces)
-        await ctx.send(f"Your new band name is {adjective} {noun} {place}")
+        message = f"Your new band name is {adjective} {noun} {place}"
+        if style:
+            bandstyle = random.choice(self.bandstyles)
+            message += f"\nwhich is a {bandstyle} cover band."
+        await interaction.response.send_message(message)
 
-    @band.command()
-    async def style(self, ctx):
-        style = random.choice(self.bandstyles)
-        await ctx.send(f"which is a {style} cover band.")
-
-    @command(aliases=['world', 'planet'], help="Name a new Land! Thanks, Homestuck!")
-    async def land(self, ctx):
+    @command(description="Name a new Land! Thanks, Homestuck!")
+    async def land(self, interaction: discord.Interaction):
         # Repeat words are OK
         word1 = random.choice(self.worldwords)
         word2 = random.choice(self.worldwords)
         # Might have to watch this one for iffy combos
         abbreviation = f"LO{word1[0]}A{word2[0]}"
-        await ctx.send(f"Land of {word1} and {word2}   ({abbreviation})")
+        await interaction.response.send_message(f"Land of {word1} and {word2}   ({abbreviation})")
 
     # TODO figure out how to make commands with spaces. Probably have to just do SUMMON @group() somehow tho.
-    @command(aliases=['SUMMON THE BEAR'], help="SUMMON THE BEAR")
-    async def BEAR(self, ctx):
+    @command(description="SUMMON THE BEAR")
+    async def bear(self, interaction: discord.Interaction):
         ''' SUMMON THE BEAR '''
 
         # Alt. upload version. Bad for slow upload speeds. Also maybe don't fill Discord with 100s of bear gif files?
         # await ctx.send(file=discord.File(str(self.assets_path / "SUMMONTHEBEAR.gif")))
 
-        emoji_bear = discord.utils.get(ctx.message.guild.emojis, name="bearmoji")
+        emoji_bear = discord.utils.get(interaction.guild.emojis, name="bearmoji")
         # print(f"{type(emoji_bear)} : {emoji_bear}")
         if emoji_bear is None:
             # Fallback unicode bear
             emoji_bear = "🐻"
         
-        await ctx.send(emoji_bear)
+        await interaction.response.send_message(emoji_bear)
 
-    @command(help=("(Sauce by Captain_Siix (Twitter/Twitch))"))
-    async def arc(self, ctx):
+    @command(description=("(Sauce by Captain_Siix (Twitter/Twitch))"))
+    async def arc(self, interaction: discord.Interaction):
         ''' Server in-joke memes. The source file is being kept separately. '''
 
         # Well, screw it, this meme'll work until this link dies, lol. Don't want to upload it every time.
-        await ctx.send("https://cdn.discordapp.com/attachments/452175328148979713/583852441519390740/arc_warden.mp4")
+        await interaction.response.send_message("https://cdn.discordapp.com/attachments/452175328148979713/583852441519390740/arc_warden.mp4")

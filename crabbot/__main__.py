@@ -40,6 +40,7 @@ parser = argparse.ArgumentParser(fromfile_prefix_chars='@', description='A silly
 token_args = parser.add_mutually_exclusive_group(required=True)
 token_args.add_argument('-t', '--token',
                         help="The bot user's login token. Use this or -f.")
+# BUG? I don't really know why this keeps throwing invalid token errors on my Windows machine (with Powershell 7), and debugging this is low priority right now
 token_args.add_argument('-f', '--file', type=argparse.FileType('r'),
                         help="A file with the bot user's login token as the first line. Use this or -t")
 parser.add_argument('-p', '--prefix', default="!crab",
