@@ -40,6 +40,8 @@ class Messages(Cog):
         self.bandstyles = read_list_file(self.assets_path / "band-styles.txt")
         # !world
         self.worldwords = read_list_file(self.assets_path / "world-words.txt")
+        # !newthing
+        self.newthingwords = read_list_file(self.assets_path / "newthing-words.txt")
 
     @command(description='The bots have something to say')
     async def takeover(self, interaction: discord.Interaction):
@@ -138,3 +140,10 @@ class Messages(Cog):
 
         # Well, screw it, this meme'll work until this link dies, lol. Don't want to upload it every time.
         await interaction.response.send_message("https://cdn.discordapp.com/attachments/452175328148979713/583852441519390740/arc_warden.mp4")
+
+    @command(description="Idea of the day")
+    async def newthing(self, interaction: discord.Interaction, who: str = "Muddy"):
+        action = "playing"  # TODO Would like to randomize this, but weighted towards "play" since that's the main idea
+        chosennewthing = random.choice(self.newthingwords)
+        
+        await interaction.response.send_message(f"{who} wants to try {action} {chosennewthing}")
