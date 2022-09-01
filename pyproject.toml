@@ -18,8 +18,7 @@ python = "^3.8"
 
 # NOTE: Because of Discord updates, assume that only the latest version of discord.py works.
 #       This version number mostly denotes when I've *noticed* a breaking change. I usually only test the latest.
-# Currently targeting v2, which is not released yet
-"discord.py" = { git = "https://github.com/Rapptz/discord.py.git", extras = ["voice"] }
+"discord.py" = {version = "~2", extras = ["voice"] }
 
 # There's probably a really old youtube-dl version that doesn't work,
 # but for the most part only the latest version works anyway due to website updates.
