@@ -4,6 +4,7 @@
 import asyncio
 from pathlib import Path
 import random
+from typing import Literal
 
 import discord
 from discord.app_commands import command
@@ -97,14 +98,16 @@ class Messages(Cog):
             location = random.choice(self.locations)
             await interaction.followup.send(f"You were {death} by {killer} in {location}")
 
-    # TODO make style optional (/make it a switch. Optional + autocomplete)
+    # NOTE style is left over from when band was a test of Group subcommands, moreso than an actual good idea (thus it is default now).
+    #      I thought maybe the Literal transformer would cause Discord to present it similarly (it doesn't, but you can at least type style if you want now), 
+    #      but it does open the possibility of having style modifiers, so this awkward version will stay as an example
     @command(description="Need a band name?")
-    async def band(self, interaction: discord.Interaction, style : bool = False):
+    async def band(self, interaction: discord.Interaction, style : Literal["style", "none"] = "style"):
         adjective = random.choice(self.bandadjectives)
         noun = random.choice(self.bandnouns)
         place = random.choice(self.bandplaces)
         message = f"Your new band name is {adjective} {noun} {place}"
-        if style:
+        if style == "style":
             bandstyle = random.choice(self.bandstyles)
             message += f"\nwhich is a {bandstyle} cover band."
         await interaction.response.send_message(message)
