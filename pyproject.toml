@@ -29,7 +29,7 @@ python = "^3.8"
 
 [tool.poetry.extras]
 # Semi-incomplete due to extras issue.
-voice = ["discord.py[voice]", "youtube-dl"]
+#voice = ["discord.py[voice]", "youtube-dl"]
 aiohttpspeedups = ["aiohttp"]
 
 [tool.poetry.dev-dependencies]
