@@ -102,7 +102,10 @@ def poll_terminal():
     # TODO function dict instead of if/elif.
 
     while True:  # Run thread as daemon, so Python will exit despite this loop
-        term_input = input()
+        try:
+            term_input = input()
+        except EOFError: # Silence exception on Ctrl+C
+            return
         if term_input == "help":
             # TODO write help for the terminal commands
             print("Uh, no. I'm gonna be annoying instead.")
