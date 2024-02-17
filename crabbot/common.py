@@ -46,7 +46,7 @@ class CrabBot(DiscordBot):
         # loop.set_debug(True)  # Set asyncio loop to output more info for debugging
         # self.add_listener(self.on_ready)  # TIL on_ready in a Bot subclass is already registered
 
-        self.cogs_update_lists = {}
+        self.cogs_update_lists: dict = {}
 
         # TODO? Be able to reconfigure this live. Should probably add a function to the cogs too rather than reloading them.
         self.assets_path = assets_path

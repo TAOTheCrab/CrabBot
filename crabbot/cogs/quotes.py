@@ -36,9 +36,9 @@ class Quotes(GroupCog):
         self.quotes_db_cursor.close()
         self.quotes_db_connection.close()
 
-    @command(description=("Grab a quote."
+    @command(description=("Grab a quote."  # type: ignore
                           'If no name is given, a random quote is printed'))
-    async def quote(self, interaction: discord.Interaction, name : str =None):
+    async def quote(self, interaction: discord.Interaction, name : str|None = None):
         # TODO consider using name.lower() to standardize input. Or some kind of fuzzy matching.
 
         self.quotes_db_cursor.execute("SELECT DISTINCT author FROM quotes")
@@ -66,7 +66,7 @@ class Quotes(GroupCog):
         else:
             await interaction.response.send_message(f"No quotes from {name}.")
 
-    @command(description='List all authors of recorded quotes')
+    @command(description='List all authors of recorded quotes') # type: ignore
     async def authors(self, interaction: discord.Interaction):
         self.quotes_db_cursor.execute("SELECT DISTINCT author FROM quotes "
                                       "ORDER BY author COLLATE NOCASE")
@@ -75,7 +75,7 @@ class Quotes(GroupCog):
 
         await interaction.response.send_message(";  ".join(authors))
 
-    @command(description='Search for a random quote with the given string in it.\n')
+    @command(description='Search for a random quote with the given string in it.\n') # type: ignore
     async def search(self, interaction: discord.Interaction, query: str):
         ''' Get a random quote containing the word-for-word query in it'''
         # LIKE is case-insensitive for ASCII-range letters only.
@@ -93,7 +93,7 @@ class Quotes(GroupCog):
         else:
             await interaction.response.send_message(f"{quote[1]} \n  —{quote[0]}")
 
-    @command(description='Add a quote.\n')
+    @command(description='Add a quote.\n')  # type: ignore
     async def add(self, interaction: discord.Interaction, name: str, quote: str):
         # TODO Would kind of like to number quote for reference purposes.
         # TODO? allow use of @User id numbers instead of hardcoded names
