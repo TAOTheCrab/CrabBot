@@ -1,6 +1,8 @@
 CrabBot
 =======
 
+NOTE: I haven't been actively running this lately due to losing its dedicated server, so I'm not sure what's broken by Discord changes. Please file an issue if needed.
+
 Silly Discord bot for funsies
 
 Mostly prints funny messages in reply to commands, with some additional voice functionality
@@ -24,11 +26,11 @@ By default, use !crabhelp or "@\*botname\* help" to see a list of visible comman
 
 Requires:
 
-- `discord.py <https://github.com/Rapptz/discord.py>`__ v1.0+
+- `discord.py <https://github.com/Rapptz/discord.py>`__ v2.0+
 
-- Python 3.6+ (uses `f-strings <https://docs.python.org/3/reference/lexical_analysis.html#f-strings>`__, can be edited for 3.5)
+- Python 3.8+
 
-For voice (module will automatically be disabled if dependencies are missing):
+~~For voice~~ CURRENTLY DISABLED - Not converted to discord.py v2 yet (module will automatically be disabled if dependencies are missing):
 
 - ``discord.py[voice]``
 - ``youtube-dl`` (for stream command)
