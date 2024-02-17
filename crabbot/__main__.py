@@ -18,7 +18,8 @@ import sys
 from tempfile import gettempdir  # for PID file (for easier service management)
 from threading import Thread
 
-import pkg_resources # Allows us to access assets from a package as a default
+import importlib.resources # Allows us to access assets from a package as a default
+from contextlib import ExitStack # Needed to replicate pkg_resources usage in importlib
 
 import crabbot.common
 try:
@@ -35,6 +36,11 @@ pidfile = Path(gettempdir() + '/CrabBot.pid')  # eg. so systemd's PIDFile can fi
 with open(pidfile, 'w') as temppidfile:
     temppidfile.write(pid)
 
+# Load the default paths
+pkg_resources_manager = ExitStack()
+pkg_assets = importlib.resources.files(__name__) / 'assets'
+pkg_memes = importlib.resources.files(__name__) / 'assets/memes'
+
 # Do argparse first so that -h can print and exit before anything else happens
 parser = argparse.ArgumentParser(fromfile_prefix_chars='@', description='A silly Discord bot')
 token_args = parser.add_mutually_exclusive_group(required=True)
@@ -46,9 +52,9 @@ token_args.add_argument('-f', '--file', type=argparse.FileType('r'),
 parser.add_argument('-p', '--prefix', default="!crab",
                     help="Command prefix the bot responds to")
 # The default is to grab the assets from its own distribution
-parser.add_argument('--assets-path', type=Path, default=Path(pkg_resources.resource_filename(__name__, 'assets')),
+parser.add_argument('--assets-path', type=Path, default=None, # None is used to determine if we need to load package resources
                     help="Path for general assets (ex. sir-places.txt)")
-parser.add_argument('--memes-path', type=Path, default=Path(pkg_resources.resource_filename(__name__, 'assets/memes')),
+parser.add_argument('--memes-path', type=Path, default=None, # None is used to determine if we need to load package resources
                     help="Path for memes audio clips (and its filelist.txt)")
 parser.add_argument('--quotes-path', type=Path, default=Path('.'),  # NOTE we write to this location, be careful where you put it
                     help="Path containing the quotes database. Will create quotes.sqlite3 if it does not exist.")
@@ -80,6 +86,11 @@ if args.file is not None:
 else:
     login = args.token
 
+if (args.assets_path is None):
+    pkg_assets_path = pkg_resources_manager.enter_context(
+        importlib.resources.as_file(pkg_assets)
+    )
+    args.assets_path = pkg_assets_path
 
 # Initializing early so poll_terminal can refer to it. Otherwise it is kind of a poor grouping of control flow.
 bot = crabbot.common.CrabBot(prefix=args.prefix, 
@@ -121,6 +132,10 @@ input_thread.start()
 ''' DISABLING TO FOCUS ON OTHER ASPECTS OF v2 MIGRATION. Need to add signaling to CrabBot to have it add the cog now that it has to be await-ed
 # Example of adding a cog to CrabBot outside of CrabBot's init (...also voice is the iffiest module)
 # Comment out import of voice to completely disable voice commands
+if (args.memes_path is None):
+    pkg_memes_path = pkg_resources_manager.enter_context(
+        importlib.resources.as_file(pkg_memes)
+    )
 if "crabbot.cogs.voice" in sys.modules and args.disable_voice is False:
     bot.add_cog(crabbot.cogs.voice.Voice(bot.loop, args.memes_path, args.use_libav))
 '''
@@ -135,8 +150,8 @@ logging.info("CrabBot has recieved a SIGINT and has now exited as intended\n" +
              "————— CrabBot exited at " + str(datetime.datetime.now()))
 print("CrabBot says goodbye")
 
-# Remove ResourceManager caches
-pkg_resources.cleanup_resources()
+# Cleanup any importlib pkg files
+pkg_resources_manager.close()
 
 # Cleanup pidfile
 try:
