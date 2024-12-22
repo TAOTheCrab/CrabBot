@@ -11,7 +11,7 @@ import random
 
 from discord import FFmpegPCMAudio, PCMVolumeTransformer
 from discord.ext.commands import Cog, command, CommandError
-import youtube_dl
+from yt_dlp import YoutubeDL
 
 from crabbot.common import read_list_file
 
@@ -35,8 +35,6 @@ ffmpeg_options = {
     'options': '-vn'
 }
 
-ytdl = youtube_dl.YoutubeDL(ytdl_format_options)
-
 class YTDLSource(PCMVolumeTransformer):
     def __init__(self, source, *, data, volume=0.5):
         super().__init__(source, volume)
@@ -48,14 +46,15 @@ class YTDLSource(PCMVolumeTransformer):
 
     @classmethod
     async def from_url(cls, url, *, loop=None, stream=False, executable='ffmpeg'):
-        loop = loop or asyncio.get_event_loop()
-        data = await loop.run_in_executor(None, lambda: ytdl.extract_info(url, download=not stream))
+        with YoutubeDL(ytdl_format_options) as ytdl:
+            loop = loop or asyncio.get_event_loop()
+            data = await loop.run_in_executor(None, lambda: ytdl.extract_info(url, download=not stream))
 
-        if 'entries' in data:
-            # take first item from a playlist
-            data = data['entries'][0]
+            if 'entries' in data:
+                # take first item from a playlist
+                data = data['entries'][0]
 
-        filename = data['url'] if stream else ytdl.prepare_filename(data)
+            filename = data['url'] if stream else ytdl.prepare_filename(data)
         return cls(FFmpegPCMAudio(filename, executable=executable, **ffmpeg_options), data=data)
 """ End discord.py examples/basic_voice.py copied code block """
 

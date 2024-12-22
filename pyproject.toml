@@ -20,16 +20,16 @@ python = "^3.8"
 #       This version number mostly denotes when I've *noticed* a breaking change. I usually only test the latest.
 "discord.py" = {version = "~2", extras = ["voice"] }
 
-# There's probably a really old youtube-dl version that doesn't work,
+# There's probably a really old yt-dlp version that doesn't work,
 # but for the most part only the latest version works anyway due to website updates.
-"youtube-dl" = {version = "*", optional = true}
+"yt-dlp" = {version = "*", optional = true}
 
 # Duplicate discord.py's aiohttp requirement so we can enable speedups extra
 "aiohttp" = {version = "~3", extras = ["speedups"], optional = true}
 
 [tool.poetry.extras]
 # Semi-incomplete due to extras issue.
-#voice = ["discord.py[voice]", "youtube-dl"]
+#voice = ["discord.py[voice]", "yt-dlp"]
 aiohttpspeedups = ["aiohttp"]
 
 [tool.poetry.dev-dependencies]
