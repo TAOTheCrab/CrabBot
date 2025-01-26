@@ -1,39 +1,35 @@
-[tool.poetry]
+[project]
 name = "crabbot"
 version = "0.2.0"
 description = "Silly Discord bot for funsies"
-authors = ["TAOTheCrab <taothecrab@gmail.com>"]
+authors = [{ name = "Jeffrey Owens", email = "TAOTheCrab <taothecrab@gmail.com>" }]
 license = "MIT"
-homepage = "https://github.com/TAOTheCrab/CrabBot"
-
-[tool.poetry.dependencies]
 # NOTE: Waiting on 3.9 for logging.basicConfig(encoding=)
 # discord.py currently targets >=3.8. The latest feature we use directly I believe is just 3.6's f-strings.
-python = "^3.8"
+requires-python = ">=3.8"
+dependencies = [
+    # I would like to optionally depend on discord.py[voice] since we have guards for voice,
+    # but I can't figure out if optionally depending on a required dep's extras is possible.
+    #   - discord.py[voice] depends on PyNaCL==1.3.0, and native libraries `libopus` and 'ffmpeg'/'avconv'
+    #     although I would like to depend on their extras_require if I can help it.
 
-# I would like to optionally depend on discord.py[voice] since we have guards for voice,
-# but I can't figure out if optionally depending on a required dep's extras is possible.
-#   - discord.py[voice] depends on PyNaCL==1.3.0, and native libraries `libopus` and 'ffmpeg'/'avconv'
-#     although I would like to depend on their extras_require if I can help it.
+    # NOTE: Because of Discord updates, assume that only the latest version of discord.py works.
+    #       This version number mostly denotes when I've *noticed* a breaking change. I usually only test the latest.
+    "discord.py[voice] (>=2, <3)"
+]
 
-# NOTE: Because of Discord updates, assume that only the latest version of discord.py works.
-#       This version number mostly denotes when I've *noticed* a breaking change. I usually only test the latest.
-"discord.py" = {version = "~2", extras = ["voice"] }
+[project.urls]
+repository = "https://github.com/TAOTheCrab/CrabBot"
 
-# There's probably a really old yt-dlp version that doesn't work,
-# but for the most part only the latest version works anyway due to website updates.
-"yt-dlp" = {version = "*", optional = true}
-
-# Duplicate discord.py's aiohttp requirement so we can enable speedups extra
-"aiohttp" = {version = "~3", extras = ["speedups"], optional = true}
-
-[tool.poetry.extras]
+[project.optional-dependencies]
 # Semi-incomplete due to extras issue.
 #voice = ["discord.py[voice]", "yt-dlp"]
-aiohttpspeedups = ["aiohttp"]
-
-[tool.poetry.dev-dependencies]
+# Duplicate discord.py's aiohttp requirement so we can enable speedups extra
+aiohttpspeedups = ["aiohttp[speedups] (>=3.7.4, <4)"]
+# There's probably a really old yt-dlp version that doesn't work,
+# but for the most part only the latest version works anyway due to website updates.
+ytdlp = ["yt-dlp"]
 
 [build-system]
-requires = ["poetry>=0.12"]
+requires = ["poetry>=2.0"]
 build-backend = "poetry.masonry.api"
